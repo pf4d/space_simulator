@@ -1,0 +1,230 @@
+\input{functions.tex}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\begin{document}
+\small
+
+\title{Project 02}
+\author{Evan Cummings and Joshua Bartz\\
+CSCI 576 - Human Computer Interaction}
+
+\maketitle
+
+\section*{Description}
+
+For our project idea, we would like to develop a 3D rendered engine via Python's interface to OpenGL.  As it stands, we have a 3D particle simulation and an efficient way to calculate forces between particles and such.  From this simulation, we would first like to create a space simulator - complete with gravity between planets and other space bodies and thrusters on the spacecraft which create rotational and directional momentum.  With the addition of a rear engine and front braking thrusters, this would effectively simulate a real space craft.  
+
+Once the thruster part of the engine has been created, it would be interesting to add a missile with the same thruster system which could seek out and destroy asteroids or other space objects which may be in the spacecraft's way.  Next, multiplayer could be developed where two opponents might chase each other through an asteroid field or planetary system by following some kind of particle trail.  
+
+Long-term development outside of the scope of this class includes random generation of planetary systems from a series of differential equation solvers which the user will run in the background.  These simulations may take several hours to complete, but will allow the user to explore these new planetary systems with their spacecraft.  From here, it would be interesting to add the option for planetary evolution, i.e., randomly generated atmosphere, oceans, and mountain ranges.  The user may then enter the atmosphere with their spacecraft, complete with physics calculations and potential failure.  This is a major highlight of the game as it would allow the user to generate and explore an entire solar system, all with the power of their home PC.  In a sense this would be similar to entering into the computer's imagination, a completely unique experience.
+
+\subsection*{Intended users}
+
+The intended users of the system are:
+
+\begin{enumerate}
+
+  \item Anyone who enjoys flying is space.
+
+  \item People who enjoy the experience of speed.
+
+  \item People who enjoy competition.
+
+  \item Anyone interested in the physics of space.
+
+  \item People looking for a casual low-stress game.
+
+  \item People looking for a high-stress challenge.
+
+  \item People looking for a quick game.
+
+  \item People who enjoy wasting an entire day playing one game because it is so good.
+
+  \item People looking for a game they never tire of.
+
+  \item People who enjoy watching things explode.
+
+  \item People who wonder what it would be like to fire a rocket in space.
+
+  \item People who are technically-minded.
+
+  \item People who just want to have a good time.
+
+  \item Anyone who enjoys wireframe rendered 3D games.
+
+  \item People looking to escape from reality.
+
+  \item People who always wanted to be a space-person when they grew up but never could.
+
+  \item Old people.
+
+  \item Young people.
+
+  \item People who do not enjoy excessive violence in a video game.
+
+  \item Parents.
+
+  \item Males.
+
+  \item Females.
+
+  \item Hermaphrodites.
+
+  \item People who like flashing lights and colors that dazzle the senses.
+
+  \item People with a computer.
+
+  \item People who just don't care.
+
+\end{enumerate}
+
+\subsection*{Usability requirements}
+
+The non-functional requirements for this game will be:
+
+\vspace{4mm}
+The game will be
+\begin{enumerate}
+
+  \item fun,
+
+  \item relatively easy to learn,
+
+  \item realistic,
+
+  \item rewarding,
+
+  \item challenging,
+  
+  \item artistic,
+  
+  \item innovative,
+  
+  \item visually pleasing,
+  
+  \item surprising,
+  
+  \item informative,
+  
+  \item educational,
+  
+  \item awe inspiring,
+  
+  \item worth paying money for,
+  
+  \item able to make the \emph{user} feel artistic,
+  
+  \item full of infinite possibilities,
+
+  \item replayable,
+
+  \item affordable,
+
+  \item a good gift for a special person,
+
+  \item easily executable from an PC created within the last decade,
+
+  \item and notable.
+
+\end{enumerate}
+
+\subsection*{Functional requirements}
+
+The users of the game should be able to
+
+\begin{enumerate}
+
+  \item fly a spaceship,
+
+  \item dodge space debris,
+
+  \item orientate the spacecraft 360 degrees,
+
+  \item rotate the spacecraft 360 degrees,
+
+  \item move the spacecraft side to side,
+
+  \item stop the spacecraft from accelerating, 
+  
+  \item reduce the speed of the spacecraft, 
+
+  \item control the thrust of the main engine,
+
+  \item avoid the gravitational pull of planets and asteroids, 
+
+  \item visually see their current speed and acceleration,
+
+  \item have a map and a way to navigate,
+
+  \item control the craft with a mouse and keyboard,
+
+  \item control the craft with a joystick,
+
+  \item adjust the sensitivities of the mouse or joystick,
+
+  \item invert either axis of input for the mouse or joystick,
+
+  \item choose from a menu to start or stop a game or configure settings,
+
+  \item scale the game's complexity to increase the framerate of the game,
+
+  \item display the framerate of the game,
+
+  \item choose from several different spaceships with different attributes,
+
+  \item customize their own spacecraft from attributes, i.e., speed, maneuverability, or color,
+
+  \item select from a list of rendering effects to increase framerate,
+
+  \item and have a really good time, no matter what.
+
+\end{enumerate}
+
+\section*{Design critique 1 feedback}
+
+\begin{itemize}
+  \item \emph{Provide a goal other than simply flying around in space.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{We plan on implementing an obstacle course and entering into orbit around a planet.  We will also be able to launch missiles at space debris and learn about space and physics.  Also, the challenge with the simulator lies in simply avoiding collisions with planets and other space debris.}
+
+  \item \emph{Include a clear navigation system.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{We will indicate the current speed, direction, and acceleration of the spacecraft in a corner of the screen, as well as a compass.  Also, tiny particles will be included to give the player a sense of speed as they move through empty space.}
+
+  \item \emph{Show the player statistics of the space vehicle such as speed.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{New statistics and feedback options need to be explored.}
+
+  \item \emph{Provide player customizations for the spacecraft.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{We would like to allow the user to apply attributes to the craft such as maximum speed and maneuverability.}
+
+  \item \emph{Make it possible to scale the difficulty and realism.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{We would like to scale the size of the space to render and quality of visual effects, as well as a `simulator' mode providing the most realistic space movement and `arcade' mode with simplified controls.}
+
+  \item \emph{Explicitly educate the players on the physics of space.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{Ideas for this include Nebula color changes to particles as they gain kinetic and potential energy with a colorbar which indicates current energy in Joules.  Also, we would like to show the player a path which places the spacecraft in orbit around a planet or star.  This will include a visual indicator of direction and speed.}
+
+  \item \emph{Challenge the player to put their spacecraft into orbit around a planet.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{Rings may be included which the player could use to guide the spacecraft through while increasing or decreasing speed in order to obtain a stable orbit.}
+
+  \item \emph{Model the known solar system.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{In the time scales relevant to our game, this may be a challenge.  We have discussed increasing time and providing near- or at-light speed travel.  The physics of the planets may also be included in this simulation with gravitational forces acting between each planet and the spacecraft.}
+
+  \item \emph{Allow the user to launch probes into space to investigate other systems.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{While an interesting idea, the expanse of space would be difficult to model within the course of the class, but if there was an efficient way to randomly generate these other systems, this is an interesting option.}
+
+  \item \emph{Provide a ``missile cam'' to guide missiles through obstacles.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{Totally cool -- If we have time, this will be included.}
+
+\end{itemize}
+
+\end{document}
+
+
