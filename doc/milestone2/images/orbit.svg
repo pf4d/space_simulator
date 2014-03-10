@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="orbit.svg"
+   inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/orbit.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="267.115"
+     inkscape:cy="635.70375"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:snap-grids="false"
+     inkscape:snap-center="false"
+     inkscape:object-paths="false"
+     inkscape:snap-nodes="true"
+     inkscape:snap-smooth-nodes="false"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-global="false"
+     inkscape:window-width="1359"
+     inkscape:window-height="974"
+     inkscape:window-x="177"
+     inkscape:window-y="127"
+     inkscape:window-maximized="0"
+     showborder="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2987"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+    <sodipodi:guide
+       position="0,0"
+       orientation="0,744.09448"
+       id="guide3089" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="30"
+       sodipodi:ry="35"
+       d="m 630,287.36218 a 30,35 0 1 1 -60,0 30,35 0 1 1 60,0 z"
+       transform="translate(70.913732,85.507627)"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(1,0,0,-1,41.382912,758.36398)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-7-1"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="19.091373"
+       sodipodi:ry="35"
+       d="m 619.09137,287.36218 a 19.091373,35 0 1 1 -38.18274,0 19.091373,35 0 1 1 38.18274,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(1,0,0,-1,-143.12688,870.232)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-4-9"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="5.9593897"
+       sodipodi:ry="35"
+       d="m 605.95939,287.36218 a 5.9593897,35 0 1 1 -11.91878,0 5.9593897,35 0 1 1 11.91878,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(1,0,0,-1,-245.04566,880.23199)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-4-9-1"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="0.95938969"
+       sodipodi:ry="35"
+       d="m 600.95939,287.36218 a 0.95938969,35 0 1 1 -1.91878,0 0.95938969,35 0 1 1 1.91878,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="translate(41.151392,-2.2164527)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-7-1-4"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="19.091373"
+       sodipodi:ry="35"
+       d="m 619.09137,287.36218 a 19.091373,35 0 1 1 -38.18274,0 19.091373,35 0 1 1 38.18274,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="translate(-37.145188,-69.084463)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-8-5-8"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="12.827407"
+       sodipodi:ry="35"
+       d="m 591.31626,261.60175 a 12.827407,35 0 0 1 21.50489,26.85378"
+       sodipodi:start="3.9687536"
+       sodipodi:end="6.3144289"
+       sodipodi:open="true"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-8"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="30"
+       sodipodi:ry="35"
+       d="m 630,287.36218 a 30,35 0 1 1 -60,0 30,35 0 1 1 60,0 z"
+       transform="matrix(-1,0,0,1,631.40586,90.569983)"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(-1,0,0,-1,660.93668,763.42634)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-7-1-6"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="19.091373"
+       sodipodi:ry="35"
+       d="m 619.09137,287.36218 a 19.091373,35 0 1 1 -38.18274,0 19.091373,35 0 1 1 38.18274,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(-1,0,0,-1,845.4465,875.29436)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-4-9-9"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="5.9593897"
+       sodipodi:ry="35"
+       d="m 605.95939,287.36218 a 5.9593897,35 0 1 1 -11.91878,0 5.9593897,35 0 1 1 11.91878,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(-1,0,0,1,661.1682,2.8459013)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-7-1-4-7"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="19.091373"
+       sodipodi:ry="35"
+       d="m 619.09137,287.36218 a 19.091373,35 0 1 1 -38.18274,0 19.091373,35 0 1 1 38.18274,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(-1,0,0,1,739.46478,-64.022103)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-8-5-8-1"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="12.827407"
+       sodipodi:ry="35"
+       d="m 593.28614,257.53913 a 12.827407,35 0 0 1 19.40874,24.80485"
+       sodipodi:start="4.1615528"
+       sodipodi:end="6.1393123"
+       sodipodi:open="true"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3011"
+       sodipodi:cx="355"
+       sodipodi:cy="407.36218"
+       sodipodi:rx="275"
+       sodipodi:ry="275"
+       d="m 630,407.36218 a 275,275 0 1 1 -550,0 275,275 0 1 1 550,0 z"
+       transform="translate(-4.0862675,-29.492373)"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(1,0,0,-1,-36.913678,825.232)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-8-5"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="12.827407"
+       sodipodi:ry="35"
+       d="m 612.82741,287.36218 a 12.827407,35 0 1 1 -25.65482,0 12.827407,35 0 1 1 25.65482,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#ff0000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:12, 12;stroke-dashoffset:0"
+       id="path3087"
+       sodipodi:cx="547.50269"
+       sodipodi:cy="352.32648"
+       sodipodi:rx="321.22852"
+       sodipodi:ry="216.23212"
+       d="m 784.14117,206.09831 a 321.22852,216.23212 0 1 1 -473.23258,-0.0325"
+       transform="translate(-196.58896,25.543333)"
+       sodipodi:start="5.5405176"
+       sodipodi:end="10.16765"
+       sodipodi:open="true"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       transform="matrix(-1,0,0,-1,739.23327,830.29436)"
+       sodipodi:type="arc"
+       style="fill:#1c241f;fill-opacity:0;stroke:#d0cd35;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3013-8-5-7"
+       sodipodi:cx="600"
+       sodipodi:cy="287.36218"
+       sodipodi:rx="12.827407"
+       sodipodi:ry="35"
+       d="m 612.82741,287.36218 a 12.827407,35 0 1 1 -25.65482,0 12.827407,35 0 1 1 25.65482,0 z"
+       inkscape:export-filename="/home/pf4d/Documents/space_simulator/doc/milestone2/images/planet.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+  </g>
+</svg>
