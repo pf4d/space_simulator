@@ -22,6 +22,7 @@ Long-term development outside of the scope of this class includes random generat
 
 The intended users of the system are:
 
+\begin{multicols}{2}
 \begin{enumerate}
 
   \item Anyone who enjoys flying is space.
@@ -67,6 +68,7 @@ The intended users of the system are:
   \item People with a computer.
 
 \end{enumerate}
+\end{multicols}
 
 \subsection*{Usability requirements}
 
@@ -74,6 +76,8 @@ The non-functional requirements for this game will be:
 
 \vspace{4mm}
 The game will be
+
+\begin{multicols}{2}
 \begin{enumerate}
 
   \item fun,
@@ -117,6 +121,7 @@ The game will be
   \item and notable.
 
 \end{enumerate}
+\end{multicols}
 
 \subsection*{Functional requirements}
 
@@ -124,31 +129,22 @@ The game will be
 
 The users of the game should be able to
 
+\begin{multicols}{2}
 \begin{enumerate}
 
   \item navigate easily between menus and the game screen,
 
-  \item view the controls before starting a game,
+  \item configure the controls,
 
-  \item start a game,
+  \item pause the game and return to the main menu,
 
-  \item pause the game,
-
-  \item exit back to the main menu,
-
-  \item aim by moving a targeting reticule,
-
-  \item fly a spaceship,
-
-  \item orientate the spacecraft 360 degrees,
+  \item fly the spaceship,
 
   \item rotate the spacecraft 360 degrees,
 
   \item move the spacecraft side to side,
 
-  \item stop the spacecraft from accelerating, 
-  
-  \item reduce the speed of the spacecraft, 
+  \item change the speed of the spacecraft in all directions, 
 
   \item control the thrust of the main engine,
 
@@ -159,16 +155,20 @@ The users of the game should be able to
   \item choose from a menu to start or stop a game or configure settings,
 
 \end{enumerate}
+\end{multicols}
 
 \noindent \textbf{Medium priority:}
 
 The users of the game should be able to
 
+\begin{multicols}{2}
 \begin{enumerate}
 
   \item avoid the gravitational pull of planets and asteroids, 
 
   \item have a map and a way to navigate,
+
+  \item aim by moving a targeting reticule,
 
   \item know their distance from their selected destination,
 
@@ -178,19 +178,21 @@ The users of the game should be able to
 
   \item invert either axis of input for the mouse or joystick,
 
+  \item fly through a nebula and see color changes related to velocity,
+
 \end{enumerate}
+\end{multicols}
 
 \noindent \textbf{Low priority:}
 
 The users of the game should be able to
 
+\begin{multicols}{2}
 \begin{enumerate}
 
   \item dodge space debris,
 
   \item see on-screen vectors for moving objects,
-
-  \item fly through a nebula and see color changes related to velocity,
 
   \item fly through rings that guide the ship into orbit of a planet,
 
@@ -205,6 +207,7 @@ The users of the game should be able to
   \item select from a list of rendering effects to increase framerate,
 
 \end{enumerate}
+\end{multicols}
 
 \section*{Design critique 1 feedback}
 
@@ -248,8 +251,68 @@ The users of the game should be able to
   \item \emph{Provide a ``missile cam'' to guide missiles through obstacles.}
         
         \textbf{Decision : } \parbox[t]{5in}{Totally cool -- If we have time, this will be included.}
-
 \end{itemize}
+
+\section*{Menus}
+
+The menu system has been adapted from Josh's design crit one and uses a common video game configuration with buttons accessed with the mouse or joystick.  An explanation of the individual screens are presented below.
+
+\subsection*{Menu storyboards}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/01-start.png}
+  \caption{Start screen upon initialization.  From here the player may either start a new game, load an existing game, edit the configuration of the game, or exit.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/02-load.png}
+  \caption{Load screen enabling a player to load a previously-saved game.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/03-pause.png}
+  \caption{Pause screen accessed at any time by pressing the ``esc'' key.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/04-save.png}
+  \caption{Save screen.  The player can name the save game and press ``save'' to save.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/05-config.png}
+  \caption{Config for global settings with access to control config screens.  The player clicks on the parameter which increments the setting.  Once any setting has been changed, nothing more is required of the player.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/06-mouse_config.png}
+  \caption{Mouse config, the user may select from a list of logical actions for both left and right buttons.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/07-joystick_config.png}
+  \caption{Joystick config.  User may set the button by pressing the desired joystick button or moving the joystick in a particular direction.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/08-keyboard_config.png}
+  \caption{Keyboard config.  User may set the button by pressing the desired key.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/09-exit.png}
+  \caption{Exit screen confirms the player's desire to exit the program.}
+\end{figure}
+
 
 \end{document}
 
