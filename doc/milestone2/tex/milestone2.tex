@@ -208,15 +208,23 @@ The users of the game should be able to
 \section*{Design critique 1 feedback}
 
 \subsection*{Evan's feedback:}
-
+\subsubsection*{Cosmetic:}
 \begin{itemize}
-  \item \emph{Provide a goal other than simply flying around in space.}
+
+  \item \emph{Model the known solar system.}
         
-        \textbf{Decision : } \parbox[t]{5in}{We plan on implementing an obstacle course and entering into orbit around a planet.  We will also be able to launch missiles at space debris and learn about space and physics.  Also, the challenge with the simulator lies in simply avoiding collisions with planets and other space debris.}
+        \textbf{Decision : } \parbox[t]{5in}{In the time scales relevant to our game, this may be a challenge.  We have discussed increasing time and providing near- or at-light speed travel.  The physics of the planets may also be included in this simulation with gravitational forces acting between each planet and the spacecraft.}
 
   \item \emph{Include a clear navigation system.}
         
         \textbf{Decision : } \parbox[t]{5in}{We will indicate the current speed, direction, and acceleration of the spacecraft in a corner of the screen, as well as a compass.  Also, tiny particles will be included to give the player a sense of speed as they move through empty space.}
+\end{itemize}
+
+\subsubsection*{Functionality:}
+\begin{itemize}
+  \item \emph{Provide a goal other than simply flying around in space.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{We plan on implementing an obstacle course and entering into orbit around a planet.  We will also be able to launch missiles at space debris and learn about space and physics.  Also, the challenge with the simulator lies in simply avoiding collisions with planets and other space debris.}
 
   \item \emph{Show the player statistics of the space vehicle such as speed.}
         
@@ -238,10 +246,6 @@ The users of the game should be able to
         
         \textbf{Decision : } \parbox[t]{5in}{Rings may be included which the player could use to guide the spacecraft through while increasing or decreasing speed in order to obtain a stable orbit.}
 
-  \item \emph{Model the known solar system.}
-        
-        \textbf{Decision : } \parbox[t]{5in}{In the time scales relevant to our game, this may be a challenge.  We have discussed increasing time and providing near- or at-light speed travel.  The physics of the planets may also be included in this simulation with gravitational forces acting between each planet and the spacecraft.}
-
   \item \emph{Allow the user to launch probes into space to investigate other systems.}
         
         \textbf{Decision : } \parbox[t]{5in}{While an interesting idea, the expanse of space would be difficult to model within the course of the class, but if there was an efficient way to randomly generate these other systems, this is an interesting option.}
@@ -252,6 +256,107 @@ The users of the game should be able to
 \end{itemize}
 
 \subsection*{Josh's feedback:}
+\subsubsection*{Cosmetic:}
+\begin{itemize}
+  \item \emph{Change unit of measurement for distance.}
+        
+        \textbf{Decision : } \parbox[t]{5in}{Lightyears will be used in the next design. However, using miles or kilometers with scientific notation may be more appropriate}
+
+  \item \emph{Add a load screen while the universe builds.}
+
+        \textbf{Decision : } \parbox[t]{5in}{Some form of feedback is definitely required. An appropriate decision can be reached when the actual load time is known.}
+
+  \item \emph{Add a thrust bar for acceleration feedback.}
+
+        \textbf{Decision : } \parbox[t]{5in}{This should absolutely be implemented.}
+
+  \item \emph{Provide more help for navigating the map.}
+
+        \textbf{Decision : } \parbox[t]{5in}{Yes, it definitely needs to be more clear, especially for the different control schemes.}
+
+  \item \emph{Use the real universe.}
+
+        \textbf{Decision : } \parbox[t]{5in}{While this is would be a great option to have, it is probably beyond the scope of what we can accomplish in a semester.}
+\end{itemize}
+
+\subsubsection*{Functionality:}
+\begin{itemize}
+  \item \emph{Add educational attributes for teaching physics.}
+
+        \textbf{Decision : } \parbox[t]{5in}{I would love to implement some educational aspects. While I don't believe it will be the main purpose of the game, some options should be considered.}
+
+  \item \emph{Show trajectory and vector changes for moving objects.}
+
+        \textbf{Decision : } \parbox[t]{5in}{This is one of the educational features I'd like to attempt.}
+
+  \item \emph{If a player finishes a level, provide them with some educational information. Then, if they die, ask them to enter that information for the purpose of education.}
+
+        \textbf{Decision : } \parbox[t]{5in}{While this is an interesting idea, I don't intend for this to be a question and answer game.}
+
+  \item \emph{Add a tutorial to introduce the vector controls.}
+
+        \textbf{Decision : } \parbox[t]{5in}{This is a great idea. I'd like it to be a low priority functional requirement.}
+
+  \item \emph{Use rings to help a player steer the ship into orbit around a planet.}
+
+        \textbf{Decision : } \parbox[t]{5in}{This was my favorite feedback idea, and I would definitely try to put it in the game.}
+
+  \item \emph{Be able to save and load a game.}
+
+        \textbf{Decision : } \parbox[t]{5in}{This should be a part of most PC games, so I think an effort should be made to include it.}
+
+  \item \emph{Fast travel between locations.}
+
+        \textbf{Decision : } \parbox[t]{5in}{I'd like to include some system of warping between locations, but it's definitely low priority for now.}
+
+  \item \emph{Enable power-ups.}
+
+        \textbf{Decision : } \parbox[t]{5in}{Because this is meant to be more of a simulator rather than an arcade-style game, I doubt this will be implemented.}
+
+  \item \emph{Allow player to choose different ships.}
+
+        \textbf{Decision : } \parbox[t]{5in}{Users love to have some form of customization, so I think this should be implemented.}
+\end{itemize}
+
+\section*{Questionnaire Results}
+
+\subsection*{Questions Asked:}
+\begin{enumerate}
+
+  \item How interested would you be in playing a space simulator?
+
+  \item Would adding educational elements increase or decrease your desire to play such a game?
+
+  \item Please rank the following features in the order you would prefer to see in a space simulator, 1 being the one you would like to see the most, 5 being the least:
+  \begin{itemize}
+
+        \item A feature that guides your ship into orbit of a planet, using rings and velocity indicators as guides.
+
+        \item Showing vectors of moving objects to demonstrate how they change due to collisions or gravity from nearby objects.
+
+        \item The ability to destroy asteroids using weapons such as guns or missiles.
+
+        \item A universe that is randomly generated.
+
+        \item On-screen physics calulations.
+
+  \end{itemize}
+
+  \item Would realistic spaceflight controls add to or detract from the experience? In other words, if a thrust is applied to the ship to cause it to travel in a certain direction, it wuld continue to travel in that direction until an opposite force is applied.
+
+  \item What do you envision as being the ideal way to control a spaceship in a simulator? Examples: joystick, mouse, keyboard...
+
+  \item Which is more important to you: realistic visuals with fewer objects or realistic physics on more objects.
+
+  \item Would a multiplayer aspect increase your desire to play this game?
+
+  \item Other than those already listed, can you think of any features you would like to see in a space simulator? If so, please list them.
+
+\end{enumerate}
+
+\subsubsection*{Results:}
+
+  \parbox[t]{6.5in}{10 people were polled in total. Nearly all of them expresed interest in playing a space simulator. While some expressed interest in adding educational elements, the results were not overwhelming for either side. Because of this, we have decided to implement some educational features while not making education the focal point of the game. For example, strong support was given to the orbit and on-screen vector information. Because of this, those two items have been added as low-priority functional requirements. Additionally, most respondents favored realistic controls and physics to a more arcade-style system with better visuals. We envision these being features that contribute to the educational nature of the game. Because of the lack of strong support for a multiplayer system, it will remain a low-priority for the first version of the game.}
 
 \section*{Menus}
 
