@@ -10,7 +10,7 @@ CSCI 576 - Human Computer Interaction}
 
 \maketitle
 
-\section*{Description}
+\section{Description}
 
 For our project idea, we would like to develop a 3D rendered engine via Python's interface to OpenGL.  As it stands, we have a 3D particle simulation and an efficient way to calculate forces between particles and such.  From this simulation, we would first like to create a space simulator - complete with gravity between planets and other space bodies and thrusters on the spacecraft which create rotational and directional momentum.  With the addition of a rear engine and front braking thrusters, this would effectively simulate a real space craft.  
 
@@ -18,7 +18,7 @@ Once the thruster part of the engine has been created, it would be interesting t
 
 Long-term development outside of the scope of this class includes random generation of planetary systems from a series of differential equation solvers which the user will run in the background.  These simulations may take several hours to complete, but will allow the user to explore these new planetary systems with their spacecraft.  From here, it would be interesting to add the option for planetary evolution, i.e., randomly generated atmosphere, oceans, and mountain ranges.  The user may then enter the atmosphere with their spacecraft, complete with physics calculations and potential failure.  This is a major highlight of the game as it would allow the user to generate and explore an entire solar system, all with the power of their home PC.  In a sense this would be similar to entering into the computer's imagination, a completely unique experience.
 
-\subsection*{Intended users}
+\subsection{Intended users}
 
 The intended users of the system are:
 
@@ -70,7 +70,7 @@ The intended users of the system are:
 \end{enumerate}
 \end{multicols}
 
-\subsection*{Usability requirements}
+\subsection{Usability requirements}
 
 The non-functional requirements for this game will be:
 
@@ -119,7 +119,7 @@ The game will be
 \end{enumerate}
 \end{multicols}
 
-\subsection*{Functional requirements}
+\subsection{Functional requirements}
 
 \noindent \textbf{High priority:}
 
@@ -162,7 +162,7 @@ The users of the game should be able to
 \begin{multicols}{2}
 \begin{enumerate}
 
-  \item lock onto a piece of space debri and destroy the debri with weapons,
+  \item lock onto a piece of space debris and destroy the Debra with weapons,
 
   \item chase a network opponent around in space by following a particle trail,
 
@@ -209,10 +209,10 @@ The users of the game should be able to
 \end{enumerate}
 \end{multicols}
 
-\section*{Design critique 1 feedback}
+\section{Design critique 1 feedback}
 
-\subsection*{Evan's feedback:}
-\subsubsection*{Cosmetic:}
+\subsection{Evan's feedback:}
+\subsubsection{Cosmetic:}
 \begin{itemize}
 
   \item \emph{Model the known solar system.}
@@ -224,7 +224,7 @@ The users of the game should be able to
         \textbf{Decision : } \parbox[t]{5in}{We will indicate the current speed, direction, and acceleration of the spacecraft in a corner of the screen, as well as a compass.  Also, tiny particles will be included to give the player a sense of speed as they move through empty space.}
 \end{itemize}
 
-\subsubsection*{Functionality:}
+\subsubsection{Functionality:}
 \begin{itemize}
   \item \emph{Provide a goal other than simply flying around in space.}
         
@@ -259,12 +259,12 @@ The users of the game should be able to
         \textbf{Decision : } \parbox[t]{5in}{Totally cool -- If we have time, this will be included.}
 \end{itemize}
 
-\subsection*{Josh's feedback:}
-\subsubsection*{Cosmetic:}
+\subsection{Josh's feedback:}
+\subsubsection{Cosmetic:}
 \begin{itemize}
   \item \emph{Change unit of measurement for distance.}
         
-        \textbf{Decision : } \parbox[t]{5in}{Lightyears will be used in the next design. However, using miles or kilometers with scientific notation may be more appropriate}
+        \textbf{Decision : } \parbox[t]{5in}{Light-years will be used in the next design. However, using miles or kilometers with scientific notation may be more appropriate}
 
   \item \emph{Add a load screen while the universe builds.}
 
@@ -283,7 +283,7 @@ The users of the game should be able to
         \textbf{Decision : } \parbox[t]{5in}{While this is would be a great option to have, it is probably beyond the scope of what we can accomplish in a semester.}
 \end{itemize}
 
-\subsubsection*{Functionality:}
+\subsubsection{Functionality:}
 \begin{itemize}
   \item \emph{Add educational attributes for teaching physics.}
 
@@ -322,7 +322,7 @@ The users of the game should be able to
         \textbf{Decision : } \parbox[t]{5in}{Users love to have some form of customization, so I think this should be implemented.}
 \end{itemize}
 
-\section*{Design critique 2 feedback}
+\section{Design critique 2 feedback}
 
 \begin{itemize}
 
@@ -332,9 +332,9 @@ The users of the game should be able to
 
 \end{itemize}
 
-\section*{Questionnaire Results}
+\section{Questionnaire Results}
 
-\subsection*{Questions Asked:}
+\subsection{Questions Asked:}
 \begin{enumerate}
 
   \item How interested would you be in playing a space simulator?
@@ -352,11 +352,11 @@ The users of the game should be able to
 
         \item A universe that is randomly generated.
 
-        \item On-screen physics calulations.
+        \item On-screen physics calculations.
 
   \end{itemize}
 
-  \item Would realistic spaceflight controls add to or detract from the experience? In other words, if a thrust is applied to the ship to cause it to travel in a certain direction, it wuld continue to travel in that direction until an opposite force is applied.
+  \item Would realistic spaceflight controls add to or detract from the experience? In other words, if a thrust is applied to the ship to cause it to travel in a certain direction, it would continue to travel in that direction until an opposite force is applied.
 
   \item What do you envision as being the ideal way to control a spaceship in a simulator? Examples: joystick, mouse, keyboard...
 
@@ -368,69 +368,133 @@ The users of the game should be able to
 
 \end{enumerate}
 
-\subsubsection*{Results:}
+\subsubsection{Results:}
 
-  \parbox[t]{6.5in}{10 people were polled in total. Nearly all of them expresed interest in playing a space simulator. While some expressed interest in adding educational elements, the results were not overwhelming for either side. Because of this, we have decided to implement some educational features while not making education the focal point of the game. For example, strong support was given to the orbit and on-screen vector information. Because of this, those two items have been added as low-priority functional requirements. Additionally, most respondents favored realistic controls and physics to a more arcade-style system with better visuals. We envision these being features that contribute to the educational nature of the game. Because of the lack of strong support for a multiplayer system, it will remain a low-priority for the first version of the game.}
+  \parbox[t]{6.5in}{10 people were polled in total. Nearly all of them expressed interest in playing a space simulator. While some expressed interest in adding educational elements, the results were not overwhelming for either side. Because of this, we have decided to implement some educational features while not making education the focal point of the game. For example, strong support was given to the orbit and on-screen vector information. Because of this, those two items have been added as low-priority functional requirements. Additionally, most respondents favored realistic controls and physics to a more arcade-style system with better visuals. We envision these being features that contribute to the educational nature of the game. Because of the lack of strong support for a multiplayer system, it will remain a low-priority for the first version of the game.}
 
-\section*{Menus}
+\section{Cognitive Walkthrough}
 
-The menu system has been adapted from Josh's design crit one and uses a common video game configuration with buttons accessed with the mouse or joystick.  An explanation of the individual screens are presented below.
 
-\subsection*{Menu storyboards}
+\subsection{Main representative tasks:}
+\begin{enumerate}
 
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/01-start.png}
-%  \caption{Start screen upon initialization.  From here the player may either start a new game, load an existing game, edit the configuration of the game, or exit.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/02-load.png}
-%  \caption{Load screen enabling a player to load a previously-saved game.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/03-pause.png}
-%  \caption{Pause screen accessed at any time by pressing the ``esc'' key.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/04-save.png}
-%  \caption{Save screen.  The player can name the save game and press ``save'' to save.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/05-config.png}
-%  \caption{Config for global settings with access to control config screens.  The player clicks on the parameter which increments the setting.  Once any setting has been changed, nothing more is required of the player.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/06-mouse_config.png}
-%  \caption{Mouse config, the user may select from a list of logical actions for both left and right buttons.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/07-joystick_config.png}
-%  \caption{Joystick config.  User may set the button by pressing the desired joystick button or moving the joystick in a particular direction.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/08-keyboard_config.png}
-%  \caption{Keyboard config.  User may set the button by pressing the desired key.}
-%\end{figure}
-%
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.5]{../images/09-exit.png}
-%  \caption{Exit screen confirms the player's desire to exit the program.}
-%\end{figure}
+  \item Translate and rotate the spacecraft in 360 degrees.  Controls will be provided to roll, pitch, yaw, sidestep (move perpendicular to direction of travel), move forward, and move backward.
+
+  \item Dodge space debris which are randomly located throughout the area.  If these object hit the spacecraft, the craft will be moved off in the opposite direction and rotated.  This rotation and translation will need to be corrected by space simulator controls and will be very difficult -- this provides great motivation for evading the debris.
+
+  \item Experience the gravitational pull of planets and stars.  The planets will affect the flight of the space craft and will need to be accounted for at all times.  On-screen vectors showing the craft's velocity and the effect of gravity from stars and planets will aid the player in navigation.  If the gravity of a planet overtakes the craft, the vectors will show that escape is impossible; when the spacecraft hits the planet, the craft will respawn in the starting position.
+
+  \item Fly thorough a nebula and visually determine the change in gas energy.  As the craft moves through the nebula, the gas particles change color and move in the opposite direction of impact.  As the craft moves through the gas, the player can make pretty patterns of high energy gas.
+
+  \item See vectors corresponding to forces acting upon the spacecraft.  These vectors allow the player to better judge how much acceleration is needed in what direction.  A stable orbit will be attained when the velocity vector of the craft forward is approximately the same as the velocity vector towards the planet.  If a collision occurs between the space craft and debris, rotation vectors appear showing the torque applied to the craft, as well as the force vectors that the debris applied to the craft.  Rotation, current velocity and acceleration vectors will always be shown to aid the player in navigation.
+
+\end{enumerate}
+
+\subsection*{List of actions needed to complete each task}
+\begin{enumerate}
+
+\item\textbf{Translate and rotate the spacecraft in 360 degrees.}
+\begin{enumerate}
+
+  \item User presses appropriate key for action.
+
+  \item Vector appears showing direction of applied force.
+
+  \item If force is applied for translation, speed indicator either increases or decreases depending on direction of acceleration.
+
+  \item Player sees the craft's velocity or rotation visually change with respect to the surrounding space.
+
+\end{enumerate}
+
+\item\textbf{Dodge space debris which are randomly located throughout the area.}
+\begin{enumerate}
+
+  \item User identifies a probable collision.
+
+  \item User steers the craft away from the collision by applying a force in the desired direction of travel.
+
+  \item Vectors appear confirming that the forces are being correctly applied in the desired direction.
+
+  \item User continues to apply acceleration in the opposite direction of the collision until it is apparent that the collision is either avoided or inevitable.
+
+  \item The spacecraft continues to fly onward if the collision is avoided or else the craft is rotated and/or pushed in some non-desirable location.
+
+\end{enumerate}
+
+\item\textbf{Experience the gravitational pull of planets and stars.}
+\begin{enumerate}
+
+  \item User notices a high-magnitude acceleration vector of a color matching a planet or star.
+
+  \item User recognizes the fact that compensation is needed to correct for the pull of space-body.
+
+  \item User rotates the craft until the force vector of the planet in in the opposite direction of where the user would like to apply a translation force.
+
+  \item User presses keys corresponding to the application of translational force to oppose the effect of gravity from the space-body.
+
+  \item The space-craft's velocity changes as the forces are applied.
+
+  \item The space-craft either escapes the gravitational pull of the planet, acheieves orbit, or is overcome by the planet's gravity.
+
+  \item If the gravitational force cannot be overcome, the spacecraft hits the planet or star and instantly respawns in the starting position.
+
+\end{enumerate}
+
+\item\textbf{Fly thorough a nebula and visually determine the change in gas energy.}
+\begin{enumerate}
+
+  \item User locates a nebula.
+
+  \item User presses the controls to apply enough force to reach the nebula.
+
+  \item User moves inside the nebula.
+
+  \item Nebula gas particles move out of the way of the spacecraft.
+
+  \item Affected gas particles change color from low-energy blue to high-energy red.
+
+  \item User continues to fly through the nebula and clears a path of particles.  These paths are areas where the particles have bounced off into space.
+
+  \item user navigates through the nebula while experiencing gas-density gradients where gas have accumulated in clumps, the earliest stages of planetary formation.
+
+\end{enumerate}
+
+\item\textbf{See vectors corresponding to forces acting upon the spacecraft.}
+\begin{enumerate}
+
+  \item User starts with a completely stationary craft.
+
+  \item User applies a rotation force by pressing a key.
+
+  \item Torque vector appears on the craft (perpendicular to plane of rotation).
+  
+  \item Angular velocity vector appears in the same direction as applied torque.
+
+  \item User stops pressing key of rotation force.
+
+  \item Torque vector disappears.
+
+  \item Angular velocity vector remains showing angular velocity.
+
+  \item User presses translational force key.
+
+  \item Translation force vector appears on the spacecraft.
+
+  \item Space-craft velocity vector changes magnitude and direction as the craft
+'s direction and speed change.
+
+  \item User releases the translation force key.
+
+  \item Translational force vector disappears.
+
+  \item Angular velocity and translational velocity vectors remain showing the craft's current speed, direction, and angular velocity.
+
+\end{enumerate}
+
+\end{enumerate}
+
+
+\section{Concept Art}
 
 \begin{figure}[H]
   \centering
