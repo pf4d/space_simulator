@@ -418,7 +418,7 @@ The users of the game should be able to
 
 \end{enumerate}
 
-\subsection*{List of actions needed to complete each task}
+\subsection{List of actions needed to complete each task}
 \begin{enumerate}
 
 \item\textbf{Translate and rotate the spacecraft in 360 degrees.}
@@ -462,7 +462,7 @@ The users of the game should be able to
 
   \item The space-craft's velocity changes as the forces are applied.
 
-  \item The space-craft either escapes the gravitational pull of the planet, acheieves orbit, or is overcome by the planet's gravity.
+  \item The space-craft either escapes the gravitational pull of the planet, achieves orbit, or is overcome by the planet's gravity.
 
   \item If the gravitational force cannot be overcome, the spacecraft hits the planet or star and instantly respawns in the starting position.
 
@@ -521,6 +521,194 @@ The users of the game should be able to
 
 \end{enumerate}
 
+\subsection{Detailed analysis of tasks}
+\begin{enumerate}
+
+\item\textbf{Translate and rotate the spacecraft in 360 degrees.}
+\begin{enumerate}
+
+  \item User presses appropriate key for action.
+  \begin{enumerate}
+    \item \emph{Will users be trying to produce whatever effect the action has?}
+		
+    Given that the user already understands the controls of the game, yes.		
+    \item \emph{Will users see the control (button, menu, switch, etc.) for the action?}
+    
+    Yes, the keyboard.
+    \item \emph{Once users find the control, will they recognize that it produces the effect they want?}
+    
+    Yes, they understand what key does what.
+    \item \emph{After the action is taken, will users understand the feedback they get, so they can go on to the next action with confidence?}
+    
+    The key is pressed, resulting in a force vector appearing on the craft, see following steps.
+  \end{enumerate}
+
+  \item Vector appears showing direction of applied force.
+
+  \item If force is applied for translation, speed indicator either increases or decreases depending on direction of acceleration.
+
+  \item Player sees the craft's velocity or rotation visually change with respect to the surrounding space.
+
+\end{enumerate}
+
+\item\textbf{Dodge space debris which are randomly located throughout the area.}
+\begin{enumerate}
+
+  \item User identifies a probable collision.
+
+  \item User steers the craft away from the collision by applying a force in the desired direction of travel.
+  \begin{enumerate}
+    \item \emph{Will users be trying to produce whatever effect the action has?}
+	  
+    Given that the users are actively playing the game, this situation will become obvious when it happens.
+    \item \emph{Will users see the control (button, menu, switch, etc.) for the action?}
+
+    Yes, the keyboard.
+    \item \emph{Once users find the control, will they recognize that it produces the effect they want?}
+
+    Yes, vectors appear showing that the correct force is being applied in the desired direction of travel.
+    \item \emph{After the action is taken, will users understand the feedback they get, so they can go on to the next action with confidence?}
+
+    Yes, the craft will move in the direction desired.
+  \end{enumerate}
+
+  \item Vectors appear confirming that the forces are being correctly applied in the desired direction.
+
+  \item User continues to apply acceleration in the opposite direction of the collision until it is apparent that the collision is either avoided or inevitable.
+  \begin{enumerate}
+    \item \emph{Will users be trying to produce whatever effect the action has?}
+		
+    Assuming that the craft still appears to be moving toward the debris, yes.
+    \item \emph{Will users see the control (button, menu, switch, etc.) for the action?}
+
+    Yes, the keyboard.
+    \item \emph{Once users find the control, will they recognize that it produces the effect they want?}
+
+    Yes, the force vectors appear and the craft accelerates in the direction of applied force.
+    \item \emph{After the action is taken, will users understand the feedback they get, so they can go on to the next action with confidence?}
+
+    Yes, feedback is continuous.
+  \end{enumerate}
+
+  \item The spacecraft continues to fly onward if the collision is avoided or else the craft is rotated and/or pushed in some non-desirable location.
+
+\end{enumerate}
+
+\item\textbf{Experience the gravitational pull of planets and stars.}
+\begin{enumerate}
+
+  \item User notices a high-magnitude acceleration vector of a color matching a planet or star.
+
+  \item User recognizes the fact that compensation is needed to correct for the pull of space-body.
+
+  \item User rotates the craft until the force vector of the planet in in the opposite direction of where the user would like to apply a translation force.
+  \begin{enumerate}
+    \item \emph{Will users be trying to produce whatever effect the action has?}
+		
+    If the craft is rotated in an incorrect orientation, it will not be able to apply a force in the appropriate direction.  Rotation will be applied first.
+    \item \emph{Will users see the control (button, menu, switch, etc.) for the action?}
+
+    Yes, the keyboard.
+    \item \emph{Once users find the control, will they recognize that it produces the effect they want?}
+
+    Yes, vectors appear showing that the torque is being correctly applied.
+    \item \emph{After the action is taken, will users understand the feedback they get, so they can go on to the next action with confidence?}
+
+    Yes, the ship rotates in the direction desired.
+  \end{enumerate}
+
+  \item User presses keys corresponding to the application of translational force to oppose the effect of gravity from the space-body.
+  \begin{enumerate}
+    \item \emph{Will users be trying to produce whatever effect the action has?}
+		
+    With the craft rotated correctly, and the gravitational force vectors clearly visible, the user should in theory know that applying a force to the craft in the opposite direction would be required.
+    \item \emph{Will users see the control (button, menu, switch, etc.) for the action?}
+
+    Yes, the keyboard.
+    \item \emph{Once users find the control, will they recognize that it produces the effect they want?}
+
+    Vectors appear and show that the force is being applied and the craft moves in the direction of applied force.
+    \item \emph{After the action is taken, will users understand the feedback they get, so they can go on to the next action with confidence?}
+
+    Yes, vectors appear and the craft's velocity changes.
+  \end{enumerate}
+
+  \item The space-craft's velocity changes as the forces are applied.
+
+  \item The space-craft either escapes the gravitational pull of the planet, achieves orbit, or is overcome by the planet's gravity.
+
+  \item If the gravitational force cannot be overcome, the spacecraft hits the planet or star and instantly respawns in the starting position.
+
+\end{enumerate}
+
+\item\textbf{Fly thorough a nebula and visually determine the change in gas energy.}
+\begin{enumerate}
+
+  \item User locates a nebula.
+  \begin{enumerate}
+    \item \emph{Will users be trying to produce whatever effect the action has?}
+	  
+    The nebula will be a large multi-colored blob and will be clearly differentiated from normal space.
+    \item \emph{Will users see the control (button, menu, switch, etc.) for the action?}
+
+    Yes, the keyboard.
+    \item \emph{Once users find the control, will they recognize that it produces the effect they want?}
+
+    Yes, vectors appear and the craft moves.
+    \item \emph{After the action is taken, will users understand the feedback they get, so they can go on to the next action with confidence?}
+
+    Yes, vectors appear and the craft moves.
+  \end{enumerate}
+
+  \item User presses the controls to apply enough force to reach the nebula.
+
+  \item User moves inside the nebula.
+
+  \item Nebula gas particles move out of the way of the spacecraft.
+
+  \item Affected gas particles change color from low-energy blue to high-energy red.
+
+  \item User continues to fly through the nebula and clears a path of particles.  These paths are areas where the particles have bounced off into space.
+
+  \item user navigates through the nebula while experiencing gas-density gradients where gas have accumulated in clumps, the earliest stages of planetary formation.
+
+\end{enumerate}
+
+\item\textbf{See vectors corresponding to forces acting upon the spacecraft.}
+
+This situation is presented hypothetically and as such no detailed description is available.  The steps presented describe the steps and feedback received in detail.
+
+\begin{enumerate}
+
+  \item User starts with a completely stationary craft.
+
+  \item User applies a rotation force by pressing a key.
+
+  \item Torque vector appears on the craft (perpendicular to plane of rotation).
+  
+  \item Angular velocity vector appears in the same direction as applied torque.
+
+  \item User stops pressing key of rotation force.
+
+  \item Torque vector disappears.
+
+  \item Angular velocity vector remains showing angular velocity.
+
+  \item User presses translational force key.
+
+  \item Translation force vector appears on the spacecraft.
+
+  \item Space-craft velocity vector changes magnitude and direction as the craft's direction and speed change.
+
+  \item User releases the translation force key.
+
+  \item Translational force vector disappears.
+
+  \item Angular velocity and translational velocity vectors remain showing the craft's current speed, direction, and angular velocity.
+
+\end{enumerate}
+
+\end{enumerate}
 
 \section{Concept Art}
 
