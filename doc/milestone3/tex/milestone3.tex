@@ -676,7 +676,7 @@ The users of the game should be able to
 
 \item\textbf{See vectors corresponding to forces acting upon the spacecraft.}
 
-This situation is presented hypothetically and as such no detailed description is available.  The steps presented describe the steps and feedback received in detail.
+This situation is presented hypothetically and as such no detailed description is available.  The steps presented describe the steps and feedback received in detail.  Because the vector feedback is ongoing and continuous, we expect the user to be able to correctly interpret the situation given they understand the controls.
 
 \begin{enumerate}
 
@@ -710,17 +710,234 @@ This situation is presented hypothetically and as such no detailed description i
 
 \end{enumerate}
 
+\section{Heuristic Evaluation}
+
+\begin{enumerate}
+
+  \item Translate and rotate the spacecraft in 360 degrees.  Controls will be provided to roll, pitch, yaw, sidestep (move perpendicular to direction of travel), move forward, and move backward.
+\begin{enumerate}
+  
+  \item \emph{Simple and natural duologue.}
+
+  The controls provided are the minimal set required to fly the spacecraft.
+  
+  \item \emph{Speak user's language.}
+
+  The system is analogous to any flight simulator.
+  
+  \item \emph{Minimize user's memory load.}
+
+  Minimal controls to remember.
+  
+  \item \emph{Consistency.}
+
+  The vector feedback and behavior of the craft is always the same given the set of inputs.
+  
+  \item \emph{Feedback.}
+
+  A moving ``starfield'' guides the player in translations.  Rotation will alter the viewpoint of the user and be obvious.
+  
+  \item \emph{Clearly marked exits.}
+
+  The appropriate control to reverse the movement is given.
+  
+  \item \emph{Shortcuts.}
+
+  Not applicable.
+  
+  \item \emph{Good error messages.}
+  
+  The feedback in this case is the error message; if the craft moves incorrectly, the user has pressed the wrong key.
+
+  \item \emph{Prevent errors.}
+
+  Vectors help the user control the ship.
+ 
+\end{enumerate}
+
+  \item Dodge space debris which are randomly located throughout the area.  If these object hit the spacecraft, the craft will be moved off in the opposite direction and rotated.  This rotation and translation will need to be corrected by space simulator controls and will be very difficult -- this provides great motivation for evading the debris.
+\begin{enumerate}
+  
+  \item \emph{Simple and natural dialog.}
+
+  Feedback from the world can be clearly interpreted.
+  
+  \item \emph{Speak user's language.}
+
+  The system follows the laws of physics.
+  
+  \item \emph{Minimize user's memory load.}
+
+  Once understood, the physics of space can be memorized and predicted.
+  
+  \item \emph{Consistency.}
+
+  Physics do not change.
+  
+  \item \emph{Feedback.}
+
+  Visual feedback is continuously given to aid the user if flight.
+  
+  \item \emph{Clearly marked exits.}
+
+  Not applicable.
+  
+  \item \emph{Shortcuts.}
+
+  Not applicable.
+  
+  \item \emph{Good error messages.}
+  
+  Not applicable.
+
+  \item \emph{Prevent errors.}
+ 
+  Feedback is continually provided to help aid the player in guiding the craft.
+
+\end{enumerate}
+
+  \item Experience the gravitational pull of planets and stars.  The planets will affect the flight of the space craft and will need to be accounted for at all times.  On-screen vectors showing the craft's velocity and the effect of gravity from stars and planets will aid the player in navigation.  If the gravity of a planet overtakes the craft, the vectors will show that escape is impossible; when the spacecraft hits the planet, the craft will respawn in the starting position.
+\begin{enumerate}
+  
+  \item \emph{Simple and natural dialog.}
+
+  The interface is as minimalistic as possible to allow the user to understand feedback from the game engine.
+  
+  \item \emph{Speak user's language.}
+
+  Again, the physics of space.
+  
+  \item \emph{Minimize user's memory load.}
+
+  Minimal controls to remember and physics which are consistent.
+  
+  \item \emph{Consistency.}
+
+  Yes.
+  
+  \item \emph{Feedback.}
+  
+  Continuous.
+  
+  \item \emph{Clearly marked exits.}
+
+  N/A.
+  
+  \item \emph{Shortcuts.}
+
+  N/A.
+  
+  \item \emph{Good error messages.}
+
+  If the user applies and incorrect force, the effects will be immediately noticed via on-screen vectors.
+  
+  \item \emph{Prevent errors.}
+
+  Continuous feedback helps minimize errors.
+ 
+\end{enumerate}
+
+  \item Fly thorough a nebula and visually determine the change in gas energy.  As the craft moves through the nebula, the gas particles change color from blue (cool) to red (hot) and move in the opposite direction of impact.  As the craft moves through the gas, the player can make pretty patterns of high energy gas.
+\begin{enumerate}
+  
+  \item \emph{Simple and natural dialog.}
+
+  Yes.
+  
+  \item \emph{Speak user's language.}
+  
+  People generally understand that blue represents cold and red represents hot.
+
+  \item \emph{Minimize user's memory load.}
+
+  Yes.
+  
+  \item \emph{Consistency.}
+
+  Yes.
+  
+  \item \emph{Feedback.}
+
+  Constant.
+  
+  \item \emph{Clearly marked exits.}
+
+  N/A.
+  
+  \item \emph{Shortcuts.}
+
+  N/A.
+  
+  \item \emph{Good error messages.}
+
+  No ``errors'' as such for this task; the user is free to play!
+  
+  \item \emph{Prevent errors.}
+
+  N/A.
+ 
+\end{enumerate}
+
+  \item See vectors corresponding to forces acting upon the spacecraft.  These vectors allow the player to better judge how much acceleration is needed in what direction.  A stable orbit will be attained when the velocity vector of the craft forward is approximately the same as the velocity vector towards the planet.  If a collision occurs between the space craft and debris, rotation vectors appear showing the torque applied to the craft, as well as the force vectors that the debris applied to the craft.  Rotation, current velocity and acceleration vectors will always be shown to aid the player in navigation.
+\begin{enumerate}
+  
+  \item \emph{Simple and natural dialog.}
+
+  For the user, the interface is similar to a space-pilots technical readout; velocities are clearly shown and applied forces clearly shown.
+  
+  \item \emph{Speak user's language.}
+
+  The torque vectors are perpendicular to the plane of rotation and as such may not be easily understood.  For this, some kind of initial help screen explaining the `right-hand rule' might be helpful.
+  
+  \item \emph{Minimize user's memory load.}
+
+  Once the vectors are understood, the color-coding and orientation of the vectors make their meaning clear.  However, extra feedback might be beneficial to the user, such as a label on the control vectors (translation and rotation), as well as a number depicting it's magnitude.
+  
+  \item \emph{Consistency.}
+
+  These vectors are consistent.
+  
+  \item \emph{Feedback.}
+
+  The very nature of the vector is feedback.
+  
+  \item \emph{Clearly marked exits.}
+
+  N/A.
+  
+  \item \emph{Shortcuts.}
+
+  N/A.
+  
+  \item \emph{Good error messages.}
+  
+  Again, the user will see immediately if they have applied an incorrect force because the vector will be in the wrong direction.
+
+  \item \emph{Prevent errors.}
+
+  As much as possible, this is what the vector system has been designed for.
+ 
+\end{enumerate}
+
+\end{enumerate}
+
 \section{Concept Art}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{../../milestone2/images/10-nebula.png}
-  \caption{Here we have the spacecraft flying into the nebula, with a colorbar to show the energy level of the nebula particles.  The red `X' in the middle is a crosshair used for guiding the ship and firing rockets when implemented.  The speed of the craft is shown in the top left corner.  Notice that the color of the nebula changes as the craft pushes nebula gas particles out of its path.}
+  \includegraphics[scale=0.5]{../images/nebula.png}
+  \caption{Here we have the spacecraft flying into the nebula.  The speed of the craft is shown in the top left corner.  Notice that the color of the nebula changes as the craft pushes nebula gas particles out of its path.}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{../../milestone2/images/12-orbit.png}
+  \includegraphics[scale=0.5]{../images/vectors.png}
+  \caption{Vectors on the craft showing rotational velocity (tau) and translational velocity (sigma).  The yellow vector represents a gravitational force vector from some nearby planet or star.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../images/orbit.png}
   \caption{Concept for entering the spacecraft into orbit.}
 \end{figure}
 
