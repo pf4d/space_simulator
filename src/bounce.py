@@ -26,8 +26,8 @@ vz        = 0      # depth velocity
 
 k         = 30.0   # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
-#k         = 1.5    # elastic 'bounce'
-#gamma     = 0.1    # energy dissipation/loss
+k         = 1.5    # elastic 'bounce'
+gamma     = 0.1    # energy dissipation/loss
 g         = 0.25   # downward acceleration
 
 on        = False  # start / stop adding particles
