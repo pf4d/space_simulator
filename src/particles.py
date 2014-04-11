@@ -25,38 +25,43 @@ class GranularMaterialForce(object):
 
   def __init__(self, k=1.5, gamma=0.3, g=0.25):
     # parameters in force model
-    self.k     = k       # Elastic 'bounce'
-    self.gamma = gamma   # Energy dissipation/loss
-    self.g     = g       # Gravity
-    self.f     = 1.0
+    self.k     = k           # elastic 'bounce'
+    self.gamma = gamma       # energy dissipation/loss
+    self.g     = g           # gravity
+    self.f     = 1.0         # floor damping coefficient
+    self.rho   = 1.0         # density
+    self.G     = 6.67384E-11 # gravitational constant
 
   def __call__(self, p):
-    # Find position differences
+    # find position differences :
     d, dx, dy, dz = p.distanceMatrix(p.x, p.y, p.z)
 
-    # Compute overlap
+    # compute overlap :
     dr = d - p.sumOfRadii
     fill_diagonal(dr, 0)
 
-    # No forces arising in no overlap cases
+    # no forces arising in no overlap cases :
     dr[dr > 0] = 0
 
-    # Compute elastic particle/particle forces
+    # compute elastic particle/particle forces :
     mag_r = self.k * dr
 
-    # Velocity differences
+    # velocity differences :
     dv, dvx, dvy, dvz = p.distanceMatrix(p.vx, p.vy, p.vz)
     da, dax, day, daz = p.distanceMatrix(p.ax, p.ay, p.az)
     
-    # Damping terms
+    # damping terms :
     vijDotrij             = dvx*dx + dvy*dy + dvz*dz
     vijDotrij[dr==0]      = 0 
 
-    # Damping is subtracted from force
+    # damping is subtracted from force :
     mag_r += self.gamma * vijDotrij / d
 
     # floor components of acceleration :
     crx, cry, crz, ctx, cty, ctz = self.floorConstraint(p)
+
+    # gravitational pull between particles :
+    F = self.G * p.mi_mj / d**2
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii, axis=1) + crx
@@ -210,25 +215,25 @@ class VerletIntegrator(object):
 class Particles(object):
 
   def __init__(self, L, force, periodicX=1, periodicY=1, periodicZ=1):
-    # Container size
+    # container size
     self.L = L
-    # Total Number of particles
+    # total Number of particles
     self.N = 0
     # type
     self.type = 'float32'
-    # Positions
+    # positions
     self.x  = array([],dtype=self.type)
     self.y  = array([],dtype=self.type)
     self.z  = array([],dtype=self.type)
-    # Velocities
+    # velocities
     self.vx = array([],dtype=self.type)
     self.vy = array([],dtype=self.type)
     self.vz = array([],dtype=self.type)
-    # Forces
+    # forces
     self.ax = array([],dtype=self.type)
     self.ay = array([],dtype=self.type)
     self.az = array([],dtype=self.type)
-    # Radii
+    # radii
     self.r  = array([],dtype=self.type)
     # angular rotation :
     self.thetax = array([],dtype=self.type)
@@ -242,12 +247,16 @@ class Particles(object):
     self.alphax = array([],dtype=self.type)
     self.alphay = array([],dtype=self.type)
     self.alphaz = array([],dtype=self.type)
-    # Periodic on?
+    # periodic on?
     self.periodicX = periodicX 
     self.periodicY = periodicY 
     self.periodicZ = periodicZ 
-    # Force function
+    # force function :
     self.f = force
+    # mass / gravity :
+    self.m     = array([],dtype=self.type)
+    self.mi_mj = array([],dtype=self.type)
+    self.rho   = 1.0
      
   def addParticle(self, x, y, z, vx, vy, vz, r,
                   thetax, thetay, thetaz, 
@@ -276,6 +285,10 @@ class Particles(object):
     self.sumOfRadii   = temp + temp.T
     self.ratioOfRadii = temp / temp.T
     self.f(self)
+    # gravitational pull :
+    self.v     = 4.0/3.0 * pi * self.r**3
+    self.m     = self.rho * self.v
+    self.mi_mj = outer(self.m, self.m)
 
   def pbcUpdate(self):
     """
