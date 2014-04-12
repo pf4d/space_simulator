@@ -21,9 +21,9 @@ viewport = (800,600)
 hx = viewport[0]/2
 hy = viewport[1]/2
 srf = pygame.display.set_mode(viewport, OPENGL | DOUBLEBUF)
-L = 10.0
+L = 200.0
 px = 0
-py = 2*L
+py = 0
 pz = 0
 pvx = 0
 pvy = 0
@@ -33,22 +33,6 @@ f = GranularMaterialForce(k=1.5, g=.000001, gamma=.1)
 p = Particles(L, f, periodicY=0, periodicZ=1, periodicX=1)
 integrate = VerletIntegrator(dt)
 #p.addParticle(px,py,pz,pvx,pvy,pvz,pr,0,0,0,0,0,0)
-
-def initParticles():
-    #particle = p.addParticle(0,py,0,pvx,pvy,pvz,pr,0,0,0,0,0,0)
-    for i in range(0,10):
-        spx = randint(1,40)
-        #spy = randint(1,40)
-        #spz = randint(1,40)
-        #p.addParticle(spx,py,spz,pvx,pvy,pvz,pr,0,0,0,0,0,0)
-
-def drawParticles():
-    glTranslate(p.x[0],p.y[0],p.z[0])
-    glutSolidSphere(p.r[0]/radiusDiv, SLICES, STACKS)
-    for i in range(0,10):
-        glTranslate(randint(1,40),py,randint(1,40))
-        glutSolidSphere(p.r[0]/radiusDiv, SLICES, STACKS)
-
 
 
 #  def addParticle(self, x, y, z, vx, vy, vz, r,
@@ -68,7 +52,7 @@ glEnable(GL_DEPTH_TEST)
 glShadeModel(GL_SMOOTH)
 glutInit()
 
-obj = OBJ(sys.argv[1], swapyz=True)
+obj = OBJ(sys.argv[1], swapyz=False)
 
 clock = pygame.time.Clock()
 
@@ -86,6 +70,12 @@ rotate = move = False
 
 p.addParticle(px,py,pz,pvx,pvy,pvz,pr,0,0,0,0,0,0)
 
+for i in range (1,10):
+    random.seed()
+    randx = randint(10, 200)
+    randz = randint(10, 200)
+    p.addParticle(randx,py,randz,pvx,pvy,pvz,pr,0,0,0,0,0,0)
+
 #initParticles()
 while 1:
     clock.tick(30)
@@ -96,22 +86,22 @@ while 1:
             sys.exit()
         elif e.type == KEYDOWN and e.key == K_UP:
             #paz -= .2
-            p.az[0] -= 10
+            p.ay[0] -= 100
         elif e.type == KEYDOWN and e.key == K_DOWN:
             #paz += .2
-            p.az[0] += 10
+            p.ay[0] += 100
         elif e.type == KEYDOWN and e.key == K_a:
-            pvx -= .2
-            p.ax[0] -= 10
+            #pvx -= .2
+            p.ax[0] -= 100
         elif e.type == KEYDOWN and e.key == K_d:
-            pvx += .2
-            p.ax[0] += 10
+            #pvx += .2
+            p.ax[0] += 100
         elif e.type == KEYDOWN and e.key == K_w:
-            pvy += .2
-            p.ay[0] += 10
+            #pvy += .2
+            p.az[0] += 100
         elif e.type == KEYDOWN and e.key == K_s:
-            pvy -= .2
-            p.ay[0] -= 10
+            #pvy -= .2
+            p.az[0] -= 100
         elif e.type == MOUSEBUTTONDOWN:
             if e.button == 4: zpos = max(1, zpos-1)
             elif e.button == 5: zpos += 1
@@ -140,6 +130,7 @@ while 1:
     #p.x[0] += pvx
     #p.y[0] += pvy
     #p.z[0] += pvz
+
     particlePosition = numpy.array([p.x[0],p.y[0],p.z[0]])
     cameraDist = particlePosition + numpy.array([20*cos(pvz),10,20*sin(pvz)])
     cameraDist = particlePosition + numpy.array([0,3,-10])
@@ -152,13 +143,21 @@ while 1:
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     #gluLookAt(cameraDist, cameraTarget, cameraUp)
-    gluLookAt(cameraDist[0],cameraDist[1],cameraDist[2],cameraTarget[0],cameraTarget[1],cameraTarget[2],cameraUp[0],cameraUp[1],cameraUp[2]) 
-
+    glPushMatrix()
+    gluLookAt(cameraDist[0],cameraDist[1],cameraDist[2],cameraTarget[0],cameraTarget[1],cameraTarget[2],cameraUp[0],cameraUp[1],cameraUp[2])
     glTranslate(p.x[0],p.y[0],p.z[0])
     glRotate(ry, 1, 0, 0)
     glRotate(rx, 0, 1, 0)
     glCallList(obj.gl_list)
+    glPopMatrix()
 
+    for i in range(1,10):
+        glPushMatrix()
+        glTranslate(p.x[i], p.y[i], p.z[i])
+        glRotate(ry, 1, 0, 0)
+        glRotate(rx, 0, 1, 0)
+        glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
+        glPopMatrix()
     pygame.display.flip()
 
 
