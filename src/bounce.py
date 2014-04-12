@@ -24,11 +24,17 @@ vy        = 0      # vertical velocity
 vx        = 0      # horizontal velocity
 vz        = 0      # depth velocity
 
+# "pool balls" :
 k         = 30.0   # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
+# "squishy balls" :
 k         = 1.5    # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
-g         = 0.25   # downward acceleration
+# "space balls" :
+k         = 4.0    # elastic 'bounce'
+gamma     = 0.5    # energy dissipation/loss
+
+g         = 0.10   # downward acceleration
 
 on        = False  # start / stop adding particles
 trans     = False  # transparency enable

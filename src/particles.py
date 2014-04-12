@@ -62,11 +62,12 @@ class GranularMaterialForce(object):
 
     # gravitational pull between particles :
     F = self.G * p.mi_mj / d**2
+    F[d < 0.1] = 0
 
     # Project onto components, sum all forces on each particle
-    p.ax = sum(mag_r * dx/d * p.ratioOfRadii, axis=1) + crx
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii, axis=1) + cry - self.g 
-    p.az = sum(mag_r * dz/d * p.ratioOfRadii, axis=1) + crz
+    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
+    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
     
     omegax = tile(p.omegax, (p.N, 1))
     omegay = tile(p.omegay, (p.N, 1))
@@ -255,8 +256,9 @@ class Particles(object):
     self.f = force
     # mass / gravity :
     self.m     = array([],dtype=self.type)
+    self.V     = array([],dtype=self.type)
     self.mi_mj = array([],dtype=self.type)
-    self.rho   = 1.0
+    self.rho   = 1.0E5
      
   def addParticle(self, x, y, z, vx, vy, vz, r,
                   thetax, thetay, thetaz, 
@@ -284,11 +286,12 @@ class Particles(object):
     temp    = tile(self.r,(self.N,1))
     self.sumOfRadii   = temp + temp.T
     self.ratioOfRadii = temp / temp.T
-    self.f(self)
     # gravitational pull :
-    self.v     = 4.0/3.0 * pi * self.r**3
-    self.m     = self.rho * self.v
+    V          = 4.0/3.0 * pi * r**3
+    self.V     = hstack((self.V, V))
+    self.m     = self.rho * self.V
     self.mi_mj = outer(self.m, self.m)
+    self.f(self)
 
   def pbcUpdate(self):
     """
