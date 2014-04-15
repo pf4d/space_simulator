@@ -36,7 +36,7 @@ gamma     = 0.1    # energy dissipation/loss
 k         = 4.0    # elastic 'bounce'
 gamma     = 0.5    # energy dissipation/loss
 
-g         = 0.10   # downward acceleration
+g         = 0.00   # downward acceleration
 
 on        = False  # start / stop adding particles
 trans     = False  # transparency enable

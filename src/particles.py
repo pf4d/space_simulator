@@ -66,7 +66,7 @@ class GranularMaterialForce(object):
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry# - self.g 
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
     p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
     
     omegax = tile(p.omegax, (p.N, 1))
