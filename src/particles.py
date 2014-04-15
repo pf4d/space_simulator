@@ -62,7 +62,7 @@ class GranularMaterialForce(object):
 
     # gravitational pull between particles :
     F = self.G * p.mi_mj / d**2
-    F[d < 0.1] = 0
+    F[d < 0.0] = 0
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
@@ -218,7 +218,7 @@ class VerletIntegrator(object):
 
 class Particles(object):
 
-  def __init__(self, L, force, periodicX=1, periodicY=1, periodicZ=1):
+  def __init__(self, L, rho, force, periodicX=1, periodicY=1, periodicZ=1):
     # container size
     self.L = L
     # total Number of particles
@@ -261,7 +261,7 @@ class Particles(object):
     self.m     = array([],dtype=self.type)
     self.V     = array([],dtype=self.type)
     self.mi_mj = array([],dtype=self.type)
-    self.rho   = 1.0E5
+    self.rho   = rho
      
   def addParticle(self, x, y, z, vx, vy, vz, r,
                   thetax, thetay, thetaz, 
@@ -341,6 +341,32 @@ class Particles(object):
     d[d==0] = -1
 
     return d, dx, dy, dz
+
+
+def initialize_grid(p, n, r, L):
+  """
+  addParticle(x, y, z, vx, vy, vz, r,
+              thetax, thetay, thetaz, 
+              omegax, omegay, omegaz): 
+  """
+  dx = 2.0*L / n
+  d  = linspace(dx/2.0 - L, L - dx/2.0, n)
+
+  for i in d:
+    for j in d:
+      for k in d:
+        p.addParticle(i,j,k,0,0,0,r,0,0,0,0,0,0)
+
+
+def initialize_random(p, n, r, L):
+  """
+  addParticle(x, y, z, vx, vy, vz, r,
+              thetax, thetay, thetaz, 
+              omegax, omegay, omegaz): 
+  """
+  for i in range(n):
+    x,y,z = L*randn(3)
+    p.addParticle(x,y,z,0,0,0,r,0,0,0,0,0,0)
 
 
 

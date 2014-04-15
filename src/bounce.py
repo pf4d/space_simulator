@@ -1,5 +1,4 @@
 from particles          import *
-from particleInitialize import *
 from pylab              import *
 from OpenGL.GL          import *
 from OpenGL.GLUT        import *
@@ -20,7 +19,7 @@ w         = 700    # screen width
 h         = 700    # screen height
 
 dt        = 0.10   # time step taken by the time integration routine.
-L         = 60.0   # size of the box.
+L         = 120.0  # size of the box.
 t         = 0      # initial time
 vy        = 0      # vertical velocity
 vx        = 0      # horizontal velocity
@@ -33,7 +32,7 @@ gamma     = 0.1    # energy dissipation/loss
 k         = 1.5    # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
 # "space balls" :
-k         = 4.0    # elastic 'bounce'
+k         = 40.0    # elastic 'bounce'
 gamma     = 0.5    # energy dissipation/loss
 
 g         = 0.00   # downward acceleration
@@ -55,11 +54,12 @@ SLICES = 30
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-p = Particles(L, f, periodicY=1, periodicZ=1, periodicX=1)
+p = Particles(L, 7E4, f, periodicY=1, periodicZ=1, periodicX=1)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-particleInitialize(p, 5, 1, L)
+#initialize_grid(p, 7, 1, L)
+initialize_random(p, 200, 1, L)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
@@ -164,10 +164,10 @@ def display():
     glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
     glMaterial(GL_FRONT, GL_SHININESS, 100.0)
     glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
-    glColor(0.0,0.0,0.0,1.0)
-    glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
-    glMaterial(GL_FRONT, GL_SHININESS, 0.0)
-    glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
+    #glColor(0.0,0.0,0.0,1.0)
+    #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
+    #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
+    #glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
     glPopMatrix()
    
   ## draw velocity vectors : 
