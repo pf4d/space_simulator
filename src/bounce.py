@@ -31,7 +31,7 @@ gamma     = 0.1    # energy dissipation/loss
 k         = 1.5    # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
 # "space balls" :
-k         = 4.0    # elastic 'bounce'
+k         = 40.0    # elastic 'bounce'
 gamma     = 0.5    # energy dissipation/loss
 
 g         = 0.10   # downward acceleration
@@ -53,11 +53,12 @@ SLICES = 30
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-p = Particles(L, f, periodicY=0, periodicZ=1, periodicX=1)
+p = Particles(L, f, periodicY=1, periodicZ=1, periodicX=1)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-p.addParticle(0,2*L,0,0,0,0,1.0/2,0,0,0,0,0,0)
+particleInitialize(p, 5, L)
+#p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
 
@@ -278,7 +279,7 @@ def idle():
         r = 1.0/2
       if on:
         px = 0.25*randn()
-        py = 2*L
+        py = L/2
         pz = 0
         p.addParticle(px, py, pz, vx, vy, vz, r,0,0,0,0,0,0)
   glutPostRedisplay()

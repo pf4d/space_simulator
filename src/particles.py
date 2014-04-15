@@ -66,7 +66,7 @@ class GranularMaterialForce(object):
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry# - self.g 
     p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
     
     omegax = tile(p.omegax, (p.N, 1))
@@ -124,7 +124,7 @@ class GranularMaterialForce(object):
     I = 0.4*p.r**2
     
     # angular momentum exchange coefficient :
-    kappa = 0.9*p.r
+    kappa = 0.0001*p.r
    
     # project onto components, sum all angular forces on each particle
     p.alphax = + sum(-(taux + f*epix) / I - kappa*omegax, axis=1) \
@@ -143,27 +143,30 @@ class GranularMaterialForce(object):
     and damping) the same way a particle does. Presently, if constraints are 
     to change, one would have to rewrite the function.
     """
-    r          = 3.0 # This is how 'hard' the floor is
-    fd         = p.y + p.L/2 - p.r
-    fd[fd > 0] = 0
-    
-    floorForce_r     = -self.k * fd 
-    floorDamping_r   = -self.gamma * p.vy * fd
-    floorForce_r     = floorForce_r - floorDamping_r
-    crx = 0
-    cry = floorForce_r * r / p.r
-    crz = 0
-    
-    floorDamping_tx  = p.omegax.copy()
-    floorDamping_ty  = p.omegay.copy()
-    floorDamping_tz  = p.omegaz.copy()
-    floorDamping_tx[fd == 0] = 0 
-    floorDamping_ty[fd == 0] = 0 
-    floorDamping_tz[fd == 0] = 0 
-
-    ctx = -self.f*floorDamping_tx
-    cty = -self.f*floorDamping_ty
-    ctz = -self.f*floorDamping_tz
+    if p.periodicY == 1:
+      crx = cry = crz = ctx = cty = ctz = 0
+    else:
+      r          = 3.0 # This is how 'hard' the floor is
+      fd         = p.y + p.L/2 - p.r
+      fd[fd > 0] = 0
+      
+      floorForce_r     = -self.k * fd 
+      floorDamping_r   = -self.gamma * p.vy * fd
+      floorForce_r     = floorForce_r - floorDamping_r
+      crx = 0
+      cry = floorForce_r * r / p.r
+      crz = 0
+      
+      floorDamping_tx  = p.omegax.copy()
+      floorDamping_ty  = p.omegay.copy()
+      floorDamping_tz  = p.omegaz.copy()
+      floorDamping_tx[fd == 0] = 0 
+      floorDamping_ty[fd == 0] = 0 
+      floorDamping_tz[fd == 0] = 0 
+      
+      ctx = -self.f*floorDamping_tx
+      cty = -self.f*floorDamping_ty
+      ctz = -self.f*floorDamping_tz
 
     return crx, cry, crz, ctx, cty, ctz
 

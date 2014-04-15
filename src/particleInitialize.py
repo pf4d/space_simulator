@@ -1,44 +1,16 @@
 from pylab import *
-def particleInitialize(p,initialization,L):
-  vel=1.0
-  dist = L/10.
-  if initialization == 'one':
-    p.addParticle(0,dist,0,0,0,0,1)
 
-  elif initialization == 'two':
-    p.addParticle(-dist,0.,0.,vel,0.,0.,1.)
-    p.addParticle(dist,0.,0,-vel,0.,0.,1.)
 
-  elif initialization == 'three':
-    p.addParticle(0.,dist*sqrt(3)/2,0.,0.,-vel,0.,1.)
-    p.addParticle(-dist,0.,0.,vel,0.,0.,1.0)
-    p.addParticle(dist,0.,0,-vel,0.,0.,1.)
+def particleInitialize(p, n, L):
+  """
+  addParticle(x, y, z, vx, vy, vz, r,
+              thetax, thetay, thetaz, 
+              omegax, omegay, omegaz): 
+  """
+  dx = 2.0*L / n
+  d  = linspace(dx/2.0 - L, L - dx/2.0, n)
 
-  elif initialization == 'four':
-    p.addParticle(-dist,0.,0.,vel,0.,0.,1.)
-    p.addParticle(dist,0.,0,-vel,0.,0.,1.)
-    p.addParticle(0.,dist,0,0.,-vel,0.,1.)
-    p.addParticle(0.,-dist,0,0.,vel,0.,1.)
-
-  elif initialization == 'six':
-    p.addParticle(0.,dist,0.,0.,-vel,0.,1.)
-    p.addParticle(0.,-dist,0.,0.,vel,0.,1.)
-    p.addParticle(dist/sqrt(2),dist/sqrt(2),0,-vel/sqrt(2),-vel/sqrt(2),0.,1.)
-    p.addParticle(-dist/sqrt(2),dist/sqrt(2),0,vel/sqrt(2),-vel/sqrt(2),0.,1.)
-    p.addParticle(-dist/sqrt(2),-dist/sqrt(2),0,vel/sqrt(2),vel/sqrt(2),0.,1.)
-    p.addParticle(dist/sqrt(2),-dist/sqrt(2),0,-vel/sqrt(2),vel/sqrt(2),0.,1.)       
-  elif initialization == 'eight':
-    p.addParticle(-dist,0.,0.,vel,0.,0.,1.)
-    p.addParticle(dist,0.,0,-vel,0.,0.,1.)
-    p.addParticle(0.,dist,0,0.,-vel,0.,1.)
-    p.addParticle(0.,-dist,0,0.,vel,0.,1.)
-
-    p.addParticle(dist/sqrt(2),dist/sqrt(2),0,-vel/sqrt(2),-vel/sqrt(2),0.,1.)
-    p.addParticle(-dist/sqrt(2),dist/sqrt(2),0,vel/sqrt(2),-vel/sqrt(2),0.,1.)
-    p.addParticle(-dist/sqrt(2),-dist/sqrt(2),0,vel/sqrt(2),vel/sqrt(2),0.,1.)
-    p.addParticle(dist/sqrt(2),-dist/sqrt(2),0,-vel/sqrt(2),vel/sqrt(2),0.,1.)       
-     
-  else:
-    p.addParticle(-dist,0.,0.,vel,0.,0.,1.)
-    p.addParticle(dist,0.,0,-vel,0.,0.,1.)
-
+  for i in d:
+    for j in d:
+      for k in d:
+        p.addParticle(i,j,k,0,0,0,1.0/4,0,0,0,0,0,0)
