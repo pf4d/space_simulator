@@ -16,9 +16,11 @@ rotz      = 0      # camera z rotation
 frames    = 0      # for spf calculation
 lastTime  = time() # current time
 fps       = 1.0    # current frames per second
+w         = 700    # screen width
+h         = 700    # screen height
 
 dt        = 0.10   # time step taken by the time integration routine.
-L         = 10.0   # size of the box.
+L         = 60.0   # size of the box.
 t         = 0      # initial time
 vy        = 0      # vertical velocity
 vx        = 0      # horizontal velocity
@@ -31,7 +33,7 @@ gamma     = 0.1    # energy dissipation/loss
 k         = 1.5    # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
 # "space balls" :
-k         = 40.0    # elastic 'bounce'
+k         = 4.0    # elastic 'bounce'
 gamma     = 0.5    # energy dissipation/loss
 
 g         = 0.10   # downward acceleration
@@ -57,7 +59,7 @@ p = Particles(L, f, periodicY=1, periodicZ=1, periodicX=1)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-particleInitialize(p, 5, L)
+particleInitialize(p, 5, 1, L)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
@@ -96,29 +98,32 @@ def display():
   # print statistics :
   glPushMatrix()
   glLoadIdentity()
+ 
+  dx = 0.2 * L
+  dy = 0.1 * L
   
   glColor(1.0,1.0,1.0,1.0) 
-  glRasterPos2f(L-2, L-1)
+  glRasterPos2f(L-dx, L-dy)
   font = BitmapFont('ProggySquareSZ.ttf')
   font.FaceSize(16)
   #font = TextureFont('ProggySquareSZ.ttf')
   #font.FaceSize(13)
   #glScale(0.05, 0.05, 0.05)
   font.Render("n = %i" % p.N)
-  glRasterPos2f(-L+1, L-1)
+  glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
-  #t1 = 'red particle statistics :'
-  #t2 = 'theta (x,y,z): %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
-  #t3 = 'omega (x,y,z): %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
-  #t4 = 'alpha (x,y,z): %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
-  #glRasterPos2f(-L+1,-L+3)
-  #font.Render(t1)
-  #glRasterPos2f(-L+1,-L+2.5)
-  #font.Render(t2)
-  #glRasterPos2f(-L+1,-L+2)
-  #font.Render(t3)
-  #glRasterPos2f(-L+1,-L+1.5)
-  #font.Render(t4)
+  t1 = 'red particle statistics :'
+  t2 = 'theta (x,y,z): %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
+  t3 = 'omega (x,y,z): %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
+  t4 = 'alpha (x,y,z): %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
+  glRasterPos2f(-L+dy,-L+dy*3)
+  font.Render(t1)
+  glRasterPos2f(-L+dy,-L+dy*2.5)
+  font.Render(t2)
+  glRasterPos2f(-L+dy,-L+dy*2)
+  font.Render(t3)
+  glRasterPos2f(-L+dy,-L+dy*1.5)
+  font.Render(t4)
   
   glPopMatrix()
   
@@ -397,8 +402,8 @@ def motion(x,y):
 if __name__ == '__main__':
 
     i      = 70
-    width  = i*int(L)
-    height = i*int(L)
+    #width  = i*int(L)
+    #height = i*int(L)
     
     sx = 600# + 1920
     sy = 300# + 100
@@ -407,7 +412,7 @@ if __name__ == '__main__':
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowPosition(sx, sy)
-    glutInitWindowSize(width, height)
+    glutInitWindowSize(w, h)
     glutCreateWindow("bounce")
     glutDisplayFunc(display)
     glutMouseFunc(mouse)

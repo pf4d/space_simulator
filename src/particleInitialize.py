@@ -1,7 +1,7 @@
 from pylab import *
 
 
-def particleInitialize(p, n, L):
+def particleInitialize(p, n, r, L):
   """
   addParticle(x, y, z, vx, vy, vz, r,
               thetax, thetay, thetaz, 
@@ -13,4 +13,4 @@ def particleInitialize(p, n, L):
   for i in d:
     for j in d:
       for k in d:
-        p.addParticle(i,j,k,0,0,0,1.0/4,0,0,0,0,0,0)
+        p.addParticle(i,j,k,0,0,0,r,0,0,0,0,0,0)
