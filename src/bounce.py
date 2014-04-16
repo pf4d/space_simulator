@@ -32,9 +32,10 @@ gamma     = 0.1    # energy dissipation/loss
 k         = 1.5    # elastic 'bounce'
 gamma     = 0.1    # energy dissipation/loss
 # "space balls" :
-k         = 40.0    # elastic 'bounce'
-gamma     = 0.5    # energy dissipation/loss
+k         = 60.0   # elastic 'bounce'
+gamma     = 1.5    # energy dissipation/loss
 
+rho       = 1e4    # particle denisty
 g         = 0.00   # downward acceleration
 
 on        = False  # start / stop adding particles
@@ -55,13 +56,13 @@ SLICES = 30
 #f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-#p = Particles(L, 7E4, f, periodicY=1, periodicZ=1, periodicX=1)
-p = Nebula(L, 7E4, f)
+#p = Particles(L, rho, f, periodicY=1, periodicZ=1, periodicX=1)
+p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#initialize_grid(p, 7, 1, L)
-initialize_random(p, 100, 1, L)
+initialize_grid(p, 7, 1.0/2.0, L/2)
+#initialize_random(p, 200, 1, L)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
 #integrate = VerletIntegrator(dt)
@@ -94,13 +95,13 @@ def init():
   glEnable(GL_BLEND)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glPointSize(10.0)
-  
+
 def display():
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  
   # camera viewpoint :
   glLoadIdentity()
-  gluLookAt(0,0,10,   # Camera Position
+  gluLookAt(0,0,L,   # Camera Position
             0,0,0,    # Point the Camera looks at
             0,1,0)    # the Up-Vector
   
@@ -125,18 +126,21 @@ def display():
   font.Render("n = %i" % p.N)
   glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
-  #t1 = 'red particle statistics :'
+  t1 = 'red particle statistics :'
   #t2 = 'theta (x,y,z): %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
   #t3 = 'omega (x,y,z): %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
   #t4 = 'alpha (x,y,z): %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
-  #glRasterPos2f(-L+dy,-L+dy*3)
-  #font.Render(t1)
-  #glRasterPos2f(-L+dy,-L+dy*2.5)
-  #font.Render(t2)
-  #glRasterPos2f(-L+dy,-L+dy*2)
-  #font.Render(t3)
-  #glRasterPos2f(-L+dy,-L+dy*1.5)
-  #font.Render(t4)
+  t2 = 'position     (x,y,z): %.2E, %.2E, %.2E' % (p.x[0],  p.y[0],  p.z[0])
+  t3 = 'velocity     (x,y,z): %.2E, %.2E, %.2E' % (p.vx[0], p.vy[0], p.vz[0])
+  t4 = 'acceleration (x,y,z): %.2E, %.2E, %.2E' % (p.ax[0], p.ay[0], p.az[0])
+  glRasterPos2f(-L+dy,-L+dy*3)
+  font.Render(t1)
+  glRasterPos2f(-L+dy,-L+dy*2.5)
+  font.Render(t2)
+  glRasterPos2f(-L+dy,-L+dy*2)
+  font.Render(t3)
+  glRasterPos2f(-L+dy,-L+dy*1.5)
+  font.Render(t4)
   
   glPopMatrix()
   
@@ -170,16 +174,16 @@ def display():
       glColor(1, 1/2.0, 0.0, mag)
     
     glPushMatrix()
-    #glTranslate(p.x[i], p.y[i], p.z[i])
+    glTranslate(p.x[i], p.y[i], p.z[i])
     #glRotate(p.thetax[i]*180/pi, 1,0,0)
     #glRotate(p.thetay[i]*180/pi, 0,1,0)
     #glRotate(p.thetaz[i]*180/pi, 0,0,1)
-    #glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
-    #glMaterial(GL_FRONT, GL_SHININESS, 100.0)
-    glBegin(GL_POINTS)
-    glVertex3f(p.x[i], p.y[i], p.z[i])
-    glEnd()
-    #glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
+    glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
+    glMaterial(GL_FRONT, GL_SHININESS, 100.0)
+    #glBegin(GL_POINTS)
+    #glVertex3f(p.x[i], p.y[i], p.z[i])
+    #glEnd()
+    glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
     #glColor(0.0,0.0,0.0,1.0)
     #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
     #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
@@ -398,7 +402,7 @@ def special(k, x, y):
 def mouse(button,state,x,y):
   global beginx,beginy,rotate
   if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
-    print "Mouseclick: ",x,"x> ",y,"yv"
+    #print "Mouseclick <x,y> : <%i,%i>" % (x,y)
     rotate = 1
     beginx = x
     beginy = y
@@ -408,41 +412,42 @@ def mouse(button,state,x,y):
 def motion(x,y):
   global rotx,roty,beginx,beginy,rotate
   if rotate:
-    rotx = rotx + (y - beginy)
-    roty = roty + (x - beginx)
+    rotx = rotx + (y - beginy) / 10.0
+    roty = roty + (x - beginx) / 10.0
     beginx = x
     beginy = y
     glutPostRedisplay()
+    #print "Mouse movement <x,y> : <%i,%i>" % (x,y)
   
 
 if __name__ == '__main__':
 
-    i      = 70
-    #width  = i*int(L)
-    #height = i*int(L)
-    
-    sx = 600# + 1920
-    sy = 300# + 100
-
-    # open a window
-    glutInit(sys.argv)
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
-    glutInitWindowPosition(sx, sy)
-    glutInitWindowSize(w, h)
-    glutCreateWindow("bounce")
-    glutDisplayFunc(display)
-    glutMouseFunc(mouse)
-    glutMotionFunc(motion)
-    glutReshapeFunc(reshape)
-    glutIdleFunc(idle)
-    glutKeyboardFunc(key)
-    glutSpecialFunc(special)
+  i      = 70
+  #width  = i*int(L)
+  #height = i*int(L)
   
-    
-    # initialize
-    init()
+  sx = 600# + 1920
+  sy = 300# + 100
 
-    # hand off control to event loop
-    glutMainLoop()
+  # open a window
+  glutInit(sys.argv)
+  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
+  glutInitWindowPosition(sx, sy)
+  glutInitWindowSize(w, h)
+  glutCreateWindow("bounce")
+  glutDisplayFunc(display)
+  glutMouseFunc(mouse)
+  glutMotionFunc(motion)
+  glutReshapeFunc(reshape)
+  glutIdleFunc(idle)
+  glutKeyboardFunc(key)
+  glutSpecialFunc(special)
+
+  
+  # initialize
+  init()
+
+  # hand off control to event loop
+  glutMainLoop()
 
 

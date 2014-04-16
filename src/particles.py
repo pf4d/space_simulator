@@ -206,40 +206,15 @@ class NebulaGranularMaterialForce(object):
     # damping is subtracted from force :
     mag_r += self.gamma * vijDotrij / d
 
-    # floor components of acceleration :
-    crx, cry, crz = self.floorConstraint(p)
-
     # gravitational pull between particles :
     F = self.G * p.mi_mj / d**2
     F[d < 0.0] = 0
 
     # Project onto components, sum all forces on each particle
-    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
-    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
+    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1)
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) - self.g 
+    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1)
     
-  def floorConstraint(self, p):
-    """ 
-    This is a highly specific function for a floor that responds (elasticity 
-    and damping) the same way a particle does. Presently, if constraints are 
-    to change, one would have to rewrite the function.
-    """
-    if p.periodicY == 1:
-      crx = cry = crz = 0
-    else:
-      r          = 3.0 # This is how 'hard' the floor is
-      fd         = p.y + p.L/2 - p.r
-      fd[fd > 0] = 0
-      
-      floorForce_r     = -self.k * fd 
-      floorDamping_r   = -self.gamma * p.vy * fd
-      floorForce_r     = floorForce_r - floorDamping_r
-      crx = 0
-      cry = floorForce_r * r / p.r
-      crz = 0
-      
-    return crx, cry, crz
-
 
 class VerletIntegrator(object):
 
@@ -510,6 +485,7 @@ def initialize_random(p, n, r, L):
               omegax, omegay, omegaz): 
   """
   for i in range(n):
+    r     = 0.1*randn() + r
     x,y,z = L*randn(3)
     p.addParticle(x,y,z,0,0,0,r,0,0,0,0,0,0)
 
