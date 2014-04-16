@@ -61,7 +61,7 @@ p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-initialize_grid(p, 7, 1.0/2.0, L/2)
+initialize_grid(p, 7, 1.0, L/2)
 #initialize_random(p, 200, 1, L)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
