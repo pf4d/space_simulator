@@ -1,12 +1,11 @@
-from particles          import *
-from particleInitialize import *
-from pylab              import *
-from OpenGL.GL          import *
-from OpenGL.GLUT        import *
-from OpenGL.GLE         import *
-from OpenGL.GLU         import *
-from FTGL               import *
-from time               import time
+from particles      import *
+from pylab          import *
+from OpenGL.GL      import *
+from OpenGL.GLUT    import *
+from OpenGL.GLE     import *
+from OpenGL.GLU     import *
+from FTGL           import *
+from time           import time
 import sys
 
 rotx      = 0      # camera x rotation
@@ -16,9 +15,11 @@ rotz      = 0      # camera z rotation
 frames    = 0      # for spf calculation
 lastTime  = time() # current time
 fps       = 1.0    # current frames per second
+w         = 700    # screen width
+h         = 700    # screen height
 
 dt        = 0.10   # time step taken by the time integration routine.
-L         = 10.0   # size of the box.
+L         = 120.0  # size of the box.
 t         = 0      # initial time
 vy        = 0      # vertical velocity
 vx        = 0      # horizontal velocity
@@ -34,7 +35,7 @@ gamma     = 0.1    # energy dissipation/loss
 k         = 40.0    # elastic 'bounce'
 gamma     = 0.5    # energy dissipation/loss
 
-g         = 0.10   # downward acceleration
+g         = 0.00   # downward acceleration
 
 on        = False  # start / stop adding particles
 trans     = False  # transparency enable
@@ -51,18 +52,23 @@ STACKS = 30
 SLICES = 30
 
 # instantiate the forces function between particles
-f = GranularMaterialForce(k=k, g=g, gamma=gamma)
+#f = GranularMaterialForce(k=k, g=g, gamma=gamma)
+f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-p = Particles(L, f, periodicY=1, periodicZ=1, periodicX=1)
+#p = Particles(L, 7E4, f, periodicY=1, periodicZ=1, periodicX=1)
+p = Nebula(L, 7E4, f)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-particleInitialize(p, 5, L)
+#initialize_grid(p, 7, 1, L)
+initialize_random(p, 100, 1, L)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
-integrate = VerletIntegrator(dt)
+#integrate = VerletIntegrator(dt)
+integrate = NebulaVerletIntegrator(dt)
 
 def init():
+  # general properties :
   glEnable(GL_COLOR_MATERIAL)
   glEnable(GL_BLEND)
   glShadeModel(GL_SMOOTH)
@@ -73,12 +79,21 @@ def init():
   glEnable(GL_POLYGON_OFFSET_FILL) # Prevents hidden line problems when drawing
   glPolygonOffset(1.0, 1.0)        # a wireframe on top of filled polygons.
 
+  # 3d parameters :
   glEnable(GL_CULL_FACE)
   glEnable(GL_DEPTH_TEST)
-  
+ 
+  # lights : 
   glEnable(GL_LIGHTING)
   glEnable(GL_LIGHT0)
   glEnable(GL_LIGHT1)
+
+  # point config :
+  glEnable(GL_POINT_SPRITE)
+  glEnable(GL_POINT_SMOOTH)
+  glEnable(GL_BLEND)
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+  glPointSize(10.0)
   
 def display():
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -96,28 +111,31 @@ def display():
   # print statistics :
   glPushMatrix()
   glLoadIdentity()
+ 
+  dx = 0.2 * L
+  dy = 0.1 * L
   
   glColor(1.0,1.0,1.0,1.0) 
-  glRasterPos2f(L-2, L-1)
+  glRasterPos2f(L-dx, L-dy)
   font = BitmapFont('ProggySquareSZ.ttf')
   font.FaceSize(16)
   #font = TextureFont('ProggySquareSZ.ttf')
   #font.FaceSize(13)
   #glScale(0.05, 0.05, 0.05)
   font.Render("n = %i" % p.N)
-  glRasterPos2f(-L+1, L-1)
+  glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
   #t1 = 'red particle statistics :'
   #t2 = 'theta (x,y,z): %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
   #t3 = 'omega (x,y,z): %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
   #t4 = 'alpha (x,y,z): %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
-  #glRasterPos2f(-L+1,-L+3)
+  #glRasterPos2f(-L+dy,-L+dy*3)
   #font.Render(t1)
-  #glRasterPos2f(-L+1,-L+2.5)
+  #glRasterPos2f(-L+dy,-L+dy*2.5)
   #font.Render(t2)
-  #glRasterPos2f(-L+1,-L+2)
+  #glRasterPos2f(-L+dy,-L+dy*2)
   #font.Render(t3)
-  #glRasterPos2f(-L+1,-L+1.5)
+  #glRasterPos2f(-L+dy,-L+dy*1.5)
   #font.Render(t4)
   
   glPopMatrix()
@@ -152,17 +170,20 @@ def display():
       glColor(1, 1/2.0, 0.0, mag)
     
     glPushMatrix()
-    glTranslate(p.x[i], p.y[i], p.z[i])
-    glRotate(p.thetax[i]*180/pi, 1,0,0)
-    glRotate(p.thetay[i]*180/pi, 0,1,0)
-    glRotate(p.thetaz[i]*180/pi, 0,0,1)
-    glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
-    glMaterial(GL_FRONT, GL_SHININESS, 100.0)
-    glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
-    glColor(0.0,0.0,0.0,1.0)
-    glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
-    glMaterial(GL_FRONT, GL_SHININESS, 0.0)
-    glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
+    #glTranslate(p.x[i], p.y[i], p.z[i])
+    #glRotate(p.thetax[i]*180/pi, 1,0,0)
+    #glRotate(p.thetay[i]*180/pi, 0,1,0)
+    #glRotate(p.thetaz[i]*180/pi, 0,0,1)
+    #glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
+    #glMaterial(GL_FRONT, GL_SHININESS, 100.0)
+    glBegin(GL_POINTS)
+    glVertex3f(p.x[i], p.y[i], p.z[i])
+    glEnd()
+    #glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
+    #glColor(0.0,0.0,0.0,1.0)
+    #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
+    #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
+    #glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
     glPopMatrix()
    
   ## draw velocity vectors : 
@@ -397,8 +418,8 @@ def motion(x,y):
 if __name__ == '__main__':
 
     i      = 70
-    width  = i*int(L)
-    height = i*int(L)
+    #width  = i*int(L)
+    #height = i*int(L)
     
     sx = 600# + 1920
     sy = 300# + 100
@@ -407,7 +428,7 @@ if __name__ == '__main__':
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowPosition(sx, sy)
-    glutInitWindowSize(width, height)
+    glutInitWindowSize(w, h)
     glutCreateWindow("bounce")
     glutDisplayFunc(display)
     glutMouseFunc(mouse)

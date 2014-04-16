@@ -62,11 +62,11 @@ class GranularMaterialForce(object):
 
     # gravitational pull between particles :
     F = self.G * p.mi_mj / d**2
-    F[d < 0.1] = 0
+    F[d < 0.0] = 0
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry# - self.g 
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
     p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
     
     omegax = tile(p.omegax, (p.N, 1))
@@ -171,16 +171,86 @@ class GranularMaterialForce(object):
     return crx, cry, crz, ctx, cty, ctz
 
 
+class NebulaGranularMaterialForce(object):
+
+  def __init__(self, k=1.5, gamma=0.3, g=0.25):
+    # parameters in force model
+    self.k     = k           # elastic 'bounce'
+    self.gamma = gamma       # energy dissipation/loss
+    self.g     = g           # gravity
+    self.rho   = 1.0         # density
+    self.G     = 6.67384E-11 # gravitational constant
+
+  def __call__(self, p):
+    # find position differences :
+    d, dx, dy, dz = p.distanceMatrix(p.x, p.y, p.z)
+
+    # compute overlap :
+    dr = d - p.sumOfRadii
+    fill_diagonal(dr, 0)
+
+    # no forces arising in no overlap cases :
+    dr[dr > 0] = 0
+
+    # compute elastic particle/particle forces :
+    mag_r = self.k * dr
+
+    # velocity differences :
+    dv, dvx, dvy, dvz = p.distanceMatrix(p.vx, p.vy, p.vz)
+    da, dax, day, daz = p.distanceMatrix(p.ax, p.ay, p.az)
+    
+    # damping terms :
+    vijDotrij             = dvx*dx + dvy*dy + dvz*dz
+    vijDotrij[dr==0]      = 0 
+
+    # damping is subtracted from force :
+    mag_r += self.gamma * vijDotrij / d
+
+    # floor components of acceleration :
+    crx, cry, crz = self.floorConstraint(p)
+
+    # gravitational pull between particles :
+    F = self.G * p.mi_mj / d**2
+    F[d < 0.0] = 0
+
+    # Project onto components, sum all forces on each particle
+    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
+    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
+    
+  def floorConstraint(self, p):
+    """ 
+    This is a highly specific function for a floor that responds (elasticity 
+    and damping) the same way a particle does. Presently, if constraints are 
+    to change, one would have to rewrite the function.
+    """
+    if p.periodicY == 1:
+      crx = cry = crz = 0
+    else:
+      r          = 3.0 # This is how 'hard' the floor is
+      fd         = p.y + p.L/2 - p.r
+      fd[fd > 0] = 0
+      
+      floorForce_r     = -self.k * fd 
+      floorDamping_r   = -self.gamma * p.vy * fd
+      floorForce_r     = floorForce_r - floorDamping_r
+      crx = 0
+      cry = floorForce_r * r / p.r
+      crz = 0
+      
+    return crx, cry, crz
+
+
 class VerletIntegrator(object):
 
   def __init__(self, dt=0.01):
-    # Time step
+    # time step
     self.dt = dt
 
   def __call__(self, force, p):
     dt = self.dt
 
-    # Position update
+    # position update
     p.x = p.x + p.vx*dt + 0.5*p.ax*dt**2
     p.y = p.y + p.vy*dt + 0.5*p.ay*dt**2
     p.z = p.z + p.vz*dt + 0.5*p.az*dt**2
@@ -190,10 +260,10 @@ class VerletIntegrator(object):
     p.thetay = p.thetay + p.omegay*dt + 0.5*p.alphay*dt**2
     p.thetaz = p.thetaz + p.omegaz*dt + 0.5*p.alphaz*dt**2
 
-    # Update periodic BC
+    # update periodic BC
     p.pbcUpdate()
 
-    # Store accelerations for averaging that is done 
+    # store accelerations for averaging that is done 
     ax = p.ax
     ay = p.ay
     az = p.az
@@ -203,9 +273,9 @@ class VerletIntegrator(object):
     alphay = p.alphay
     alphaz = p.alphaz
 
-    force(p) # Force update with new positions
+    force(p) # force update with new positions
 
-    # Velocity updates
+    # velocity updates
     p.vx = p.vx + 0.5*(ax + p.ax)*dt
     p.vy = p.vy + 0.5*(ay + p.ay)*dt
     p.vz = p.vz + 0.5*(az + p.az)*dt
@@ -216,9 +286,39 @@ class VerletIntegrator(object):
     p.omegaz = p.omegaz + 0.5*(alphaz + p.alphaz)*dt
 
 
+class NebulaVerletIntegrator(object):
+
+  def __init__(self, dt=0.01):
+    # time step
+    self.dt = dt
+
+  def __call__(self, force, p):
+    dt = self.dt
+
+    # position update
+    p.x = p.x + p.vx*dt + 0.5*p.ax*dt**2
+    p.y = p.y + p.vy*dt + 0.5*p.ay*dt**2
+    p.z = p.z + p.vz*dt + 0.5*p.az*dt**2
+
+    # update periodic BC
+    p.pbcUpdate()
+
+    # store accelerations for averaging that is done 
+    ax = p.ax
+    ay = p.ay
+    az = p.az
+    
+    force(p) # force update with new positions
+
+    # velocity updates
+    p.vx = p.vx + 0.5*(ax + p.ax)*dt
+    p.vy = p.vy + 0.5*(ay + p.ay)*dt
+    p.vz = p.vz + 0.5*(az + p.az)*dt
+
+
 class Particles(object):
 
-  def __init__(self, L, force, periodicX=1, periodicY=1, periodicZ=1):
+  def __init__(self, L, rho, force, periodicX=1, periodicY=1, periodicZ=1):
     # container size
     self.L = L
     # total Number of particles
@@ -261,7 +361,7 @@ class Particles(object):
     self.m     = array([],dtype=self.type)
     self.V     = array([],dtype=self.type)
     self.mi_mj = array([],dtype=self.type)
-    self.rho   = 1.0E5
+    self.rho   = rho
      
   def addParticle(self, x, y, z, vx, vy, vz, r,
                   thetax, thetay, thetaz, 
@@ -341,6 +441,77 @@ class Particles(object):
     d[d==0] = -1
 
     return d, dx, dy, dz
+
+
+class Nebula(Particles):
+
+  def __init__(self, L, rho, force, periodicX=1, periodicY=1, periodicZ=1):
+    super(Nebula, self).__init__(L, rho, force, periodicX, 
+                                 periodicY, periodicZ)
+     
+  def addParticle(self, x, y, z, vx, vy, vz, r,
+                  thetax, thetay, thetaz, 
+                  omegax, omegay, omegaz): 
+    self.x  = hstack((self.x,x))
+    self.y  = hstack((self.y,y))
+    self.z  = hstack((self.z,z))
+    self.vx = hstack((self.vx,vx))
+    self.vy = hstack((self.vy,vy))
+    self.vz = hstack((self.vz,vz))
+    self.ax = hstack((self.ax,0))
+    self.ay = hstack((self.ay,0))
+    self.az = hstack((self.az,0))
+    self.r  = hstack((self.r,r))
+    self.N  = self.N+1
+    temp    = tile(self.r,(self.N,1))
+    self.sumOfRadii   = temp + temp.T
+    self.ratioOfRadii = temp / temp.T
+    # gravitational pull :
+    V          = 4.0/3.0 * pi * r**3
+    self.V     = hstack((self.V, V))
+    self.m     = self.rho * self.V
+    self.mi_mj = outer(self.m, self.m)
+    self.f(self)
+
+  def pbcUpdate(self):
+    """
+    Moves paricles across periodic boundary
+    """
+    super(Nebula, self).pbcUpdate()
+
+  def distanceMatrix(self, x, y, z):
+    """
+    Computes distances between all particles and places the result in a 
+    matrix such that the ij th matrix entry corresponds to the distance 
+    between particle i and j
+    """ 
+    return super(Nebula, self).distanceMatrix(x, y, z)
+
+
+def initialize_grid(p, n, r, L):
+  """
+  addParticle(x, y, z, vx, vy, vz, r,
+              thetax, thetay, thetaz, 
+              omegax, omegay, omegaz): 
+  """
+  dx = 2.0*L / n
+  d  = linspace(dx/2.0 - L, L - dx/2.0, n)
+
+  for i in d:
+    for j in d:
+      for k in d:
+        p.addParticle(i,j,k,0,0,0,r,0,0,0,0,0,0)
+
+
+def initialize_random(p, n, r, L):
+  """
+  addParticle(x, y, z, vx, vy, vz, r,
+              thetax, thetay, thetaz, 
+              omegax, omegay, omegaz): 
+  """
+  for i in range(n):
+    x,y,z = L*randn(3)
+    p.addParticle(x,y,z,0,0,0,r,0,0,0,0,0,0)
 
 
 
