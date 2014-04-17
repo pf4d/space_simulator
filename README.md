@@ -40,3 +40,5 @@ In the ```src``` directory, simply type
 ```bash
 python bounce.py
 ```
+
+To move the camera, press the left mouse button and drag up and down.
