@@ -5,6 +5,7 @@ from OpenGL.GLE     import *
 from OpenGL.GLU     import *
 from FTGL           import *
 from pylab          import *
+from objLoader      import *
 from time           import time
 import sys
 
@@ -52,18 +53,24 @@ UPDATE_FRAMES = 1  # how often to redraw screen
 STACKS = 30
 SLICES = 30
 
+# create specter field :
+specter = Specter(1e3, 4*L)
+
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 #f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
+
 # create some particles and a box
 p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
+
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#initialize_grid(p, 7, 2.0, L)
-initialize_random(p, 50, 4, L)
+#initialize_grid(p, 4, 4.0, 2*L)
+initialize_random(p, 100, 4, L/2)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
+
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
 #integrate = NebulaVerletIntegrator(dt)
@@ -292,6 +299,23 @@ def print_ship_stats(dx, dy):
   glPopMatrix()
   glMatrixMode(GL_MODELVIEW)
 
+
+def draw_specter_field(S, r):
+  """
+  """
+  glDisable(GL_LIGHTING)   # disable lighting
+  glPointSize(r)
+  glColor(1.0,1.0,1.0,1.0)
+  for i in range(S.n):
+    mag = sqrt(S.x[i]**2 + S.y[i]**2 + S.z[i]**2)
+    tra = (S.L - mag)/S.L
+    glColor(1.0,1.0,1.0,tra)
+    glBegin(GL_POINTS)
+    glVertex3f(S.x[i], S.y[i], S.z[i])
+    glEnd()
+  glEnable(GL_LIGHTING)    # enable lighting
+
+
 def display():
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  
@@ -300,8 +324,13 @@ def display():
  
   # camera viewpoint :
   glLoadIdentity()
+  #pt = array([p.x[0],  p.y[0],  p.z[0]])
+  #pt /= sqrt(pt**2)
+  #pr = array([p.thetax[0],  p.thetay[0],  p.thetaz[0]])
+  #pr /= sqrt(pr**2)
+  #px = 10*(pt - pr)
   #gluLookAt(p.x[0],  p.y[0],  p.z[0],    # Camera Position
-  #          p.vx[0], p.vy[0], p.vz[0],   # Point the Camera looks at
+  #          p.thetax[0], p.thetay[0], p.thetaz[0],   # Point the Camera looks at
   #          0,       1,       0)         # the Up-Vector
   gluLookAt(0,0,4*L,   # Camera Position
             0,0,0,     # Point the Camera looks at
@@ -312,10 +341,13 @@ def display():
   glRotate(rotz,0,0,1)
 
   # print ship stats :
-  print_ship_stats(dx,dy)
+  #print_ship_stats(dx,dy)
 
   # draw ship vectors :
-  draw_ship_vectors(dx,dy)
+  #draw_ship_vectors(dx,dy)
+
+  # draw specter field :
+  draw_specter_field(specter, 1.0)
  
   # draw the spheres :
   glPushMatrix() 
@@ -356,7 +388,10 @@ def display():
     #glBegin(GL_POINTS)
     #glVertex3f(p.x[i], p.y[i], p.z[i])
     #glEnd()
-    glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
+    if i == 0:
+      glCallList(obj.gl_list)
+    else:  
+      glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
     #glColor(0.0,0.0,0.0,1.0)
     #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
     #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
@@ -617,6 +652,7 @@ if __name__ == '__main__':
   glutKeyboardFunc(key)
   glutSpecialFunc(special)
 
+  obj = OBJ('phantom.obj', swapyz=False)
   
   # initialize
   init()

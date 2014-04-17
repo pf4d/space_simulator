@@ -421,6 +421,27 @@ class Nebula(Particles):
     return super(Nebula, self).distanceMatrix(x, y, z)
 
 
+class Specter(object):
+
+  def __init__(self, n, L):
+    """
+    """
+    self.n = int(n)       # number of points
+    self.L = L            # extent of field
+    self.x = array([])    # x-coords
+    self.y = array([])    # y-coords
+    self.z = array([])    # z-coords
+    for i in range(self.n):
+      #x,y,z = L*rand(3) - L/2.0
+      x,y,z = L*randn(3)
+      self.addSpecter(x,y,z)
+   
+  def addSpecter(self, x, y, z): 
+    self.x  = hstack((self.x,x))
+    self.y  = hstack((self.y,y))
+    self.z  = hstack((self.z,z))
+
+
 def initialize_grid(p, n, r, L):
   """
   addParticle(x, y, z, vx, vy, vz, r,
