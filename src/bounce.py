@@ -56,6 +56,9 @@ SLICES = 30
 # create specter field :
 specter = Specter(1e3, 4*L)
 
+# create star field :
+star    = Specter(1e3, 100*L)
+
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 #f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
@@ -348,6 +351,9 @@ def display():
 
   # draw specter field :
   draw_specter_field(specter, 1.0)
+ 
+  # draw star field :
+  draw_specter_field(star, 4.0)
  
   # draw the spheres :
   glPushMatrix() 
