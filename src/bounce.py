@@ -1,10 +1,10 @@
 from particles      import *
-from pylab          import *
 from OpenGL.GL      import *
 from OpenGL.GLUT    import *
 from OpenGL.GLE     import *
 from OpenGL.GLU     import *
 from FTGL           import *
+from pylab          import *
 from time           import time
 import sys
 
@@ -53,20 +53,20 @@ STACKS = 30
 SLICES = 30
 
 # instantiate the forces function between particles
-#f = GranularMaterialForce(k=k, g=g, gamma=gamma)
-f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
+f = GranularMaterialForce(k=k, g=g, gamma=gamma)
+#f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-#p = Particles(L, rho, f, periodicY=1, periodicZ=1, periodicX=1)
-p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
+p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
+#p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-initialize_grid(p, 7, 1.0, L/2)
-#initialize_random(p, 200, 1, L)
+#initialize_grid(p, 2, 4.0, L/2)
+initialize_random(p, 200, 1, L/3)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
-#integrate = VerletIntegrator(dt)
-integrate = NebulaVerletIntegrator(dt)
+integrate = VerletIntegrator(dt)
+#integrate = NebulaVerletIntegrator(dt)
 
 def init():
   # general properties :
@@ -95,26 +95,140 @@ def init():
   glEnable(GL_BLEND)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glPointSize(10.0)
-
-def display():
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
- 
-  # camera viewpoint :
-  glLoadIdentity()
-  gluLookAt(0,0,L,   # Camera Position
-            0,0,0,    # Point the Camera looks at
-            0,1,0)    # the Up-Vector
   
-  glRotate(rotx,1,0,0)
-  glRotate(roty,0,1,0)
-  glRotate(rotz,0,0,1)
+def draw_ship_vectors(dx, dy):
+  # draw the ship statistics :
+  glColor(0.6, 0.1, 0.1)
+  glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
+  glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
+  glMaterial(GL_FRONT, GL_SHININESS, 100.0)
+  glDisable(GL_LIGHTING)   # disable lighting
+  
+  # parameters for positioning :
+  xt =  L-dx
+  yt = -L+dy
+  zt =  L
+  xr =  L-2*dx
+  yr =  yt
+  zr =  zt
+  thetax = pi/4
+  thetay = pi/4
+  thetaz = pi/2
+  
+  ## draw the 'ship' :
+  #glPushMatrix()
+  #glTranslate(xt, yt, zt)
+  #glutSolidSphere(p.r[0]/radiusDiv, SLICES, STACKS)
+  #glPopMatrix()
+  #glPushMatrix()
+  #glTranslate(xr, yr, zr)
+  #glutSolidSphere(p.r[0]/radiusDiv, SLICES, STACKS)
+  #glPopMatrix()
 
+  # translational statistics :
+  glPushMatrix()
+  glLoadIdentity()
+  
+  glTranslate(xt, yt, zt)
+  glRotate(thetax*180/pi, 1,0,0)
+  glRotate(thetay*180/pi, 0,1,0)
+  glRotate(thetaz*180/pi, 0,0,1)
+  xyz1 = array([0,0,0])
+  glLineWidth(2.0)
+  glBegin(GL_LINES)
+ 
+  # acceleration vectors :
+  c = 1.0
+  glColor4f(0.0,0.0,1.0,1.0)
+  t = array([0.5,0.5,0.5])
+  axyz = c * array([p.ax[0], 0, 0])
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  axyz = c * array([0, p.ay[0], 0])
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  axyz = c * array([0, 0, p.az[0]])
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  
+  # velocity vectors :
+  c = 1.0
+  glColor4f(0.0,1.0,0.0,1.0)
+  vxyz = c * array([p.vx[0], 0, 0])
+  xyz2 = xyz1 + vxyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  vxyz = c * array([0, p.vy[0], 0])
+  xyz2 = xyz1 + vxyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  vxyz = c * array([0, 0, p.vz[0]])
+  xyz2 = xyz1 + vxyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  
+  glEnd()
+  glPopMatrix()
+ 
+  # rotational statistics : 
+  glPushMatrix()
+  glLoadIdentity()
+  
+  glTranslate(xr, yr, zr)
+  glRotate(thetax*180/pi, 1,0,0)
+  glRotate(thetay*180/pi, 0,1,0)
+  glRotate(thetaz*180/pi, 0,0,1)
+  xyz1 = array([0,0,0])
+  glBegin(GL_LINES)
+ 
+  # angular acceleration vectors :
+  c = 1.0
+  glColor4f(1.0,0.0,0.0,1.0)
+  t = array([0.5,0.5,0.5])
+  axyz = c * array([p.alphax[0], 0, 0])
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  axyz = c * array([0, p.alphay[0], 0])
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  axyz = c * array([0, 0, p.alphaz[0]])
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  
+  # angular velocity vectors :
+  c = 1.0
+  glColor4f(1.0,1.0,0.0,1.0)
+  vxyz = c * array([p.omegax[0], 0, 0])
+  xyz2 = xyz1 + vxyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  vxyz = c * array([0, p.omegay[0], 0])
+  xyz2 = xyz1 + vxyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  vxyz = c * array([0, 0, p.omegaz[0]])
+  xyz2 = xyz1 + vxyz
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
+  
+  glEnd()
+  glPopMatrix()
+  
+  # re-enable lighting :
+  glEnable(GL_LIGHTING)
+  
+def print_ship_stats(dx, dy):
+  glDisable(GL_LIGHTING)   # disable lighting
+  
   # print statistics :
   glPushMatrix()
   glLoadIdentity()
- 
-  dx = 0.2 * L
-  dy = 0.1 * L
   
   glColor(1.0,1.0,1.0,1.0) 
   glRasterPos2f(L-dx, L-dy)
@@ -141,9 +255,33 @@ def display():
   font.Render(t3)
   glRasterPos2f(-L+dy,-L+dy*1.5)
   font.Render(t4)
-  
   glPopMatrix()
   
+  # re-enable lighting :
+  glEnable(GL_LIGHTING)
+
+def display():
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+ 
+  dx = 0.2 * L
+  dy = 0.1 * L
+ 
+  # camera viewpoint :
+  glLoadIdentity()
+  gluLookAt(0,0,L,   # Camera Position
+            0,0,0,    # Point the Camera looks at
+            0,1,0)    # the Up-Vector
+  
+  glRotate(rotx,1,0,0)
+  glRotate(roty,0,1,0)
+  glRotate(rotz,0,0,1)
+
+  # print ship stats :
+  print_ship_stats(dx,dy)
+
+  # draw ship vectors :
+  draw_ship_vectors(dx,dy)
+ 
   # draw the spheres :
   glPushMatrix() 
   glColor(0.6, 0.1, 0.1)
@@ -199,7 +337,7 @@ def display():
   #  v_mag = sqrt(p.vx[i]**2 + p.vy[i]**2 + p.vz[i]**2) + 1e-16
   #  xyz1 = array([p.x[i],  p.y[i],  p.z[i]])
   #  vxyz = array([p.vx[i], p.vy[i], p.vz[i]])
-  #  vxyz = vxyz / v_mag * (p.r[i]+0.5)
+  #  vxyz = vxyz / v_mag * 2.0*p.r[i]
   #  xyz2 = xyz1 + vxyz
   #  glVertex3fv(xyz1)
   #  glVertex3fv(xyz2)
