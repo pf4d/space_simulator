@@ -30,7 +30,8 @@ pvy = 0
 pvz = 0
 pr = 1
 f = GranularMaterialForce(k=1.5, g=.000001, gamma=.1)
-p = Particles(L, f, periodicY=0, periodicZ=1, periodicX=1)
+#p = Particles(L, f, periodicY=0, periodicZ=1, periodicX=1)
+p = Particles(L, 0, f, periodicY=1, periodicZ=1, periodicX=1)
 integrate = VerletIntegrator(dt)
 #p.addParticle(px,py,pz,pvx,pvy,pvz,pr,0,0,0,0,0,0)
 
@@ -68,9 +69,9 @@ tx, ty = (0,0)
 zpos = 5
 rotate = move = False
 
-p.addParticle(px,py,pz,pvx,pvy,pvz,pr,0,0,0,0,0,0)
+p.addParticle(px,py,pz,pvx,pvy,pvz,4,0,0,0,0,0,0)
 
-for i in range (1,10):
+for i in range (1,50):
     random.seed()
     randx = randint(10, 200)
     randz = randint(10, 200)
@@ -143,20 +144,23 @@ while 1:
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     #gluLookAt(cameraDist, cameraTarget, cameraUp)
-    glPushMatrix()
+    #glPushMatrix()
     gluLookAt(cameraDist[0],cameraDist[1],cameraDist[2],cameraTarget[0],cameraTarget[1],cameraTarget[2],cameraUp[0],cameraUp[1],cameraUp[2])
-    glTranslate(p.x[0],p.y[0],p.z[0])
-    glRotate(ry, 1, 0, 0)
-    glRotate(rx, 0, 1, 0)
-    glCallList(obj.gl_list)
-    glPopMatrix()
+    #glTranslate(p.x[0],p.y[0],p.z[0])
+    #glRotate(ry, 1, 0, 0)
+    #glRotate(rx, 0, 1, 0)
+    #glCallList(obj.gl_list)
+    #glPopMatrix()
 
-    for i in range(1,10):
+    for i in range(p.N):
         glPushMatrix()
         glTranslate(p.x[i], p.y[i], p.z[i])
         glRotate(ry, 1, 0, 0)
         glRotate(rx, 0, 1, 0)
-        glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
+        if(i == 0):
+            glCallList(obj.gl_list)
+        else:
+            glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
         glPopMatrix()
     pygame.display.flip()
 

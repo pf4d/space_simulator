@@ -73,7 +73,8 @@ pvz = 0
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
 #p = Particles(L, f, periodicY=1, periodicZ=1, periodicX=1)
-p = Particles(L, 7E4, f, periodicY=1, periodicZ=1, periodicX=1)
+#p = Particles(L, 7E4, f, periodicY=1, periodicZ=1, periodicX=1)
+p = Particles(L, 0, f, periodicY=1, periodicZ=1, periodicX=1)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
@@ -197,6 +198,8 @@ def display():
     glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
     glMaterial(GL_FRONT, GL_SHININESS, 100.0)
     if(i == 0):
+        glLoadIdentity()
+        glTranslate(p.x[0], p.y[0], p.z[0])
         glCallList(obj.gl_list)
     else:
         glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
@@ -310,27 +313,21 @@ def idle():
 
   for e in pygame.event.get():
       if e.type == QUIT:
-          sys.exit()
+        sys.exit()
       elif e.type == KEYDOWN and e.key == K_ESCAPE:
-          sys.exit()
+        sys.exit()
       elif e.type == KEYDOWN and e.key == K_UP:
-          #paz -= .2
-          p.ay[0] -= 100
+        p.ay[0] -= 100
       elif e.type == KEYDOWN and e.key == K_DOWN:
-          #paz += .2
-          p.ay[0] += 100
+        p.ay[0] += 100
       elif e.type == KEYDOWN and e.key == K_a:
-          #pvx -= .2
-          p.ax[0] -= 100
+        p.ax[0] -= 100
       elif e.type == KEYDOWN and e.key == K_d:
-          #pvx += .2
-          p.ax[0] += 100
+        p.ax[0] += 100
       elif e.type == KEYDOWN and e.key == K_w:
-          #pvy += .2
-          p.az[0] += 100
+        p.az[0] += 100
       elif e.type == KEYDOWN and e.key == K_s:
-          #pvy -= .2
-          p.az[0] -= 100
+        p.az[0] -= 100
 
   for i in range(UPDATE_FRAMES):
     integrate(f,p) # Move the system forward in time
@@ -400,6 +397,9 @@ def key(k, x, y):
   
   if k == 'n':
     print "'n' was pressed: n =", p.N
+
+  if k == 'w':
+    p.az[0] += 50
     
 
 def special(k, x, y):
@@ -482,7 +482,7 @@ if __name__ == '__main__':
     glutIdleFunc(idle)
     glutKeyboardFunc(key)
     glutSpecialFunc(special)
-    obj = OBJ(sys.argv[1], swapyz=False)
+    obj = OBJ(sys.argv[1], swapyz=True)
     
     # initialize
     init()
