@@ -12,6 +12,7 @@ import sys
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
 rotz      = 0      # camera z rotation
+camDist   = 2.0    # camera distance coef.
 
 frames    = 0      # for spf calculation
 lastTime  = time() # current time
@@ -70,8 +71,8 @@ p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-initialize_grid(p, 4, 4.0, 2*L)
-#initialize_random(p, 100, 4, L/2)
+#initialize_grid(p, 4, 4.0, 2*L)
+initialize_random(p, 100, 4, L/2)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 
 # instantiate Integrator
@@ -337,13 +338,13 @@ def display():
   v  = array([p.vx[0], p.vy[0], p.vz[0]]) * 2.0*p.r[0]
   vmag = norm(v)
   pr = pt + v
-  pt = pt - v / vmag * 2.0 * p.r[0]
+  pt = pt - v / vmag * camDist * p.r[0]
   gluLookAt(pt[0], pt[1], pt[2],    # Camera Position
             pr[0], pr[1], pr[2],    # Point the Camera looks at
             0,     1,     0)        # the Up-Vector
-  #gluLookAt(0,0,4*L,   # Camera Position
-  #          0,0,0,     # Point the Camera looks at
-  #          0,1,0)     # the Up-Vector
+  #gluLookAt(0,0,4*camDist,   # Camera Position
+  #          0,0,0,           # Point the Camera looks at
+  #          0,1,0)           # the Up-Vector
   
   glRotate(rotx,1,0,0)
   glRotate(roty,0,1,0)
@@ -400,7 +401,7 @@ def display():
     #glBegin(GL_POINTS)
     #glVertex3f(p.x[i], p.y[i], p.z[i])
     #glEnd()
-    if i == 0:
+    if i == inf:
       glCallList(obj.gl_list)
     else:  
       glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
@@ -627,7 +628,7 @@ def special(k, x, y):
       print 'INS   key was pressed: partInt =', partInt
 
 def mouse(button,state,x,y):
-  global beginx,beginy,rotate
+  global beginx,beginy,rotate,camDist
   if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
     #print "Mouseclick <x,y> : <%i,%i>" % (x,y)
     rotate = 1
@@ -635,6 +636,13 @@ def mouse(button,state,x,y):
     beginy = y
   if button == GLUT_LEFT_BUTTON and state == GLUT_UP:
     rotate = 0
+  # move camera out :
+  if button == 4:
+    camDist += 0.2
+  # move camera in :
+  if button == 3:
+    if camDist >= 0.2:
+      camDist -= 0.2
 
 def motion(x,y):
   global rotx,roty,beginx,beginy,rotate
