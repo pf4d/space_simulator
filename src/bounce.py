@@ -323,6 +323,26 @@ def draw_velocity_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
+def draw_acceleration_vectors():
+  """
+  draw acceleration vectors.
+  """
+  glPopMatrix()  
+  glColor4f(1.0,0.0,0.0,1.0)
+  glDisable(GL_LIGHTING)
+  glBegin(GL_LINES)
+  for i in range(p.N):
+    a_mag = sqrt(p.ax[i]**2 + p.ay[i]**2 + p.az[i]**2) + 1e-16
+    xyz1 = array([p.x[i],  p.y[i],  p.z[i]])
+    axyz = array([p.ax[i], p.ay[i], p.az[i]])
+    axyz = axyz / a_mag * 2.0*p.r[i]
+    xyz2 = xyz1 + axyz
+    glVertex3fv(xyz1)
+    glVertex3fv(xyz2)
+  glEnd()
+  glEnable(GL_LIGHTING)
+  glPushMatrix()
+
 def draw_angular_velocity_vectors():  
   """
   draw angular velocity vectors.
@@ -473,6 +493,7 @@ def display():
 
   # draw vectors on particles :
   draw_velocity_vectors()
+  draw_acceleration_vectors()
   draw_angular_velocity_vectors()
   draw_angular_acceleration_vectors()   
  
