@@ -56,13 +56,13 @@ SLICES = 30
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 #f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-p = Particles(L, rho, f, periodicY=1, periodicZ=1, periodicX=1)
+p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#initialize_grid(p, 2, 4.0, L/2)
-initialize_random(p, 200, 1, L/4)
+#initialize_grid(p, 7, 2.0, L)
+initialize_random(p, 50, 4, L)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
@@ -97,6 +97,17 @@ def init():
   glPointSize(10.0)
   
 def draw_ship_vectors(dx, dy):
+  # save projection matrix
+  glMatrixMode(GL_PROJECTION)
+  glPushMatrix()
+
+  # switch to orthographic projection :
+  glLoadIdentity()
+  glOrtho(-L, L, -L, L, -4*L, 4*L)
+
+  # back to the modelview matrix mode, so that we can translate/scale text :
+  glMatrixMode(GL_MODELVIEW)
+
   # draw the ship statistics :
   glColor(0.6, 0.1, 0.1)
   glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
@@ -222,8 +233,24 @@ def draw_ship_vectors(dx, dy):
   
   # re-enable lighting :
   glEnable(GL_LIGHTING)
+
+  # get back to old perspective matrix :
+  glMatrixMode(GL_PROJECTION)
+  glPopMatrix()
+  glMatrixMode(GL_MODELVIEW)
   
 def print_ship_stats(dx, dy):
+  # save projection matrix
+  glMatrixMode(GL_PROJECTION)
+  glPushMatrix()
+
+  # switch to orthographic projection :
+  glLoadIdentity()
+  glOrtho(-L, L, -L, L, -4*L, 4*L)
+
+  # back to the modelview matrix mode, so that we can translate/scale text :
+  glMatrixMode(GL_MODELVIEW)
+
   glDisable(GL_LIGHTING)   # disable lighting
   
   # print statistics :
@@ -260,6 +287,11 @@ def print_ship_stats(dx, dy):
   # re-enable lighting :
   glEnable(GL_LIGHTING)
 
+  # get back to old perspective matrix :
+  glMatrixMode(GL_PROJECTION)
+  glPopMatrix()
+  glMatrixMode(GL_MODELVIEW)
+
 def display():
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  
@@ -268,9 +300,12 @@ def display():
  
   # camera viewpoint :
   glLoadIdentity()
-  gluLookAt(0,0,L,   # Camera Position
-            0,0,0,    # Point the Camera looks at
-            0,1,0)    # the Up-Vector
+  #gluLookAt(p.x[0],  p.y[0],  p.z[0],    # Camera Position
+  #          p.vx[0], p.vy[0], p.vz[0],   # Point the Camera looks at
+  #          0,       1,       0)         # the Up-Vector
+  gluLookAt(0,0,4*L,   # Camera Position
+            0,0,0,     # Point the Camera looks at
+            0,1,0)     # the Up-Vector
   
   glRotate(rotx,1,0,0)
   glRotate(roty,0,1,0)
@@ -423,7 +458,8 @@ def reshape(width, height):
   glViewport(0, 0, width, height)
   glMatrixMode(GL_PROJECTION)
   glLoadIdentity()
-  glOrtho(-L, L, -L, L, -4*L, 4*L)
+  gluPerspective(90.0, width/float(height), 1, 1000*L)
+  #glOrtho(-L, L, -L, L, -4*L, 4*L)
   glMatrixMode(GL_MODELVIEW)
   glLoadIdentity()
 
