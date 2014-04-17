@@ -118,7 +118,7 @@ class GranularMaterialForce(object):
     f = 0.0
 
     # angular velocity damping coefficient from medium (air) :
-    g = 0.1
+    g = 0.0
 
     # moment of inertia for a sphere :
     I = 0.4*p.r**2

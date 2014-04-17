@@ -56,13 +56,13 @@ SLICES = 30
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 #f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
 # create some particles and a box
-p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
+p = Particles(L, rho, f, periodicY=1, periodicZ=1, periodicX=1)
 #p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
 #initialize_grid(p, 2, 4.0, L/2)
-initialize_random(p, 200, 1, L/3)
+initialize_random(p, 200, 1, L/4)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
