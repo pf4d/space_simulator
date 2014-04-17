@@ -70,8 +70,8 @@ p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#initialize_grid(p, 4, 4.0, 2*L)
-initialize_random(p, 100, 4, L/2)
+initialize_grid(p, 4, 4.0, 2*L)
+#initialize_random(p, 100, 4, L/2)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 
 # instantiate Integrator
@@ -332,12 +332,18 @@ def display():
   #pr = array([p.thetax[0],  p.thetay[0],  p.thetaz[0]])
   #pr /= sqrt(pr**2)
   #px = 10*(pt - pr)
-  #gluLookAt(p.x[0],  p.y[0],  p.z[0],    # Camera Position
-  #          p.thetax[0], p.thetay[0], p.thetaz[0],   # Point the Camera looks at
-  #          0,       1,       0)         # the Up-Vector
-  gluLookAt(0,0,4*L,   # Camera Position
-            0,0,0,     # Point the Camera looks at
-            0,1,0)     # the Up-Vector
+  pt = array([p.x[0], p.y[0], p.z[0]])
+  #v  = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) * 2.0*p.r[0]
+  v  = array([p.vx[0], p.vy[0], p.vz[0]]) * 2.0*p.r[0]
+  vmag = norm(v)
+  pr = pt + v
+  pt = pt - v / vmag * 2.0 * p.r[0]
+  gluLookAt(pt[0], pt[1], pt[2],    # Camera Position
+            pr[0], pr[1], pr[2],    # Point the Camera looks at
+            0,     1,     0)        # the Up-Vector
+  #gluLookAt(0,0,4*L,   # Camera Position
+  #          0,0,0,     # Point the Camera looks at
+  #          0,1,0)     # the Up-Vector
   
   glRotate(rotx,1,0,0)
   glRotate(roty,0,1,0)
@@ -535,6 +541,12 @@ def idle():
 
 def key(k, x, y):
   global trans, on, radiusDiv, massive
+
+  if k == 'c':
+    print "'c' was pressed, reseting camera"
+    rotx = 0      # camera x rotation
+    roty = 0      # camera y rotation
+    rotz = 0      # camera z rotation
 
   if k == 'q':
     print "'q' was pressed"
