@@ -51,23 +51,20 @@ class GranularMaterialForce(object):
     da, dax, day, daz = p.distanceMatrix(p.ax, p.ay, p.az)
     
     # damping terms :
-    vijDotrij             = dvx*dx + dvy*dy + dvz*dz
-    vijDotrij[dr==0]      = 0 
+    vijDotrij        = dvx*dx + dvy*dy + dvz*dz
+    vijDotrij[dr==0] = 0 
 
     # damping is subtracted from force :
     mag_r += self.gamma * vijDotrij / d
-
-    # floor components of acceleration :
-    crx, cry, crz, ctx, cty, ctz = self.floorConstraint(p)
 
     # gravitational pull between particles :
     F = self.G * p.mi_mj / d**2
     F[d < 0.0] = 0
 
     # Project onto components, sum all forces on each particle
-    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1) + crx
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) + cry - self.g 
-    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1) + crz
+    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1)
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1)
+    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1)
     
     omegax = tile(p.omegax, (p.N, 1))
     omegay = tile(p.omegay, (p.N, 1))
@@ -118,7 +115,7 @@ class GranularMaterialForce(object):
     f = 0.0
 
     # angular velocity damping coefficient from medium (air) :
-    g = 0.1
+    g = 0.0
 
     # moment of inertia for a sphere :
     I = 0.4*p.r**2
@@ -127,48 +124,9 @@ class GranularMaterialForce(object):
     kappa = 0.0001*p.r
    
     # project onto components, sum all angular forces on each particle
-    p.alphax = + sum(-(taux + f*epix) / I - kappa*omegax, axis=1) \
-               - g*p.omegax \
-               + ctx
-    p.alphay = + sum(-(tauy + f*epiy) / I - kappa*omegay, axis=1) \
-               - g*p.omegay \
-               + cty
-    p.alphaz = + sum(-(tauz + f*epiz) / I - kappa*omegaz, axis=1) \
-               - g*p.omegaz \
-               + ctz
-
-  def floorConstraint(self, p):
-    """ 
-    This is a highly specific function for a floor that responds (elasticity 
-    and damping) the same way a particle does. Presently, if constraints are 
-    to change, one would have to rewrite the function.
-    """
-    if p.periodicY == 1:
-      crx = cry = crz = ctx = cty = ctz = 0
-    else:
-      r          = 3.0 # This is how 'hard' the floor is
-      fd         = p.y + p.L/2 - p.r
-      fd[fd > 0] = 0
-      
-      floorForce_r     = -self.k * fd 
-      floorDamping_r   = -self.gamma * p.vy * fd
-      floorForce_r     = floorForce_r - floorDamping_r
-      crx = 0
-      cry = floorForce_r * r / p.r
-      crz = 0
-      
-      floorDamping_tx  = p.omegax.copy()
-      floorDamping_ty  = p.omegay.copy()
-      floorDamping_tz  = p.omegaz.copy()
-      floorDamping_tx[fd == 0] = 0 
-      floorDamping_ty[fd == 0] = 0 
-      floorDamping_tz[fd == 0] = 0 
-      
-      ctx = -self.f*floorDamping_tx
-      cty = -self.f*floorDamping_ty
-      ctz = -self.f*floorDamping_tz
-
-    return crx, cry, crz, ctx, cty, ctz
+    p.alphax = + sum(-(taux + f*epix) / I - kappa*omegax, axis=1) - g*p.omegax
+    p.alphay = + sum(-(tauy + f*epiy) / I - kappa*omegay, axis=1) - g*p.omegay
+    p.alphaz = + sum(-(tauz + f*epiz) / I - kappa*omegaz, axis=1) - g*p.omegaz
 
 
 class NebulaGranularMaterialForce(object):
@@ -461,6 +419,27 @@ class Nebula(Particles):
     between particle i and j
     """ 
     return super(Nebula, self).distanceMatrix(x, y, z)
+
+
+class Specter(object):
+
+  def __init__(self, n, L):
+    """
+    """
+    self.n = int(n)       # number of points
+    self.L = L            # extent of field
+    self.x = array([])    # x-coords
+    self.y = array([])    # y-coords
+    self.z = array([])    # z-coords
+    for i in range(self.n):
+      #x,y,z = L*rand(3) - L/2.0
+      x,y,z = L*randn(3)
+      self.addSpecter(x,y,z)
+   
+  def addSpecter(self, x, y, z): 
+    self.x  = hstack((self.x,x))
+    self.y  = hstack((self.y,y))
+    self.z  = hstack((self.z,z))
 
 
 def initialize_grid(p, n, r, L):
