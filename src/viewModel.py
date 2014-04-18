@@ -29,7 +29,7 @@ pvx = 0
 pvy = 0
 pvz = 0
 pr = 1
-f = GranularMaterialForce(k=1.5, g=.000001, gamma=.1)
+f = GranularMaterialForce(k=1.5, g=0, gamma=.1)
 #p = Particles(L, f, periodicY=0, periodicZ=1, periodicX=1)
 p = Particles(L, 0, f, periodicY=1, periodicZ=1, periodicX=1)
 integrate = VerletIntegrator(dt)
@@ -69,7 +69,7 @@ tx, ty = (0,0)
 zpos = 5
 rotate = move = False
 
-p.addParticle(px,py,pz,pvx,pvy,pvz,4,0,0,0,0,0,0)
+p.addParticle(px,py,pz,pvx,pvy,pvz,8,0,0,0,0,0,0)
 
 for i in range (1,50):
     random.seed()
@@ -86,23 +86,17 @@ while 1:
         elif e.type == KEYDOWN and e.key == K_ESCAPE:
             sys.exit()
         elif e.type == KEYDOWN and e.key == K_UP:
-            #paz -= .2
-            p.ay[0] -= 100
+            p.ay[0] -= 1000
         elif e.type == KEYDOWN and e.key == K_DOWN:
-            #paz += .2
-            p.ay[0] += 100
+            p.ay[0] += 1000
         elif e.type == KEYDOWN and e.key == K_a:
-            #pvx -= .2
-            p.ax[0] -= 100
+            p.ax[0] -= 1000
         elif e.type == KEYDOWN and e.key == K_d:
-            #pvx += .2
-            p.ax[0] += 100
+            p.ax[0] += 1000
         elif e.type == KEYDOWN and e.key == K_w:
-            #pvy += .2
-            p.az[0] += 100
+            p.az[0] += 1000
         elif e.type == KEYDOWN and e.key == K_s:
-            #pvy -= .2
-            p.az[0] -= 100
+            p.az[0] -= 1000
         elif e.type == MOUSEBUTTONDOWN:
             if e.button == 4: zpos = max(1, zpos-1)
             elif e.button == 5: zpos += 1
@@ -123,7 +117,7 @@ while 1:
     integrate(f,p)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
-
+ 
     #px += pvx
     #py += pvy
     #pz += pvz

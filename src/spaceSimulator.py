@@ -115,8 +115,9 @@ def display():
   glLoadIdentity()
 
   particlePosition = numpy.array([p.x[0],p.y[0],p.z[0]])
-  cameraDist = particlePosition + numpy.array([20*cos(pvz),10,20*sin(pvz)])
-  cameraDist = particlePosition + numpy.array([0,3,-10])
+  #cameraDist = particlePosition + numpy.array([20*cos(pvz),10,20*sin(pvz)])
+  #cameraDist = particlePosition + numpy.array([0,3,-10])
+  cameraDist = particlePosition + numpy.array([0, 0, -10])
   cameraTarget = particlePosition
   cameraUp = numpy.array([0,1,0])
 
