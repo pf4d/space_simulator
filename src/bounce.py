@@ -71,8 +71,8 @@ p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-initialize_grid(p, 4, 4.0, 2*L)
-#initialize_random(p, 100, 4, L/2)
+#initialize_grid(p, 4, 4.0, 2*L)
+initialize_random(p, 100, 4, L/2)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 
 # instantiate Integrator
@@ -137,15 +137,17 @@ def draw_ship_vectors(dx, dy):
   thetay = pi/4
   thetaz = pi/2
   
-  ## draw the 'ship' :
-  #glPushMatrix()
-  #glTranslate(xt, yt, zt)
-  #glutSolidSphere(p.r[0]/radiusDiv, SLICES, STACKS)
-  #glPopMatrix()
-  #glPushMatrix()
-  #glTranslate(xr, yr, zr)
-  #glutSolidSphere(p.r[0]/radiusDiv, SLICES, STACKS)
-  #glPopMatrix()
+  # draw the 'ship' :
+  glPushMatrix()
+  glLoadIdentity()
+  glTranslate(xt, yt, zt)
+  glutSolidSphere(3, SLICES, STACKS)
+  glPopMatrix()
+  glPushMatrix()
+  glLoadIdentity()
+  glTranslate(xr, yr, zr)
+  glutSolidSphere(3, SLICES, STACKS)
+  glPopMatrix()
 
   # translational statistics :
   glPushMatrix()
@@ -278,21 +280,27 @@ def print_ship_stats(dx, dy):
   font.Render("n = %i" % p.N)
   glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
-  t1 = 'red particle statistics :'
-  #t2 = 'theta (x,y,z): %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
-  #t3 = 'omega (x,y,z): %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
-  #t4 = 'alpha (x,y,z): %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
-  t2 = 'position     (x,y,z): %.2E, %.2E, %.2E' % (p.x[0],  p.y[0],  p.z[0])
-  t3 = 'velocity     (x,y,z): %.2E, %.2E, %.2E' % (p.vx[0], p.vy[0], p.vz[0])
-  t4 = 'acceleration (x,y,z): %.2E, %.2E, %.2E' % (p.ax[0], p.ay[0], p.az[0])
-  glRasterPos2f(-L+dy,-L+dy*3)
+  t1 = 'red particle statistics (x,y,z) :'
+  t2 = 'theta        : %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
+  t3 = 'omega        : %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
+  t4 = 'alpha        : %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
+  t5 = 'position     : %.2E, %.2E, %.2E' % (p.x[0],  p.y[0],  p.z[0])
+  t6 = 'velocity     : %.2E, %.2E, %.2E' % (p.vx[0], p.vy[0], p.vz[0])
+  t7 = 'acceleration : %.2E, %.2E, %.2E' % (p.ax[0], p.ay[0], p.az[0])
+  glRasterPos2f(-L+dy,-(L-5)+dy*3)
   font.Render(t1)
-  glRasterPos2f(-L+dy,-L+dy*2.5)
+  glRasterPos2f(-L+dy,-(L-5)+dy*2.5)
   font.Render(t2)
-  glRasterPos2f(-L+dy,-L+dy*2)
+  glRasterPos2f(-L+dy,-(L-5)+dy*2)
   font.Render(t3)
-  glRasterPos2f(-L+dy,-L+dy*1.5)
+  glRasterPos2f(-L+dy,-(L-5)+dy*1.5)
   font.Render(t4)
+  glRasterPos2f(-L+dy,-(L-5)+dy*1.0)
+  font.Render(t5)
+  glRasterPos2f(-L+dy,-(L-5)+dy*0.5)
+  font.Render(t6)
+  glRasterPos2f(-L+dy,-(L-5)+dy*0.0)
+  font.Render(t7)
   glPopMatrix()
   
   # re-enable lighting :
@@ -307,6 +315,7 @@ def draw_velocity_vectors():
   """
   draw velocity vectors.
   """
+  glLineWidth(1.0)
   glPopMatrix()  
   glColor4f(1.0,1.0,1.0,1.0)
   glDisable(GL_LIGHTING)
@@ -327,6 +336,7 @@ def draw_acceleration_vectors():
   """
   draw acceleration vectors.
   """
+  glLineWidth(1.0)
   glPopMatrix()  
   glColor4f(1.0,0.0,0.0,1.0)
   glDisable(GL_LIGHTING)
@@ -343,10 +353,34 @@ def draw_acceleration_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
+def draw_rotation_vectors():
+  """
+  draw rotation vectors.
+  """
+  glLineWidth(1.0)
+  glPopMatrix()  
+  glColor4f(1.0,1.0,0.0,1.0)
+  glDisable(GL_LIGHTING)
+  glBegin(GL_LINES)
+  for i in range(p.N):
+    xyz1 = array([p.x[i],  p.y[i],  p.z[i]])
+    x    = p.r[i]*sin(p.thetay[i]) * cos(p.thetaz[i])
+    y    = p.r[i]*sin(p.thetay[i]) * sin(p.thetaz[i])
+    z    = p.r[i]*cos(p.thetay[i])
+    rxyz = (array([x, y, z]) + 1e-16)
+    rxyz = rxyz / norm(rxyz) * 2.0*p.r[i]
+    xyz2 = xyz1 + rxyz
+    glVertex3fv(xyz1)
+    glVertex3fv(xyz2)
+  glEnd()
+  glEnable(GL_LIGHTING)
+  glPushMatrix()
+
 def draw_angular_velocity_vectors():  
   """
   draw angular velocity vectors.
   """
+  glLineWidth(1.0)
   glPopMatrix()
   glColor4f(0.0,1.0,0.0,1.0)
   glDisable(GL_LIGHTING)
@@ -367,6 +401,7 @@ def draw_angular_acceleration_vectors():
   """
   draw angular acceleration vectors.
   """ 
+  glLineWidth(1.0)
   glPopMatrix()
   glColor4f(1.0,0.0,0.0,1.0)
   glDisable(GL_LIGHTING)
@@ -389,7 +424,6 @@ def draw_specter_field(S, r):
   """
   glDisable(GL_LIGHTING)   # disable lighting
   glPointSize(r)
-  glColor(1.0,1.0,1.0,1.0)
   for i in range(S.n):
     mag = sqrt(S.x[i]**2 + S.y[i]**2 + S.z[i]**2)
     tra = (S.L - mag)/S.L
@@ -414,27 +448,20 @@ def display():
   #pr /= sqrt(pr**2)
   #px = 10*(pt - pr)
   pt = array([p.x[0], p.y[0], p.z[0]])
-  #v  = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) * 2.0*p.r[0]
+  #v  = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) + 1e-16
   v  = array([p.vx[0], p.vy[0], p.vz[0]])
-  vmag = norm(v)
   pr = pt + v
-  pt = pt - v / vmag * camDist * p.r[0]
-  gluLookAt(pt[0], pt[1], pt[2],    # Camera Position
-            pr[0], pr[1], pr[2],    # Point the Camera looks at
-            0,     1,     0)        # the Up-Vector
-  #gluLookAt(0,0,4*camDist,   # Camera Position
-  #          0,0,0,           # Point the Camera looks at
-  #          0,1,0)           # the Up-Vector
+  pt = pt - v / norm(v) * camDist * p.r[0]   # move the camera back
+  gluLookAt(pt[0], pt[1], pt[2],             # Camera Position
+            pr[0], pr[1], pr[2],             # Point the Camera looks at
+            0,     1,     0)                 # the Up-Vector
+  #gluLookAt(0,0,4*camDist,                   # Camera Position
+  #          0,0,0,                           # Point the Camera looks at
+  #          0,1,0)                           # the Up-Vector
   
   glRotate(rotx,1,0,0)
   glRotate(roty,0,1,0)
   glRotate(rotz,0,0,1)
-
-  # print ship stats :
-  #print_ship_stats(dx,dy)
-
-  # draw ship vectors :
-  #draw_ship_vectors(dx,dy)
 
   # draw specter field :
   draw_specter_field(specter, 1.0)
@@ -492,10 +519,17 @@ def display():
     glPopMatrix()
 
   # draw vectors on particles :
-  draw_velocity_vectors()
-  draw_acceleration_vectors()
-  draw_angular_velocity_vectors()
-  draw_angular_acceleration_vectors()   
+  #draw_velocity_vectors()
+  #draw_acceleration_vectors()
+  draw_rotation_vectors()
+  #draw_angular_velocity_vectors()
+  #draw_angular_acceleration_vectors()   
+
+  # print ship stats :
+  print_ship_stats(dx,dy)
+
+  # draw ship vectors :
+  draw_ship_vectors(dx,dy)
  
   # draw the lights : 
   lx1 = 0.0
