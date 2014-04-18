@@ -71,8 +71,8 @@ p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#initialize_grid(p, 4, 4.0, 2*L)
-initialize_random(p, 100, 4, L/2)
+initialize_grid(p, 4, 4.0, 2*L)
+#initialize_random(p, 100, 4, L/2)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 
 # instantiate Integrator
@@ -141,12 +141,12 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xt, yt, zt)
-  glutSolidSphere(3, SLICES, STACKS)
+  glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
-  glutSolidSphere(3, SLICES, STACKS)
+  glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
 
   # translational statistics :
@@ -353,21 +353,46 @@ def draw_acceleration_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
+def rotate_vector(v, r):
+  """
+  rotate vector <v> about the x, y, and z axes by angles provided in <r> array.
+  """
+  rx = r[0]
+  ry = r[1]
+  rz = r[2]
+  c  = cos(rx)
+  s  = sin(rx)
+  Rx = array([[1, 0,  0],
+              [0, c, -s],
+              [0, s,  c]])
+  c  = cos(ry)
+  s  = sin(ry)
+  Ry = array([[ c, 0, s],
+              [ 0, 1, 0],
+              [-s, 0, c]])
+  c  = cos(rz)
+  s  = sin(rz)
+  Rz = array([[c, -s, 0],
+              [s,  c, 0],
+              [0,  0, 1]])
+  R  = dot(Rx, dot(Ry, Rz))
+  vn = dot(R, v)
+  return vn
+
 def draw_rotation_vectors():
   """
   draw rotation vectors.
   """
   glLineWidth(1.0)
   glPopMatrix()  
-  glColor4f(1.0,1.0,0.0,1.0)
+  glColor4f(0.0,1.0,1.0,1.0)
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
     xyz1 = array([p.x[i],  p.y[i],  p.z[i]])
-    x    = p.r[i]*sin(p.thetay[i]) * cos(p.thetaz[i])
-    y    = p.r[i]*sin(p.thetay[i]) * sin(p.thetaz[i])
-    z    = p.r[i]*cos(p.thetay[i])
-    rxyz = (array([x, y, z]) + 1e-16)
+    rxyz = array([0, 0, 1])            # initial rotation vector
+    txyz = array([p.thetax[i], p.thetay[i], p.thetaz[i]])
+    rxyz = rotate_vector(rxyz, txyz)
     rxyz = rxyz / norm(rxyz) * 2.0*p.r[i]
     xyz2 = xyz1 + rxyz
     glVertex3fv(xyz1)
@@ -448,14 +473,17 @@ def display():
   #pr /= sqrt(pr**2)
   #px = 10*(pt - pr)
   pt = array([p.x[0], p.y[0], p.z[0]])
+  pr = array([0, 0, 1])            # initial rotation vector
+  pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+  v  = rotate_vector(pr, pa)
   #v  = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) + 1e-16
-  v  = array([p.vx[0], p.vy[0], p.vz[0]])
+  #v  = array([p.vx[0], p.vy[0], p.vz[0]])
   pr = pt + v
   pt = pt - v / norm(v) * camDist * p.r[0]   # move the camera back
   gluLookAt(pt[0], pt[1], pt[2],             # Camera Position
             pr[0], pr[1], pr[2],             # Point the Camera looks at
             0,     1,     0)                 # the Up-Vector
-  #gluLookAt(0,0,4*camDist,                   # Camera Position
+  #gluLookAt(0,0,L*camDist,                   # Camera Position
   #          0,0,0,                           # Point the Camera looks at
   #          0,1,0)                           # the Up-Vector
   
@@ -508,7 +536,7 @@ def display():
     #glBegin(GL_POINTS)
     #glVertex3f(p.x[i], p.y[i], p.z[i])
     #glEnd()
-    if i == inf:
+    if i == 0:
       glCallList(obj.gl_list)
     else:  
       glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
@@ -521,15 +549,15 @@ def display():
   # draw vectors on particles :
   #draw_velocity_vectors()
   #draw_acceleration_vectors()
-  draw_rotation_vectors()
+  #draw_rotation_vectors()
   #draw_angular_velocity_vectors()
   #draw_angular_acceleration_vectors()   
 
   # print ship stats :
-  print_ship_stats(dx,dy)
+  #print_ship_stats(dx,dy)
 
   # draw ship vectors :
-  draw_ship_vectors(dx,dy)
+  #draw_ship_vectors(dx,dy)
  
   # draw the lights : 
   lx1 = 0.0
