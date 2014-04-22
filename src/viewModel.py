@@ -53,7 +53,7 @@ glEnable(GL_DEPTH_TEST)
 glShadeModel(GL_SMOOTH)
 glutInit()
 
-obj = OBJ(sys.argv[1], swapyz=False)
+obj = OBJ("SpaceShip.obj", swapyz=False)
 
 clock = pygame.time.Clock()
 

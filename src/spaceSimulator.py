@@ -16,7 +16,12 @@ import pygame
 from pygame.locals import *
 from pygame.constants import *
 
-pygame.init()
+fwd       = False
+back      = False
+left      = False
+right     = False
+up        = False
+down      = False
 
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
@@ -68,6 +73,10 @@ pz = 0
 pvx = 0
 pvy = 0
 pvz = 0
+
+accel = .1
+
+
 
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
@@ -312,24 +321,6 @@ def reshape(width, height):
 def idle():
   global COUNT, vy, vx, vz, massive, frames, lastTime, fps
 
-  for e in pygame.event.get():
-      if e.type == QUIT:
-        sys.exit()
-      elif e.type == KEYDOWN and e.key == K_ESCAPE:
-        sys.exit()
-      elif e.type == KEYDOWN and e.key == K_UP:
-        p.ay[0] -= 100
-      elif e.type == KEYDOWN and e.key == K_DOWN:
-        p.ay[0] += 100
-      elif e.type == KEYDOWN and e.key == K_a:
-        p.ax[0] -= 100
-      elif e.type == KEYDOWN and e.key == K_d:
-        p.ax[0] += 100
-      elif e.type == KEYDOWN and e.key == K_w:
-        p.az[0] += 100
-      elif e.type == KEYDOWN and e.key == K_s:
-        p.az[0] -= 100
-
   for i in range(UPDATE_FRAMES):
     integrate(f,p) # Move the system forward in time
     COUNT = COUNT + 1 
@@ -346,6 +337,24 @@ def idle():
         py = L/2
         pz = 0
         p.addParticle(px, py, pz, vx, vy, vz, r,0,0,0,0,0,0)
+  if fwd == True:
+    p.az[0] += accel
+
+  elif back == True:
+    p.az[0] -= accel
+
+  if left == True:
+    p.ax[0] += accel
+
+  elif right == True:
+    p.ax[0] -= accel
+
+  if up == True:
+    p.ay[0] -= accel
+
+  elif down == True:
+    p.ay[0] += accel
+
   glutPostRedisplay()
 
   # calculate fps :
@@ -358,11 +367,23 @@ def idle():
     #print fps
 
 def key(k, x, y):
-  global trans, on, radiusDiv, massive
+  global trans, on, radiusDiv, massive, fwd, back, left, right
 
   if k == 'q':
     print "'q' was pressed"
     exit(0)
+
+  if k == 'w':
+    fwd = True
+
+  if k == 's':
+    back = True
+
+  if k == 'a':
+    left = True
+
+  if k == 'd':
+    right = True
   
   if k == 't':
     if trans == True:
@@ -399,20 +420,31 @@ def key(k, x, y):
   if k == 'n':
     print "'n' was pressed: n =", p.N
 
+
+def keyUp(k, x, y):
+  global fwd, back, left, right
+
   if k == 'w':
-    p.az[0] += 50
+    fwd = False
+
+  if k == 's':
+    back = False
+
+  if k == 'a':
+    left = False
+
+  if k == 'd':
+    right = False
     
 
 def special(k, x, y):
-  global vy, vx, vz, partInt
+  global vy, vx, vz, partInt, up, down
   
   if k == GLUT_KEY_UP:
-    vy += .5
-    print 'UP    key was pressed: vy =', vy
+    up = True
   
   if k == GLUT_KEY_DOWN:
-    vy -= .5
-    print 'DOWN  key was pressed: vy =', vy
+    down = True
   
   if k == GLUT_KEY_RIGHT:
     vx += .5
@@ -440,6 +472,15 @@ def special(k, x, y):
     else:
       partInt -= 1/dt
       print 'INS   key was pressed: partInt =', partInt
+
+def specialUp(k, x, y):
+  global up, down
+
+  if k == GLUT_KEY_UP:
+    up = False
+
+  if k == GLUT_KEY_DOWN:
+    down = False
 
 def mouse(button,state,x,y):
   global beginx,beginy,rotate
@@ -482,8 +523,9 @@ if __name__ == '__main__':
     glutReshapeFunc(reshape)
     glutIdleFunc(idle)
     glutKeyboardFunc(key)
+    glutKeyboardUpFunc(keyUp)
     glutSpecialFunc(special)
-    obj = OBJ(sys.argv[1], swapyz=True)
+    obj = OBJ("SpaceShip.obj", swapyz=True)
     
     # initialize
     init()
