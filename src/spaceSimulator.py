@@ -16,6 +16,7 @@ import pygame
 from pygame.locals import *
 from pygame.constants import *
 
+
 fwd       = False
 back      = False
 left      = False
@@ -76,7 +77,7 @@ pvz = 0
 
 accel = .1
 
-
+paused = False
 
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
@@ -319,7 +320,7 @@ def reshape(width, height):
   glLoadIdentity()
 
 def idle():
-  global COUNT, vy, vx, vz, massive, frames, lastTime, fps
+  global COUNT, vy, vx, vz, massive, frames, lastTime, fps, paused
 
   for i in range(UPDATE_FRAMES):
     integrate(f,p) # Move the system forward in time
@@ -355,7 +356,8 @@ def idle():
   elif down == True:
     p.ay[0] += accel
 
-  glutPostRedisplay()
+  if paused == False:
+    glutPostRedisplay()
 
   # calculate fps :
   currentTime = time()
@@ -367,7 +369,7 @@ def idle():
     #print fps
 
 def key(k, x, y):
-  global trans, on, radiusDiv, massive, fwd, back, left, right
+  global trans, on, radiusDiv, massive, fwd, back, left, right, paused
 
   if k == 'q':
     print "'q' was pressed"
@@ -420,6 +422,11 @@ def key(k, x, y):
   if k == 'n':
     print "'n' was pressed: n =", p.N
 
+  if k == 'p':
+    if paused == False:
+      paused = True
+    else:
+      paused = False
 
 def keyUp(k, x, y):
   global fwd, back, left, right
