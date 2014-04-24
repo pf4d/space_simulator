@@ -9,6 +9,17 @@ from objLoader      import *
 from time           import time
 import sys
 
+fwd = False
+back = False
+left = False
+right = False
+up = False
+down = False
+rollLeft = False
+rollRight = False
+
+accel = 50.0
+
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
 rotz      = 0      # camera z rotation
@@ -66,6 +77,7 @@ f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 
 # create some particles and a box
 p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
+p.addParticle(0,0,0,0,0,0,3,0,0,0,0,0,0)
 #p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 
 #  addParticle(x, y, z, vx, vy, vz, r,
@@ -461,6 +473,8 @@ def draw_specter_field(S, r):
 
 def display():
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+  print("x: %f  y: %f  z: %f" % (p.x[0],p.y[0],p.z[0]))
  
   dx = 0.2 * L
   dy = 0.1 * L
@@ -513,6 +527,7 @@ def display():
     #   abs(p.alphay[i]) > 0.01 or \
     #   abs(p.alphaz[i]) > 0.01:
     #  glColor(p.r[i]/2.0, p.r[i]/4.0, p.r[i]/2.0, mag)
+  
     if (p.ax[i] > 0.5 or p.ax[i] < -0.5) and i != 0:
       #glColor(p.r[i]/2.0, p.r[i]/2.0, p.r[i]/2.0, mag)
       glColor(1/2.0, 1/2.0, 1/2.0, mag)
@@ -609,7 +624,7 @@ def reshape(width, height):
   glLoadIdentity()
 
 def idle():
-  global COUNT, vy, vx, vz, massive, frames, lastTime, fps
+  global COUNT, vy, vx, vz, massive, frames, lastTime, fps, fwd, back, left, right, up, down, accel
   for i in range(UPDATE_FRAMES):
     integrate(f,p) # Move the system forward in time
     COUNT = COUNT + 1 
@@ -626,6 +641,25 @@ def idle():
         py = L/2
         pz = 0
         p.addParticle(px, py, pz, vx, vy, vz, r,0,0,0,0,0,0)
+
+  if fwd == True:
+    p.az[0] += accel
+
+  elif back == True:
+    p.az[0] -= accel
+
+  if left == True:
+    p.ax[0] += accel
+
+  elif right == True:
+    p.ax[0] -= accel
+
+  if up == True:
+    p.ay[0] += accel
+
+  elif down == True:
+    p.ay[0] -= accel
+
   glutPostRedisplay()
 
   # calculate fps :
@@ -638,7 +672,7 @@ def idle():
     #print fps
 
 def key(k, x, y):
-  global trans, on, radiusDiv, massive
+  global trans, on, radiusDiv, massive, fwd, back, left, right
 
   if k == 'c':
     print "'c' was pressed, reseting camera"
@@ -684,26 +718,57 @@ def key(k, x, y):
   
   if k == 'n':
     print "'n' was pressed: n =", p.N
+
+  if k == 'w':
+    fwd = True
+
+  if k == 's':
+    back = True
+
+  if k == 'a':
+    left = True
+
+  if k == 'd':
+    right = True
+
+def keyUp(k,x,y):
+  global fwd, back, left, right
+
+  if k == 'w':
+    fwd = False
+
+  if k == 's':
+    back = False
+
+  if k == 'a':
+    left = False
+
+  if k == 'd':
+    right = False
     
 
 def special(k, x, y):
-  global vy, vx, vz, partInt
+  global vy, vx, vz, partInt, up, down, rollLeft, rollRight
   
   if k == GLUT_KEY_UP:
-    vy += .5
-    print 'UP    key was pressed: vy =', vy
+    up = True
+    #vy += .5
+    #print 'UP    key was pressed: vy =', vy
   
   if k == GLUT_KEY_DOWN:
-    vy -= .5
-    print 'DOWN  key was pressed: vy =', vy
+    down = True
+    #vy -= .5
+    #print 'DOWN  key was pressed: vy =', vy
   
   if k == GLUT_KEY_RIGHT:
-    vx += .5
-    print 'RIGHT key was pressed: vx =', vx
+    rollRight = True
+    #vx += .5
+    #print 'RIGHT key was pressed: vx =', vx
   
   if k == GLUT_KEY_LEFT:
-    vx -= .5
-    print 'LEFT  key was pressed: vx =', vx
+    rollLeft = True
+    #vx -= .5
+    #print 'LEFT  key was pressed: vx =', vx
   
   if k == GLUT_KEY_PAGE_UP:
     vz += .5
@@ -723,6 +788,21 @@ def special(k, x, y):
     else:
       partInt -= 1/dt
       print 'INS   key was pressed: partInt =', partInt
+
+def specialUp(k,x,y):
+  global up, down, rollLeft, rollRight
+
+  if k == GLUT_KEY_UP:
+    up = False
+  
+  if k == GLUT_KEY_DOWN:
+    down = False
+  
+  if k == GLUT_KEY_RIGHT:
+    rollRight = False
+  
+  if k == GLUT_KEY_LEFT:
+    rollLeft = False
 
 def mouse(button,state,x,y):
   global beginx,beginy,rotate,camDist
@@ -773,9 +853,11 @@ if __name__ == '__main__':
   glutReshapeFunc(reshape)
   glutIdleFunc(idle)
   glutKeyboardFunc(key)
+  glutKeyboardUpFunc(keyUp)
   glutSpecialFunc(special)
+  glutSpecialUpFunc(specialUp)
 
-  obj = OBJ('phantom.obj', swapyz=False)
+  obj = OBJ('SpaceShip.obj', swapyz=False)
   
   # initialize
   init()

@@ -320,7 +320,7 @@ def reshape(width, height):
   glLoadIdentity()
 
 def idle():
-  global COUNT, vy, vx, vz, massive, frames, lastTime, fps, paused
+  global COUNT, vy, vx, vz, massive, frames, lastTime, fps, paused, fwd, back, left, right, up, down
 
   for i in range(UPDATE_FRAMES):
     integrate(f,p) # Move the system forward in time
