@@ -9,16 +9,18 @@ from objLoader      import *
 from time           import time
 import sys
 
-fwd = False
-back = False
-left = False
-right = False
-up = False
-down = False
-rollLeft = False
-rollRight = False
+fwd       = False  # craft moving forward
+back      = False  #   "     "    back
+left      = False  #   "     "    left
+right     = False  #   "     "    right
+up        = False  #   "     "    up
+down      = False  #   "     "    down
+rollLeft  = False  #   "   rolling left 
+rollRight = False  #   "     "     right
 
-accel = 50.0
+taccel     = 20.0  # translational acceleration to apply 
+raccel     = 1.0   # rotational acceleration to apply
+
 
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
@@ -77,12 +79,12 @@ f = GranularMaterialForce(k=k, g=g, gamma=gamma)
 
 # create some particles and a box
 p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
-p.addParticle(0,0,0,0,0,0,3,0,0,0,0,0,0)
 #p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
+p.addParticle(0,0,0,0,0,0,3,0,0,0,0,0,0)
 initialize_grid(p, 4, 4.0, 2*L)
 #initialize_random(p, 100, 4, L/2)
 #p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
@@ -401,14 +403,20 @@ def draw_rotation_vectors():
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
-    xyz1 = array([p.x[i],  p.y[i],  p.z[i]])
-    rxyz = array([0, 0, 1])            # initial rotation vector
-    txyz = array([p.thetax[i], p.thetay[i], p.thetaz[i]])
-    rxyz = rotate_vector(rxyz, txyz)
-    rxyz = rxyz / norm(rxyz) * 2.0*p.r[i]
-    xyz2 = xyz1 + rxyz
+    xyz1  = array([p.x[i],  p.y[i],  p.z[i]])
+    fxyz  = array([0, 0, 1])            # initial forward vector
+    uxyz  = array([0, 1, 0])            # initial up vector
+    txyz  = array([p.thetax[i], p.thetay[i], p.thetaz[i]])
+    fxyz  = rotate_vector(fxyz, txyz)
+    uxyz  = rotate_vector(uxyz, txyz)
+    fxyz  = fxyz / norm(fxyz) * 2.0*p.r[i]
+    uxyz  = uxyz / norm(uxyz) * 2.0*p.r[i]
+    fxyz2 = xyz1 + fxyz
+    uxyz2 = xyz1 + uxyz
     glVertex3fv(xyz1)
-    glVertex3fv(xyz2)
+    glVertex3fv(fxyz2)
+    glVertex3fv(xyz1)
+    glVertex3fv(uxyz2)
   glEnd()
   glEnable(GL_LIGHTING)
   glPushMatrix()
@@ -474,39 +482,33 @@ def draw_specter_field(S, r):
 def display():
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-  print("x: %f  y: %f  z: %f" % (p.x[0],p.y[0],p.z[0]))
- 
   dx = 0.2 * L
   dy = 0.1 * L
  
   # camera viewpoint :
   glLoadIdentity()
-  #pt = array([p.x[0],  p.y[0],  p.z[0]])
-  #pt /= sqrt(pt**2)
-  #pr = array([p.thetax[0],  p.thetay[0],  p.thetaz[0]])
-  #pr /= sqrt(pr**2)
-  #px = 10*(pt - pr)
-  pt = array([p.x[0], p.y[0], p.z[0]])
+  pt = array([p.x[0], p.y[0], p.z[0]]) + 1e-15
   pr = array([0, 0, 1])            # initial rotation vector
-  pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-  v  = rotate_vector(pr, pa)
-  #v  = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) + 1e-16
-  #v  = array([p.vx[0], p.vy[0], p.vz[0]])
-  pr = pt + v
-  pt = pt - v / norm(v) * camDist * p.r[0]   # move the camera back
-  gluLookAt(pt[0], pt[1], pt[2],             # Camera Position
-            pr[0], pr[1], pr[2],             # Point the Camera looks at
-            0,     1,     0)                 # the Up-Vector
+  pu = array([0, 1, 0])            # initial up vector
+  pa = array([p.thetax[0]+rotx, p.thetay[0]+roty, p.thetaz[0]+rotz])
+  vf = rotate_vector(pr, pa)
+  vu = rotate_vector(pu, pa)
+  pt = pt - vf / norm(vf) * camDist * p.r[0]  # move the camera back
+  pr = pt + vf
+  gluLookAt(pt[0], pt[1], pt[2],              # Camera Position
+            pr[0], pr[1], pr[2],              # Point the Camera looks at
+            vu[0], vu[1], vu[2])              # the Up-Vector
+  
   #gluLookAt(0,0,L*camDist,                   # Camera Position
   #          0,0,0,                           # Point the Camera looks at
   #          0,1,0)                           # the Up-Vector
+  #glRotate(rotx,1,0,0)
+  #glRotate(roty,0,1,0)
+  #glRotate(rotz,0,0,1)
   
-  glRotate(rotx,1,0,0)
-  glRotate(roty,0,1,0)
-  glRotate(rotz,0,0,1)
 
   # draw specter field :
-  draw_specter_field(specter, 1.0)
+  #draw_specter_field(specter, 1.0)
  
   # draw star field :
   draw_specter_field(star, 4.0)
@@ -563,13 +565,13 @@ def display():
 
   # draw vectors on particles :
   #draw_velocity_vectors()
-  #draw_acceleration_vectors()
+  draw_acceleration_vectors()
   #draw_rotation_vectors()
   #draw_angular_velocity_vectors()
-  #draw_angular_acceleration_vectors()   
+  draw_angular_acceleration_vectors()   
 
   # print ship stats :
-  #print_ship_stats(dx,dy)
+  print_ship_stats(dx,dy)
 
   # draw ship vectors :
   #draw_ship_vectors(dx,dy)
@@ -624,7 +626,8 @@ def reshape(width, height):
   glLoadIdentity()
 
 def idle():
-  global COUNT, vy, vx, vz, massive, frames, lastTime, fps, fwd, back, left, right, up, down, accel
+  global COUNT, vy, vx, vz, massive, frames, lastTime, fps
+  global fwd, back, left, right, up, down, taccel, raccel, rollLeft, rollRight
   for i in range(UPDATE_FRAMES):
     integrate(f,p) # Move the system forward in time
     COUNT = COUNT + 1 
@@ -643,22 +646,84 @@ def idle():
         p.addParticle(px, py, pz, vx, vy, vz, r,0,0,0,0,0,0)
 
   if fwd == True:
-    p.az[0] += accel
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([0, 0, 1])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * taccel
+    p.ax[0] += pf[0]
+    p.ay[0] += pf[1]
+    p.az[0] += pf[2]
 
   elif back == True:
-    p.az[0] -= accel
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([0, 0, 1])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * taccel
+    p.ax[0] -= pf[0]
+    p.ay[0] -= pf[1]
+    p.az[0] -= pf[2]
 
   if left == True:
-    p.ax[0] += accel
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([1, 0, 0])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * taccel
+    p.ax[0] += pf[0]
+    p.ay[0] += pf[1]
+    p.az[0] += pf[2]
 
   elif right == True:
-    p.ax[0] -= accel
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([1, 0, 0])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * taccel
+    p.ax[0] -= pf[0]
+    p.ay[0] -= pf[1]
+    p.az[0] -= pf[2]
 
   if up == True:
-    p.ay[0] += accel
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([1, 0, 0])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * raccel
+    p.alphax[0] += pf[0]
+    p.alphay[0] += pf[1]
+    p.alphaz[0] += pf[2]
 
   elif down == True:
-    p.ay[0] -= accel
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([1, 0, 0])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * raccel
+    p.alphax[0] -= pf[0]
+    p.alphay[0] -= pf[1]
+    p.alphaz[0] -= pf[2]
+
+  if rollLeft == True:
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([0, 0, 1])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * raccel
+    p.alphax[0] -= pf[0]
+    p.alphay[0] -= pf[1]
+    p.alphaz[0] -= pf[2]
+
+  elif rollRight == True:
+    pt = array([p.x[0], p.y[0], p.z[0]])
+    pr = array([0, 0, 1])            # initial rotation vector
+    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+    vf = rotate_vector(pr, pa)
+    pf = vf / norm(vf) * raccel
+    p.alphax[0] += pf[0]
+    p.alphay[0] += pf[1]
+    p.alphaz[0] += pf[2]
 
   glutPostRedisplay()
 
@@ -672,7 +737,7 @@ def idle():
     #print fps
 
 def key(k, x, y):
-  global trans, on, radiusDiv, massive, fwd, back, left, right
+  global rotx, roty, rotz, trans, on, radiusDiv, massive, fwd, back, left, right
 
   if k == 'c':
     print "'c' was pressed, reseting camera"
@@ -752,23 +817,15 @@ def special(k, x, y):
   
   if k == GLUT_KEY_UP:
     up = True
-    #vy += .5
-    #print 'UP    key was pressed: vy =', vy
   
   if k == GLUT_KEY_DOWN:
     down = True
-    #vy -= .5
-    #print 'DOWN  key was pressed: vy =', vy
   
   if k == GLUT_KEY_RIGHT:
     rollRight = True
-    #vx += .5
-    #print 'RIGHT key was pressed: vx =', vx
   
   if k == GLUT_KEY_LEFT:
     rollLeft = True
-    #vx -= .5
-    #print 'LEFT  key was pressed: vx =', vx
   
   if k == GLUT_KEY_PAGE_UP:
     vz += .5
@@ -824,8 +881,8 @@ def mouse(button,state,x,y):
 def motion(x,y):
   global rotx,roty,beginx,beginy,rotate
   if rotate:
-    rotx = rotx + (y - beginy) / 10.0
-    roty = roty + (x - beginx) / 10.0
+    rotx = rotx + (y - beginy) / 100.0
+    roty = roty + (x - beginx) / 100.0
     beginx = x
     beginy = y
     glutPostRedisplay()

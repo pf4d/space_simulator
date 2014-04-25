@@ -323,7 +323,10 @@ class Particles(object):
     self.sumOfRadii   = temp + temp.T
     self.ratioOfRadii = temp / temp.T
     # gravitational pull :
-    V          = 4.0/3.0 * pi * r**3
+    if self.N == 1:
+      V          = 0
+    else:
+      V          = 4.0/3.0 * pi * r**3
     self.V     = hstack((self.V, V))
     self.m     = self.rho * self.V
     self.mi_mj = outer(self.m, self.m)
