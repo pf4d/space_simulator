@@ -28,7 +28,7 @@ class GranularMaterialForce(object):
     self.k     = k           # elastic 'bounce'
     self.gamma = gamma       # energy dissipation/loss
     self.g     = g           # gravity
-    self.f     = 1.0         # floor damping coefficient
+    self.f     = 0.5         # angular exchange damping coefficient
     self.rho   = 1.0         # density
     self.G     = 6.67384E-11 # gravitational constant
 
@@ -66,18 +66,13 @@ class GranularMaterialForce(object):
     p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1)
     p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1)
     
-    omegax = tile(p.omegax, (p.N, 1))
-    omegay = tile(p.omegay, (p.N, 1))
-    omegaz = tile(p.omegaz, (p.N, 1))
+    # differences in angular velocities :
+    do, dox, doy, doz = p.distanceMatrix(p.omegax, p.omegay, p.omegaz)
+    dox[dr==0] = 0
+    doy[dr==0] = 0
+    doz[dr==0] = 0
+    do[dr==0]  = 0
     
-    omegax = omegax + omegax.T 
-    omegay = omegax + omegax.T 
-    omegaz = omegax + omegax.T 
-    
-    omegax[dr==0] = 0
-    omegay[dr==0] = 0
-    omegaz[dr==0] = 0
-
     # projection of a onto the tangent plane to r (tangential acceleration) :
     atx = dax - (dax * dx) / d**2 * dx
     aty = day - (day * dy) / d**2 * dy
@@ -102,14 +97,17 @@ class GranularMaterialForce(object):
     vtz[dr==0] = 0
 
     # calculate torque (r x F) :
-    taux = rady*atz - aty*radz
-    tauy = radx*atz - atx*radz
-    tauz = radx*aty - atx*rady
+    taux = rady*atz - radz*aty
+    tauy = radz*atx - radx*atz
+    tauz = radx*aty - rady*atx
 
     # calculate tangential velocity parallel to torque (r x vt) :
-    epix = rady*vtz - vty*radz
-    epiy = radx*vtz - vtx*radz
-    epiz = radx*vty - vtx*rady
+    epix = rady*vtz - radz*vty
+    epiy = radz*vtx - radx*vtz
+    epiz = radx*vty - rady*vtx
+
+    # angular acceleration coefficient:
+    k = 1.0
 
     # linear velocity frictional contribution to torque coefficient :
     f = 0.0
@@ -120,14 +118,16 @@ class GranularMaterialForce(object):
     # moment of inertia for a sphere :
     I = 0.4*p.r**2
     
-    # angular momentum exchange coefficient :
-    kappa = 0.0001*p.r
+    # angular momentum exchange coefficient (damping term) :
+    #oijDotdij        = dox*dx + doy*dy + doz*dz
+    #oijDotdij[dr==0] = 0
+    kappa            = self.f * p.r
    
     # project onto components, sum all angular forces on each particle
-    p.alphax = + sum(-(taux + f*epix) / I - kappa*omegax, axis=1) - g*p.omegax
-    p.alphay = + sum(-(tauy + f*epiy) / I - kappa*omegay, axis=1) - g*p.omegay
-    p.alphaz = + sum(-(tauz + f*epiz) / I - kappa*omegaz, axis=1) - g*p.omegaz
-
+    p.alphax = + sum(-(k*taux + f*epix) / I + kappa*dox, axis=1) - g*p.omegax
+    p.alphay = + sum(-(k*tauy + f*epiy) / I + kappa*doy, axis=1) - g*p.omegay
+    p.alphaz = + sum(-(k*tauz + f*epiz) / I + kappa*doz, axis=1) - g*p.omegaz
+   
 
 class NebulaGranularMaterialForce(object):
 
