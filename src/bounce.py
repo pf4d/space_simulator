@@ -103,7 +103,7 @@ specter = Specter(1e3, 4*L)
 star    = Specter(1e3, 100*L)
 
 # instantiate the forces function between particles
-f = GranularMaterialForce(k=k, g=g, gamma=gamma)
+f = GranularMaterialForce(k=k, gamma=gamma)
 #f = NebulaGranularMaterialForce(k=k, gamma=gamma)
 
 # create some particles and a box
@@ -577,11 +577,12 @@ def display():
     
     glPushMatrix()
     glTranslate(p.x[i], p.y[i], p.z[i])
-    glRotate(p.thetax[i]*180/pi, 1,0,0)
-    glRotate(p.thetay[i]*180/pi, 0,1,0)
-    glRotate(p.thetaz[i]*180/pi, 0,0,1)
-    glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
-    glMaterial(GL_FRONT, GL_SHININESS, 100.0)
+    
+    # rotation :
+    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+    M   = dot(p.theta[i], mvm[:3,:3])
+    mvm[:3,:3] = M
+    glLoadMatrixf(mvm)
     
     ## draw particles as points :
     #glBegin(GL_POINTS)

@@ -23,11 +23,10 @@ from pylab import *
 
 class GranularMaterialForce(object):
 
-  def __init__(self, k=1.5, gamma=0.3, g=0.25):
+  def __init__(self, k=1.5, gamma=0.3):
     # parameters in force model
     self.k     = k           # elastic 'bounce'
     self.gamma = gamma       # energy dissipation/loss
-    self.g     = g           # gravity
     self.f     = 0.5         # angular exchange damping coefficient
     self.rho   = 1.0         # density
     self.G     = 6.67384E-11 # gravitational constant
@@ -188,9 +187,10 @@ class VerletIntegrator(object):
     p.z = p.z + p.vz*dt + 0.5*p.az*dt**2
 
     # angular roation update :
-    p.thetax = p.thetax + p.omegax*dt + 0.5*p.alphax*dt**2
-    p.thetay = p.thetay + p.omegay*dt + 0.5*p.alphay*dt**2
-    p.thetaz = p.thetaz + p.omegaz*dt + 0.5*p.alphaz*dt**2
+    p.thetax = -(p.omegax*dt + 0.5*p.alphax*dt**2)
+    p.thetay = -(p.omegay*dt + 0.5*p.alphay*dt**2)
+    p.thetaz = -(p.omegaz*dt + 0.5*p.alphaz*dt**2)
+    p.update_theta()
 
     # update periodic BC
     p.pbcUpdate()
@@ -274,6 +274,7 @@ class Particles(object):
     # radii
     self.r  = array([],dtype=self.type)
     # angular rotation :
+    self.theta  = []
     self.thetax = array([],dtype=self.type)
     self.thetay = array([],dtype=self.type)
     self.thetaz = array([],dtype=self.type)
@@ -312,6 +313,7 @@ class Particles(object):
     self.ay = hstack((self.ay,0))
     self.az = hstack((self.az,0))
     self.r  = hstack((self.r,r))
+    self.theta.append(identity(3))
     self.thetax = hstack((self.thetax,thetax))
     self.thetay = hstack((self.thetay,thetay))
     self.thetaz = hstack((self.thetaz,thetaz))
@@ -334,6 +336,42 @@ class Particles(object):
     self.m     = self.rho * self.V
     self.mi_mj = outer(self.m, self.m)
     self.f(self)
+
+  def update_theta(self):
+    """
+    """
+    theta_n = []
+    for M,x,y,z in zip(self.theta,self.thetax,self.thetay,self.thetaz):
+      v = array([x,y,z])
+      M = self.rotate(M, v)
+      theta_n.append(M)
+    self.theta = theta_n
+
+  def rotate(self, M, v):
+    """
+    rotate the particle's orientation matrix <M> about the x, y, and z axes by 
+    angles provided in <v> array.
+    """
+    rx = v[0]
+    ry = v[1]
+    rz = v[2]
+    c  = cos(rx)
+    s  = sin(rx)
+    Rx = array([[1, 0,  0],
+                [0, c, -s],
+                [0, s,  c]])
+    c  = cos(ry)
+    s  = sin(ry)
+    Ry = array([[ c, 0, s],
+                [ 0, 1, 0],
+                [-s, 0, c]])
+    c  = cos(rz)
+    s  = sin(rz)
+    Rz = array([[c, -s, 0],
+                [s,  c, 0],
+                [0,  0, 1]])
+    R  = dot(Rx, dot(Ry, Rz))
+    return dot(M, R)
 
   def pbcUpdate(self):
     """
