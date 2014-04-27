@@ -9,6 +9,19 @@ from objLoader      import *
 from time           import time
 import sys
 
+class Camera(object):
+
+  def __init__(self):
+    """
+    """
+    self.M = identity(3)
+
+  def update(self, R):
+    """
+    """
+    self.M = dot(R, self.M)
+  
+
 fwd       = False  # craft moving forward
 back      = False  #   "     "    back
 left      = False  #   "     "    left
@@ -18,14 +31,16 @@ down      = False  #   "     "    down
 rollLeft  = False  #   "   rolling left 
 rollRight = False  #   "     "     right
 
-taccel     = 20.0  # translational acceleration to apply 
-raccel     = 1.0   # rotational acceleration to apply
-
+taccel    = 20.0   # translational acceleration to apply 
+raccel    = 1.0    # rotational acceleration to apply
 
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
 rotz      = 0      # camera z rotation
 camDist   = 2.0    # camera distance coef.
+
+# create viewpoint camera :
+camera    = Camera()
 
 frames    = 0      # for spf calculation
 lastTime  = time() # current time
@@ -84,16 +99,17 @@ p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-p.addParticle(0,0,0,0,0,0,3,0,0,0,0,0,0)
+p.addParticle(0,0,-L,0,0,0,3,0,0,0,0,0,0)
 initialize_grid(p, 4, 4.0, 2*L)
 #initialize_random(p, 100, 4, L/2)
-#p.addParticle(0,L,0,0,0,0,1.0/2,0,0,0,0,0,0)
 
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
 #integrate = NebulaVerletIntegrator(dt)
 
 def init():
+  """
+  """
   # general properties :
   glEnable(GL_COLOR_MATERIAL)
   glEnable(GL_BLEND)
@@ -122,6 +138,8 @@ def init():
   glPointSize(10.0)
   
 def draw_ship_vectors(dx, dy):
+  """
+  """
   # save projection matrix
   glMatrixMode(GL_PROJECTION)
   glPushMatrix()
@@ -267,6 +285,8 @@ def draw_ship_vectors(dx, dy):
   glMatrixMode(GL_MODELVIEW)
   
 def print_ship_stats(dx, dy):
+  """
+  """
   # save projection matrix
   glMatrixMode(GL_PROJECTION)
   glPushMatrix()
@@ -480,6 +500,8 @@ def draw_specter_field(S, r):
 
 
 def display():
+  """
+  """
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
   dx = 0.2 * L
@@ -487,10 +509,11 @@ def display():
  
   # camera viewpoint :
   glLoadIdentity()
+  dv = array([rotx, roty, rotz])
   pt = array([p.x[0], p.y[0], p.z[0]]) + 1e-15
-  pr = array([0, 0, 1])            # initial rotation vector
-  pu = array([0, 1, 0])            # initial up vector
-  pa = array([p.thetax[0]+rotx, p.thetay[0]+roty, p.thetaz[0]+rotz])
+  pr = array([0, 0, 1])                       # initial rotation vector
+  pu = array([0, 1, 0])                       # initial up vector
+  pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) + dv
   vf = rotate_vector(pr, pa)
   vu = rotate_vector(pu, pa)
   pt = pt - vf / norm(vf) * camDist * p.r[0]  # move the camera back
@@ -505,7 +528,6 @@ def display():
   #glRotate(rotx,1,0,0)
   #glRotate(roty,0,1,0)
   #glRotate(rotz,0,0,1)
-  
 
   # draw specter field :
   #draw_specter_field(specter, 1.0)
@@ -525,22 +547,9 @@ def display():
     else:
       mag = 1.0
     
-    #if abs(p.alphax[i]) > 0.01 or \
-    #   abs(p.alphay[i]) > 0.01 or \
-    #   abs(p.alphaz[i]) > 0.01:
-    #  glColor(p.r[i]/2.0, p.r[i]/4.0, p.r[i]/2.0, mag)
-  
     if (p.ax[i] > 0.5 or p.ax[i] < -0.5) and i != 0:
-      #glColor(p.r[i]/2.0, p.r[i]/2.0, p.r[i]/2.0, mag)
       glColor(1/2.0, 1/2.0, 1/2.0, mag)
-    #elif (p.vx[i] > 0.5 or p.vy[i] > 0.5 or p.vz[i] > 0.5) and i != 0:
-    #  glColor(0.8, 0.4, 0.0, mag)
-    #elif p.vx[i] > 0.5:
-    #  glColor(0.8, 0.4, 0.0, mag)
-    #elif p.vx[i] < -0.5:
-    #  glColor(0.0, 0.5, 0.8, mag)
     elif i != 0:
-      #glColor(p.r[i]/1, p.r[i]/2, 0.0, mag)
       glColor(1, 1/2.0, 0.0, mag)
     
     glPushMatrix()
@@ -550,13 +559,19 @@ def display():
     glRotate(p.thetaz[i]*180/pi, 0,0,1)
     glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
     glMaterial(GL_FRONT, GL_SHININESS, 100.0)
+    
+    ## draw particles as points :
     #glBegin(GL_POINTS)
     #glVertex3f(p.x[i], p.y[i], p.z[i])
     #glEnd()
+
+    # draw particles as spheres or the ship if index == 0 :
     if i == 0:
       glCallList(obj.gl_list)
     else:  
       glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
+    
+    ## draw the wireframe around the particles :
     #glColor(0.0,0.0,0.0,1.0)
     #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
     #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
@@ -617,6 +632,8 @@ def display():
   glFlush()
 
 def reshape(width, height):
+  """
+  """
   glViewport(0, 0, width, height)
   glMatrixMode(GL_PROJECTION)
   glLoadIdentity()
@@ -626,25 +643,17 @@ def reshape(width, height):
   glLoadIdentity()
 
 def idle():
+  """
+  """
   global COUNT, vy, vx, vz, massive, frames, lastTime, fps
   global fwd, back, left, right, up, down, taccel, raccel, rollLeft, rollRight
+  
+  # integrate the system forward in time :
   for i in range(UPDATE_FRAMES):
-    integrate(f,p) # Move the system forward in time
+    integrate(f,p)
     COUNT = COUNT + 1 
-    if mod(COUNT,partInt) == 0:
-      # syntax is addParticle(x,y,z,vx,vy,vz,radius)
-      # note y is into page.
-      if massive:
-        r = L/4
-      else:
-        r = 0.3*randn() + 1.
-        r = 1.0/2
-      if on:
-        px = 0.25*randn()
-        py = L/2
-        pz = 0
-        p.addParticle(px, py, pz, vx, vy, vz, r,0,0,0,0,0,0)
-
+  
+  # move forward :
   if fwd == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([0, 0, 1])            # initial rotation vector
@@ -654,7 +663,8 @@ def idle():
     p.ax[0] += pf[0]
     p.ay[0] += pf[1]
     p.az[0] += pf[2]
-
+  
+  # move backward :
   elif back == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([0, 0, 1])            # initial rotation vector
@@ -664,7 +674,8 @@ def idle():
     p.ax[0] -= pf[0]
     p.ay[0] -= pf[1]
     p.az[0] -= pf[2]
-
+  
+  # move left :
   if left == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([1, 0, 0])            # initial rotation vector
@@ -674,7 +685,8 @@ def idle():
     p.ax[0] += pf[0]
     p.ay[0] += pf[1]
     p.az[0] += pf[2]
-
+  
+  # move right :
   elif right == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([1, 0, 0])            # initial rotation vector
@@ -685,6 +697,7 @@ def idle():
     p.ay[0] -= pf[1]
     p.az[0] -= pf[2]
 
+  # move up :
   if up == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([1, 0, 0])            # initial rotation vector
@@ -694,7 +707,8 @@ def idle():
     p.alphax[0] += pf[0]
     p.alphay[0] += pf[1]
     p.alphaz[0] += pf[2]
-
+  
+  # move down :
   elif down == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([1, 0, 0])            # initial rotation vector
@@ -705,6 +719,7 @@ def idle():
     p.alphay[0] -= pf[1]
     p.alphaz[0] -= pf[2]
 
+  # roll left :
   if rollLeft == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([0, 0, 1])            # initial rotation vector
@@ -714,7 +729,8 @@ def idle():
     p.alphax[0] -= pf[0]
     p.alphay[0] -= pf[1]
     p.alphaz[0] -= pf[2]
-
+  
+  # roll right :
   elif rollRight == True:
     pt = array([p.x[0], p.y[0], p.z[0]])
     pr = array([0, 0, 1])            # initial rotation vector
@@ -725,6 +741,7 @@ def idle():
     p.alphay[0] += pf[1]
     p.alphaz[0] += pf[2]
 
+  # redraw the screen :
   glutPostRedisplay()
 
   # calculate fps :
@@ -737,132 +754,109 @@ def idle():
     #print fps
 
 def key(k, x, y):
+  """
+  """
   global rotx, roty, rotz, trans, on, radiusDiv, massive, fwd, back, left, right
-
+  
+  # reset the camera :
   if k == 'c':
     print "'c' was pressed, reseting camera"
     rotx = 0      # camera x rotation
     roty = 0      # camera y rotation
     rotz = 0      # camera z rotation
-
+  
+  # quit the game :
   if k == 'q':
     print "'q' was pressed"
     exit(0)
   
-  if k == 't':
-    if trans == True:
-      trans = False
-    else:
-      trans = True
-    print "'t' was pressed: Trans =", trans
-    
-  if k == 'o':
-    if on == True:
-      on = False
-    else:
-      on = True
-    print "'o' was pressed: On =", on
-    
-  if k == '=':
-    radiusDiv += 0.05
-    print "'+' was pressed: radiusDiv =", radiusDiv
-  
-  if k == '-':
-    if radiusDiv-1 == 0:
-      print "RADIUS DIVISOR AT MIN VALUE"
-    else:
-      radiusDiv -= 0.05
-      print "'-' was pressed: radiusDiv =", radiusDiv
-  
-  if k == 'm':
-    if massive == True:
-      massive = False
-    else:
-      massive = True
-    print "'m' was pressed: massive =", massive
-  
+  # print the number of particles :
   if k == 'n':
     print "'n' was pressed: n =", p.N
-
+  
+  # move forward :
   if k == 'w':
     fwd = True
-
+  
+  # move backward :
   if k == 's':
     back = True
 
+  # move left :
   if k == 'a':
     left = True
 
+  # move right :
   if k == 'd':
     right = True
 
 def keyUp(k,x,y):
+  """
+  """
   global fwd, back, left, right
-
+  
+  # stop moving forward :
   if k == 'w':
     fwd = False
 
+  # stop moving backward :
   if k == 's':
     back = False
 
+  # stop moving left :
   if k == 'a':
     left = False
 
+  # stop moving right :
   if k == 'd':
     right = False
     
 
 def special(k, x, y):
+  """
+  """
   global vy, vx, vz, partInt, up, down, rollLeft, rollRight
   
+  # pitch up :
   if k == GLUT_KEY_UP:
     up = True
   
+  # pitch down :
   if k == GLUT_KEY_DOWN:
     down = True
   
+  # roll right :
   if k == GLUT_KEY_RIGHT:
     rollRight = True
   
+  # roll left :
   if k == GLUT_KEY_LEFT:
     rollLeft = True
   
-  if k == GLUT_KEY_PAGE_UP:
-    vz += .5
-    print 'PGUP  key was pressed: vz =', vz
-  
-  if k == GLUT_KEY_PAGE_DOWN:
-    vz -= .5
-    print 'PGDWN key was pressed: vz =', vz
-  
-  if k == GLUT_KEY_HOME:
-    partInt += 1/dt
-    print 'HOME  key was pressed: partInt =', partInt
-  
-  if k == GLUT_KEY_INSERT:
-    if partInt - 1/dt <= 0:
-      print "ADD PARTICLE INTERVAL DIVISOR AT MIN VALUE"
-    else:
-      partInt -= 1/dt
-      print 'INS   key was pressed: partInt =', partInt
-
 def specialUp(k,x,y):
   global up, down, rollLeft, rollRight
 
+  # stop pitching up :
   if k == GLUT_KEY_UP:
     up = False
   
+  # stop pitching down :
   if k == GLUT_KEY_DOWN:
     down = False
   
+  # stop rolling right :
   if k == GLUT_KEY_RIGHT:
     rollRight = False
   
+  # stop rolling left :
   if k == GLUT_KEY_LEFT:
     rollLeft = False
 
 def mouse(button,state,x,y):
+  """
+  """
   global beginx,beginy,rotate,camDist
+
   if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
     #print "Mouseclick <x,y> : <%i,%i>" % (x,y)
     rotate = 1
@@ -879,7 +873,10 @@ def mouse(button,state,x,y):
       camDist -= 0.2
 
 def motion(x,y):
-  global rotx,roty,beginx,beginy,rotate
+  """
+  """
+  global rotx,roty,beginx,beginy,rotate,camera
+
   if rotate:
     rotx = rotx + (y - beginy) / 100.0
     roty = roty + (x - beginx) / 100.0
@@ -889,14 +886,12 @@ def motion(x,y):
     #print "Mouse movement <x,y> : <%i,%i>" % (x,y)
   
 
+# main method :
 if __name__ == '__main__':
-
-  i      = 70
-  #width  = i*int(L)
-  #height = i*int(L)
   
-  sx = 600# + 1920
-  sy = 300# + 100
+  # initial window position :
+  sx = 600
+  sy = 300
 
   # open a window
   glutInit(sys.argv)
