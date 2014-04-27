@@ -51,9 +51,6 @@ h         = 700    # screen height
 dt        = 0.10   # time step taken by the time integration routine.
 L         = 120.0  # size of the box.
 t         = 0      # initial time
-vy        = 0      # vertical velocity
-vx        = 0      # horizontal velocity
-vz        = 0      # depth velocity
 
 # "pool balls" :
 k         = 30.0   # elastic 'bounce'
@@ -67,12 +64,6 @@ gamma     = 1.5    # energy dissipation/loss
 
 rho       = 1e4    # particle denisty
 g         = 0.00   # downward acceleration
-
-on        = False  # start / stop adding particles
-trans     = False  # transparency enable
-partInt   = 6/dt   # how often to add a new particle
-radiusDiv = 1      # radius divisor
-massive   = False  # the big ball.
 
 # particle update data:
 COUNT         = 1  # number of time steps computed
@@ -542,15 +533,10 @@ def display():
   glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
   glMaterial(GL_FRONT, GL_SHININESS, 100.0)
   for i in range(p.N):
-    if trans:
-      mag = sqrt(p.vx[i]**2 + p.vy[i]**2 + p.vz[i]**2) + 0.02
-    else:
-      mag = 1.0
-    
     if (p.ax[i] > 0.5 or p.ax[i] < -0.5) and i != 0:
-      glColor(1/2.0, 1/2.0, 1/2.0, mag)
+      glColor(1/2.0, 1/2.0, 1/2.0, 1.0)
     elif i != 0:
-      glColor(1, 1/2.0, 0.0, mag)
+      glColor(1, 1/2.0, 0.0, 1.0)
     
     glPushMatrix()
     glTranslate(p.x[i], p.y[i], p.z[i])
@@ -569,7 +555,7 @@ def display():
     if i == 0:
       glCallList(obj.gl_list)
     else:  
-      glutSolidSphere(p.r[i]/radiusDiv, SLICES, STACKS)
+      glutSolidSphere(p.r[i], SLICES, STACKS)
     
     ## draw the wireframe around the particles :
     #glColor(0.0,0.0,0.0,1.0)
@@ -645,7 +631,7 @@ def reshape(width, height):
 def idle():
   """
   """
-  global COUNT, vy, vx, vz, massive, frames, lastTime, fps
+  global COUNT, frames, lastTime, fps
   global fwd, back, left, right, up, down, taccel, raccel, rollLeft, rollRight
   
   # integrate the system forward in time :
@@ -756,7 +742,7 @@ def idle():
 def key(k, x, y):
   """
   """
-  global rotx, roty, rotz, trans, on, radiusDiv, massive, fwd, back, left, right
+  global rotx, roty, rotz, fwd, back, left, right
   
   # reset the camera :
   if k == 'c':
@@ -815,7 +801,7 @@ def keyUp(k,x,y):
 def special(k, x, y):
   """
   """
-  global vy, vx, vz, partInt, up, down, rollLeft, rollRight
+  global up, down, rollLeft, rollRight
   
   # pitch up :
   if k == GLUT_KEY_UP:
