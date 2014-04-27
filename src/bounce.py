@@ -41,7 +41,8 @@ class Camera(object):
                 [0,  0, 1]])
     R  = dot(Rx, dot(Ry, Rz))
     
-    self.M = dot(R, self.M)
+    self.M = dot(self.M, R)
+    print self.M
 
 
 fwd       = False  # craft moving forward
@@ -59,7 +60,7 @@ raccel    = 1.0    # rotational acceleration to apply
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
 rotz      = 0      # camera z rotation
-camDist   = 0.0    # camera distance coef.
+camDist   = 4.0    # camera distance coef.
 
 # create viewpoint camera :
 camera    = Camera()
@@ -537,22 +538,13 @@ def display():
  
   # camera viewpoint :
   glLoadIdentity()
-  #dv = array([rotx, roty, rotz])
+  M  = camera.M
   pt = array([p.x[0], p.y[0], p.z[0]]) + 1e-15
-  #pr = array([0, 0, 1])                       # initial rotation vector
-  #pu = array([0, 1, 0])                       # initial up vector
-  #pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])# + dv
-  #vf = rotate_vector(pr, pa)
-  #vu = rotate_vector(pu, pa)
-  #pt = pt - vf / norm(vf) * camDist * p.r[0]  # move the camera back
-  #pr = pt + vf
-  #gluLookAt(pt[0], pt[1], pt[2],              # Camera Position
-  #          pr[0], pr[1], pr[2],              # Point the Camera looks at
-  #          vu[0], vu[1], vu[2])              # the Up-Vector
-  M  = camera.M.copy()
+  rt = M[:,0]
+  #up = cross(M[:,2], rt)
   up = M[:,1]
-  fr = M[:,2]
-  fr += pt
+  fr = M[:,2] + pt
+  pt = pt - M[:,2] / norm(M[:,2]) * camDist * p.r[0]  # moves the camera back
   gluLookAt(pt[0], pt[1], pt[2],              # Camera Position
             fr[0], fr[1], fr[2],              # Point the Camera looks at
             up[0], up[1], up[2])              # the Up-Vector
