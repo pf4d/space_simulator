@@ -16,11 +16,33 @@ class Camera(object):
     """
     self.M = identity(3)
 
-  def update(self, R):
+  def update(self, v):
     """
+    rotate the camera orientation matrix about the x, y, and z axes by angles 
+    provided in <v> array.
     """
+    rx = v[0]
+    ry = v[1]
+    rz = v[2]
+    c  = cos(rx)
+    s  = sin(rx)
+    Rx = array([[1, 0,  0],
+                [0, c, -s],
+                [0, s,  c]])
+    c  = cos(ry)
+    s  = sin(ry)
+    Ry = array([[ c, 0, s],
+                [ 0, 1, 0],
+                [-s, 0, c]])
+    c  = cos(rz)
+    s  = sin(rz)
+    Rz = array([[c, -s, 0],
+                [s,  c, 0],
+                [0,  0, 1]])
+    R  = dot(Rx, dot(Ry, Rz))
+    
     self.M = dot(R, self.M)
-  
+
 
 fwd       = False  # craft moving forward
 back      = False  #   "     "    back
@@ -37,7 +59,7 @@ raccel    = 1.0    # rotational acceleration to apply
 rotx      = 0      # camera x rotation
 roty      = 0      # camera y rotation
 rotz      = 0      # camera z rotation
-camDist   = 2.0    # camera distance coef.
+camDist   = 0.0    # camera distance coef.
 
 # create viewpoint camera :
 camera    = Camera()
@@ -81,7 +103,7 @@ star    = Specter(1e3, 100*L)
 
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, g=g, gamma=gamma)
-#f = NebulaGranularMaterialForce(k=k, g=g, gamma=gamma)
+#f = NebulaGranularMaterialForce(k=k, gamma=gamma)
 
 # create some particles and a box
 p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
@@ -156,20 +178,35 @@ def draw_ship_vectors(dx, dy):
   xr =  L-2*dx
   yr =  yt
   zr =  zt
-  thetax = pi/4
-  thetay = pi/4
-  thetaz = pi/2
+  
+  thetax = -pi/4
+  thetay = 0#-pi/4
+  thetaz = pi
+  
+  #pt = array([p.x[0], p.y[0], p.z[0]])
+  #pr = array([0, 0, 1])            # initial rotation vector
+  #pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
+  #vf = rotate_vector(pr, pa)
+  #pf = vf / norm(vf) * taccel
   
   # draw the 'ship' :
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xt, yt, zt)
-  glutSolidSphere(2, SLICES, STACKS)
+  glRotate(thetax*180/pi, 1,0,0)
+  glRotate(thetay*180/pi, 0,1,0)
+  glRotate(thetaz*180/pi, 0,0,1)
+  glCallList(obj.gl_list)
+  #glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
-  glutSolidSphere(2, SLICES, STACKS)
+  glRotate(thetax*180/pi, 1,0,0)
+  glRotate(thetay*180/pi, 0,1,0)
+  glRotate(thetaz*180/pi, 0,0,1)
+  glCallList(obj.gl_list)
+  #glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
 
   # translational statistics :
@@ -232,7 +269,7 @@ def draw_ship_vectors(dx, dy):
   glBegin(GL_LINES)
  
   # angular acceleration vectors :
-  c = 1.0
+  c = 10.0
   glColor4f(1.0,0.0,0.0,1.0)
   t = array([0.5,0.5,0.5])
   axyz = c * array([p.alphax[0], 0, 0])
@@ -249,7 +286,7 @@ def draw_ship_vectors(dx, dy):
   glVertex3fv(xyz2)
   
   # angular velocity vectors :
-  c = 1.0
+  c = 10.0
   glColor4f(1.0,1.0,0.0,1.0)
   vxyz = c * array([p.omegax[0], 0, 0])
   xyz2 = xyz1 + vxyz
@@ -305,7 +342,7 @@ def print_ship_stats(dx, dy):
   font.Render("n = %i" % p.N)
   glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
-  t1 = 'red particle statistics (x,y,z) :'
+  t1 = 'ship statistics (x,y,z) :'
   t2 = 'theta        : %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
   t3 = 'omega        : %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
   t4 = 'alpha        : %.2E, %.2E, %.2E' % (p.alphax[0],p.alphay[0],p.alphaz[0])
@@ -459,7 +496,7 @@ def draw_angular_acceleration_vectors():
   """ 
   glLineWidth(1.0)
   glPopMatrix()
-  glColor4f(1.0,0.0,0.0,1.0)
+  glColor4f(1.0,1.0,0.0,1.0)
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
@@ -500,19 +537,27 @@ def display():
  
   # camera viewpoint :
   glLoadIdentity()
-  dv = array([rotx, roty, rotz])
+  #dv = array([rotx, roty, rotz])
   pt = array([p.x[0], p.y[0], p.z[0]]) + 1e-15
-  pr = array([0, 0, 1])                       # initial rotation vector
-  pu = array([0, 1, 0])                       # initial up vector
-  pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]]) + dv
-  vf = rotate_vector(pr, pa)
-  vu = rotate_vector(pu, pa)
-  pt = pt - vf / norm(vf) * camDist * p.r[0]  # move the camera back
-  pr = pt + vf
+  #pr = array([0, 0, 1])                       # initial rotation vector
+  #pu = array([0, 1, 0])                       # initial up vector
+  #pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])# + dv
+  #vf = rotate_vector(pr, pa)
+  #vu = rotate_vector(pu, pa)
+  #pt = pt - vf / norm(vf) * camDist * p.r[0]  # move the camera back
+  #pr = pt + vf
+  #gluLookAt(pt[0], pt[1], pt[2],              # Camera Position
+  #          pr[0], pr[1], pr[2],              # Point the Camera looks at
+  #          vu[0], vu[1], vu[2])              # the Up-Vector
+  M  = camera.M.copy()
+  up = M[:,1]
+  fr = M[:,2]
+  fr += pt
   gluLookAt(pt[0], pt[1], pt[2],              # Camera Position
-            pr[0], pr[1], pr[2],              # Point the Camera looks at
-            vu[0], vu[1], vu[2])              # the Up-Vector
+            fr[0], fr[1], fr[2],              # Point the Camera looks at
+            up[0], up[1], up[2])              # the Up-Vector
   
+  ## use fixed camera at center of domain :
   #gluLookAt(0,0,L*camDist,                   # Camera Position
   #          0,0,0,                           # Point the Camera looks at
   #          0,1,0)                           # the Up-Vector
@@ -562,6 +607,7 @@ def display():
     #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
     #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
     #glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
+    
     glPopMatrix()
 
   # draw vectors on particles :
@@ -575,7 +621,7 @@ def display():
   print_ship_stats(dx,dy)
 
   # draw ship vectors :
-  #draw_ship_vectors(dx,dy)
+  draw_ship_vectors(dx,dy)
  
   # draw the lights : 
   lx1 = 0.0
@@ -864,10 +910,13 @@ def motion(x,y):
   global rotx,roty,beginx,beginy,rotate,camera
 
   if rotate:
-    rotx = rotx + (y - beginy) / 100.0
-    roty = roty + (x - beginx) / 100.0
+    diffx  = (x - beginx) / 100.0
+    diffy  = (y - beginy) / 100.0
+    rotx   = rotx + diffy
+    roty   = roty + diffx
     beginx = x
     beginy = y
+    camera.update(array([-diffy, -diffx, 0]))
     glutPostRedisplay()
     #print "Mouse movement <x,y> : <%i,%i>" % (x,y)
   

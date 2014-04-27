@@ -131,11 +131,10 @@ class GranularMaterialForce(object):
 
 class NebulaGranularMaterialForce(object):
 
-  def __init__(self, k=1.5, gamma=0.3, g=0.25):
+  def __init__(self, k=1.5, gamma=0.3):
     # parameters in force model
     self.k     = k           # elastic 'bounce'
     self.gamma = gamma       # energy dissipation/loss
-    self.g     = g           # gravity
     self.rho   = 1.0         # density
     self.G     = 6.67384E-11 # gravitational constant
 
@@ -170,7 +169,7 @@ class NebulaGranularMaterialForce(object):
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1)
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1) - self.g 
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1)
     p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1)
     
 
@@ -252,6 +251,8 @@ class NebulaVerletIntegrator(object):
 class Particles(object):
 
   def __init__(self, L, rho, force, periodicX=1, periodicY=1, periodicZ=1):
+    """
+    """
     # container size
     self.L = L
     # total Number of particles
@@ -299,6 +300,8 @@ class Particles(object):
   def addParticle(self, x, y, z, vx, vy, vz, r,
                   thetax, thetay, thetaz, 
                   omegax, omegay, omegaz): 
+    """
+    """
     self.x  = hstack((self.x,x))
     self.y  = hstack((self.y,y))
     self.z  = hstack((self.z,z))
@@ -440,6 +443,8 @@ class Specter(object):
       self.addSpecter(x,y,z)
    
   def addSpecter(self, x, y, z): 
+    """
+    """
     self.x  = hstack((self.x,x))
     self.y  = hstack((self.y,y))
     self.z  = hstack((self.z,z))
@@ -470,6 +475,11 @@ def initialize_random(p, n, r, L):
     r     = 0.1*randn() + r
     x,y,z = L*randn(3)
     p.addParticle(x,y,z,0,0,0,r,0,0,0,0,0,0)
+
+def initialize_system():
+   """
+   """
+   pass
 
 
 
