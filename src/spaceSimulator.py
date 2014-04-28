@@ -191,16 +191,19 @@ def draw_ship_vectors(dx, dy):
   zr =  zt
   
   # vectors of orientation :
-  R  = rotate_vector(array([pi/6, -pi/6, 0]))
-  M  = dot(p.theta[0].T, R)
-  rt = M[:,0]
-  up = M[:,1]
-  fr = M[:,2]
-  xyz1 = zeros(3)
+  R      = rotate_vector(array([pi/6, -pi/6, 0]))
+  M      = dot(p.theta[0].T, R)
+  rt     = M[:,0]
+  up     = M[:,1]
+  fr     = M[:,2]
+  xyz1   = zeros(3)
   av     = array([p.ax[0], p.ay[0], p.az[0]])
   vv     = array([p.vx[0], p.vy[0], p.vz[0]])
   alphav = array([p.alphax[0], p.alphay[0], p.alphaz[0]])
   omegav = array([p.omegax[0], p.omegay[0], p.omegaz[0]])
+  x      = array([1,0,0])
+  y      = array([0,1,0])
+  z      = array([0,0,1])
   
   # draw the 'ship' :
   glPushMatrix()
@@ -221,6 +224,57 @@ def draw_ship_vectors(dx, dy):
   glLoadMatrixf(mvm)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
+  glPopMatrix()
+
+  # draw the axes :
+  glPushMatrix()
+  glLoadIdentity()
+  glTranslate(xt, yt, zt)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  glLoadMatrixf(mvm)
+  glLineWidth(1.0)
+  glBegin(GL_LINES)
+  glColor4f(0.2,0.2,0.2,1.0)
+  c    = 15.0
+  axyz = c * x
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1 - xyz2)
+  glVertex3fv(xyz2)
+  axyz = c * y
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1 - xyz2)
+  glVertex3fv(xyz2)
+  axyz = c * z
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1 - xyz2)
+  glVertex3fv(xyz2)
+  glEnd()
+  glPopMatrix()
+
+  # draw the axes :
+  glPushMatrix()
+  glLoadIdentity()
+  glTranslate(xr, yr, zr)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  glLoadMatrixf(mvm)
+  glLineWidth(1.0)
+  glBegin(GL_LINES)
+  glColor4f(0.2,0.2,0.2,1.0)
+  axyz = c * x
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1 - xyz2)
+  glVertex3fv(xyz2)
+  axyz = c * y
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1 - xyz2)
+  glVertex3fv(xyz2)
+  axyz = c * z
+  xyz2 = xyz1 + axyz
+  glVertex3fv(xyz1 - xyz2)
+  glVertex3fv(xyz2)
+  glEnd()
   glPopMatrix()
 
   # translational statistics :
