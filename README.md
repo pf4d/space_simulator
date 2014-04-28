@@ -38,11 +38,9 @@ Run the code :
 In the ```src``` directory, simply type
 
 ```bash
-python bounce.py
+python spaceSimulator.py
 ```
 
-To move the camera, press the left mouse button and drag up and down.  There are two 'axes' in the lower-right hand side of the screen --  the right is the translational velocity (green) and acceleration (blue), while the left is the rotational velocity (yellow) and acceleration (red).  in the upper-right-hand side of the screen you see the number of particles, which in the current configuration are planets.
-
-There is a periodic boundary on all edges of a box in the center of the screen.
+To move the camera, press the left mouse button and drag up and down, and zoom in and out with the mouse wheel.  There are two miniture ship images in the lower-right hand side of the screen --  the right is the translational velocity (green) and acceleration (blue), while the left is the rotational velocity (yellow) and acceleration (red).  in the upper-right-hand side of the screen you see the number of particles, which in the current configuration are planets, and in the upper-left you have frames per second.
 
 The balls are normally colored orange, but when they are accelerating above a threshold, they are colored gray.
