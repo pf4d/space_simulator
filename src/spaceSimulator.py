@@ -191,8 +191,10 @@ def draw_ship_vectors(dx, dy):
   up = M[:,1]
   fr = M[:,2]
   xyz1 = zeros(3)
-  av = array([p.ax[0], p.ay[0], p.az[0]])
-  vv = array([p.vx[0], p.vy[0], p.vz[0]])
+  av     = array([p.ax[0], p.ay[0], p.az[0]])
+  vv     = array([p.vx[0], p.vy[0], p.vz[0]])
+  alphav = array([p.alphax[0], p.alphay[0], p.alphaz[0]])
+  omegav = array([p.omegax[0], p.omegay[0], p.omegaz[0]])
   
   # draw the 'ship' :
   glPushMatrix()
@@ -208,6 +210,9 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  glLoadMatrixf(mvm)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
@@ -217,50 +222,26 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xt, yt, zt)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  mvm[:3,:3] = dot(mvm[:3,:3], M)
   glLoadMatrixf(mvm)
   glLineWidth(2.0)
   glBegin(GL_LINES)
  
   # acceleration vectors :
-  c  = 10.0
-  
   glColor4f(0.0,0.0,1.0,1.0)
-  axyz = c * dot(av, fr)
-  xyz2 = xyz1 + axyz
-  #glVertex3fv(xyz1)
-  #glVertex3fv(xyz2)
-  
-  glColor4f(0.0,1.0,0.0,1.0)
-  axyz = c * dot(av, rt)
+  c    = 1.0
+  axyz = c * av
   xyz2 = xyz1 + axyz
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
-  glColor4f(1.0,0.0,0.0,1.0)
-  axyz = c * array([1,0,0])
+  # velocity vectors :
+  glColor4f(0.0,1.0,0.0,1.0)
+  c    = 1.0
+  axyz = c * vv
   xyz2 = xyz1 + axyz
-  #glVertex3fv(xyz1)
-  #glVertex3fv(xyz2)
-  
-  ## velocity vectors :
-  #glColor4f(0.0,1.0,0.0,1.0)
-  #c  = 1.0
-
-  #axyz = c * dot(vr, vv)
-  #xyz2 = xyz1 + axyz
-  #glVertex3fv(xyz1)
-  #glVertex3fv(xyz2)
-  #
-  #axyz = c * dot(vu, vv)
-  #xyz2 = xyz1 + axyz
-  #glVertex3fv(xyz1)
-  #glVertex3fv(xyz2)
-  #
-  #axyz = c * dot(vf, vv)
-  #xyz2 = xyz1 + axyz
-  #glVertex3fv(xyz1)
-  #glVertex3fv(xyz2)
+  glVertex3fv(xyz1)
+  glVertex3fv(xyz2)
   
   glEnd()
   glPopMatrix()
@@ -269,40 +250,28 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  mvm[:3,:3] = dot(mvm[:3,:3], M)
+  glLoadMatrixf(mvm)
   glBegin(GL_LINES)
  
   # angular acceleration vectors :
-  c = 10.0
   glColor4f(1.0,0.0,0.0,1.0)
-  axyz = c * array([p.alphax[0], 0, 0])
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  axyz = c * array([0, p.alphay[0], 0])
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  axyz = c * array([0, 0, p.alphaz[0]])
+  c    = 10.0
+  axyz = c * alphav
   xyz2 = xyz1 + axyz
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
   # angular velocity vectors :
-  c = 10.0
   glColor4f(1.0,1.0,0.0,1.0)
-  vxyz = c * array([p.omegax[0], 0, 0])
-  xyz2 = xyz1 + vxyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  vxyz = c * array([0, p.omegay[0], 0])
-  xyz2 = xyz1 + vxyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  vxyz = c * array([0, 0, p.omegaz[0]])
+  c    = 10.0
+  vxyz = c * omegav
   xyz2 = xyz1 + vxyz
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
+  # done :
   glEnd()
   glPopMatrix()
   
