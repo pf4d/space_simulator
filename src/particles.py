@@ -163,8 +163,9 @@ class NebulaGranularMaterialForce(object):
     mag_r += self.gamma * vijDotrij / d
 
     # gravitational pull between particles :
-    F = self.G * p.mi_mj / d**2
-    F[d < 0.0] = 0
+    #F = self.G * p.mi_mj / d**2
+    #F[d < 0.0] = 0
+    F = 0
 
     # Project onto components, sum all forces on each particle
     p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1)
@@ -438,6 +439,7 @@ class Nebula(Particles):
     self.ax = hstack((self.ax,0))
     self.ay = hstack((self.ay,0))
     self.az = hstack((self.az,0))
+    self.theta.append(identity(3))
     self.r  = hstack((self.r,r))
     self.N  = self.N+1
     temp    = tile(self.r,(self.N,1))
@@ -449,6 +451,18 @@ class Nebula(Particles):
     self.m     = self.rho * self.V
     self.mi_mj = outer(self.m, self.m)
     self.f(self)
+
+  def update_theta(self):
+    """
+    """
+    super(Nebula, self).update_theta()
+
+  def rotate(self, M, v):
+    """
+    rotate the particle's orientation matrix <M> about the x, y, and z axes by 
+    angles provided in <v> array.
+    """
+    return super(Nebula, self).rotate(M, v)
 
   def pbcUpdate(self):
     """
