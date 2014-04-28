@@ -49,58 +49,59 @@ class Camera(object):
     
     self.M = dot(self.M, R)
 
-
-fwd       = False  # craft moving forward
-back      = False  #   "     "    back
-left      = False  #   "     "    left
-right     = False  #   "     "    right
-up        = False  #   "     "    up
-down      = False  #   "     "    down
-rollLeft  = False  #   "   rolling left 
-rollRight = False  #   "     "     right
-yawLeft   = False  #   "   rotating left
-yawRight  = False  #   "   rotating right
-ascend    = False  #   "   ascending
-descend   = False  #   "   descending
-
-
-taccel    = 20.0   # translational acceleration to apply 
-raccel    = 1.0    # rotational acceleration to apply
-
-rotx      = 0      # camera x rotation
-roty      = 0      # camera y rotation
-rotz      = 0      # camera z rotation
-camDist   = 4.0    # camera distance coef.
+fwd       = False          # craft moving forward
+back      = False          #   "     "    back
+left      = False          #   "     "    left
+right     = False          #   "     "    right
+up        = False          #   "     "    up
+down      = False          #   "     "    down
+rollLeft  = False          #   "   rolling left 
+rollRight = False          #   "     "     right
+yawLeft   = False          #   "   rotating left
+yawRight  = False          #   "   rotating right
+ascend    = False          #   "   ascending
+descend   = False          #   "   descending
+                           
+                           
+taccel    = 20.0           # translational acceleration to apply 
+raccel    = 1.0            # rotational acceleration to apply
+                           
+rotx      = 0              # camera x rotation
+roty      = 0              # camera y rotation
+rotz      = 0              # camera z rotation
+camDist   = 4.0            # camera distance coef.
 
 # create viewpoint camera :
 camera    = Camera()
 
-frames    = 0      # for spf calculation
-lastTime  = time() # current time
-fps       = 1.0    # current frames per second
-w         = 700    # screen width
-h         = 700    # screen height
-
-dt        = 0.10   # time step taken by the time integration routine.
-L         = 120.0  # size of the box.
-t         = 0      # initial time
-
-# "pool balls" :
-k         = 30.0   # elastic 'bounce'
-gamma     = 0.1    # energy dissipation/loss
+# variable uesed :
+shipColor = 0.5*ones(3)    # color of the ship
+frames    = 0              # for spf calculation
+lastTime  = time()         # current time
+fps       = 1.0            # current frames per second
+w         = 700            # screen width
+h         = 700            # screen height
+                           
+dt        = 0.10           # time step
+L         = 120.0          # size of the box
+t         = 0              # initial time
+                           
+# "pool balls" :           
+k         = 30.0           # elastic 'bounce'
+gamma     = 0.1            # energy dissipation/loss
 # "squishy balls" :
-k         = 1.5    # elastic 'bounce'
-gamma     = 0.1    # energy dissipation/loss
-# "space balls" :
-k         = 60.0   # elastic 'bounce'
-gamma     = 1.5    # energy dissipation/loss
-
-rho       = 1e4    # particle denisty
-g         = 0.00   # downward acceleration
+k         = 1.5            # elastic 'bounce'
+gamma     = 0.1            # energy dissipation/loss
+# "space balls" :          
+k         = 60.0           # elastic 'bounce'
+gamma     = 1.5            # energy dissipation/loss
+                           
+rho       = 1e4            # particle denisty
+g         = 0.00           # downward acceleration
 
 # particle update data:
-COUNT         = 1  # number of time steps computed
-UPDATE_FRAMES = 1  # how often to redraw screen
+COUNT         = 1          # number of time steps computed
+UPDATE_FRAMES = 1          # how often to redraw screen
 
 # how resolved are the spheres?
 STACKS = 10
@@ -160,10 +161,13 @@ def init():
   glEnable(GL_BLEND)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glPointSize(10.0)
-  
+
+
 def draw_ship_vectors(dx, dy):
   """
   """
+  global shipColor
+
   # save projection matrix
   glMatrixMode(GL_PROJECTION)
   glPushMatrix()
@@ -176,19 +180,22 @@ def draw_ship_vectors(dx, dy):
   glMatrixMode(GL_MODELVIEW)
 
   # draw the ship statistics :
-  glColor(0.6, 0.1, 0.1)
   glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
   glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
   glMaterial(GL_FRONT, GL_SHININESS, 100.0)
   glDisable(GL_LIGHTING)   # disable lighting
   
   # parameters for positioning :
-  xt =  L-dx
-  yt = -L+dy
+  xt =  L-1.5*dx
+  yt = -L+2*dy
   zt =  L
-  xr =  L-2*dx
+  xr =  L-3.5*dx
   yr =  yt
   zr =  zt
+  
+  # font parameters :
+  font = BitmapFont('ProggyTinySZ.ttf')
+  font.FaceSize(14)
   
   # vectors of orientation :
   R      = rotate_vector(array([pi/6, -pi/6, 0]))
@@ -196,7 +203,6 @@ def draw_ship_vectors(dx, dy):
   rt     = M[:,0]
   up     = M[:,1]
   fr     = M[:,2]
-  xyz1   = zeros(3)
   av     = array([p.ax[0], p.ay[0], p.az[0]])
   vv     = array([p.vx[0], p.vy[0], p.vz[0]])
   alphav = array([p.alphax[0], p.alphay[0], p.alphaz[0]])
@@ -204,79 +210,73 @@ def draw_ship_vectors(dx, dy):
   x      = array([1,0,0])
   y      = array([0,1,0])
   z      = array([0,0,1])
+  xyz1   = zeros(3)
+  c      = 15.0
+  xyz2_x = xyz1 + c*x
+  xyz2_y = xyz1 + c*y
+  xyz2_z = xyz1 + c*z
   
-  # draw the 'ship' :
+  #=============================================================================
+  # draw the translational info :
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xt, yt, zt)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
   mvm[:3,:3] = dot(mvm[:3,:3], R)
   glLoadMatrixf(mvm)
+  glColor(shipColor)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
-  glPopMatrix()
+  glColor4f(0.2,0.2,0.2,1.0)
+  glLineWidth(1.0)
+  glRasterPos3f(sign(vv[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
+  font.Render("%.1f" % vv[0])
+  glRasterPos3f(xyz2_y[0], sign(vv[1])*xyz2_y[1], xyz2_y[2])
+  font.Render("%.1f" % vv[1])
+  glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(vv[2])*xyz2_z[2])
+  font.Render("%.1f" % vv[2])
   
+  glBegin(GL_LINES)
+  glVertex3fv(xyz1 - xyz2_x)
+  glVertex3fv(xyz2_x)
+  glVertex3fv(xyz1 - xyz2_y)
+  glVertex3fv(xyz2_y)
+  glVertex3fv(xyz1 - xyz2_z)
+  glVertex3fv(xyz2_z)
+  glEnd()
+  glPopMatrix()
+ 
+  # draw the rotational info : 
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
   mvm[:3,:3] = dot(mvm[:3,:3], R)
   glLoadMatrixf(mvm)
+  glColor(shipColor)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
-  glPopMatrix()
-
-  # draw the axes :
-  glPushMatrix()
-  glLoadIdentity()
-  glTranslate(xt, yt, zt)
-  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], R)
-  glLoadMatrixf(mvm)
-  glLineWidth(1.0)
-  glBegin(GL_LINES)
   glColor4f(0.2,0.2,0.2,1.0)
-  c    = 15.0
-  axyz = c * x
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1 - xyz2)
-  glVertex3fv(xyz2)
-  axyz = c * y
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1 - xyz2)
-  glVertex3fv(xyz2)
-  axyz = c * z
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1 - xyz2)
-  glVertex3fv(xyz2)
+  glLineWidth(1.0)
+  c   = 15.0
+  glRasterPos3f(sign(omegav[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
+  font.Render("%.1f" % omegav[0])
+  glRasterPos3f(xyz2_y[0], sign(omegav[1])*xyz2_y[1], xyz2_y[2])
+  font.Render("%.1f" % omegav[1])
+  glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(omegav[2])*xyz2_z[2])
+  font.Render("%.1f" % omegav[2])
+  
+  glBegin(GL_LINES)
+  glVertex3fv(xyz1 - xyz2_x)
+  glVertex3fv(xyz2_x)
+  glVertex3fv(xyz1 - xyz2_y)
+  glVertex3fv(xyz2_y)
+  glVertex3fv(xyz1 - xyz2_z)
+  glVertex3fv(xyz2_z)
   glEnd()
   glPopMatrix()
 
-  # draw the axes :
-  glPushMatrix()
-  glLoadIdentity()
-  glTranslate(xr, yr, zr)
-  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], R)
-  glLoadMatrixf(mvm)
-  glLineWidth(1.0)
-  glBegin(GL_LINES)
-  glColor4f(0.2,0.2,0.2,1.0)
-  axyz = c * x
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1 - xyz2)
-  glVertex3fv(xyz2)
-  axyz = c * y
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1 - xyz2)
-  glVertex3fv(xyz2)
-  axyz = c * z
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1 - xyz2)
-  glVertex3fv(xyz2)
-  glEnd()
-  glPopMatrix()
-
+  #=============================================================================
   # translational statistics :
   glPushMatrix()
   glLoadIdentity()
@@ -305,7 +305,8 @@ def draw_ship_vectors(dx, dy):
   
   glEnd()
   glPopMatrix()
- 
+
+  #=============================================================================
   # rotational statistics : 
   glPushMatrix()
   glLoadIdentity()
@@ -342,7 +343,8 @@ def draw_ship_vectors(dx, dy):
   glMatrixMode(GL_PROJECTION)
   glPopMatrix()
   glMatrixMode(GL_MODELVIEW)
-  
+
+
 def print_ship_stats(dx, dy):
   """
   """
@@ -635,7 +637,6 @@ def display():
  
   # draw the spheres :
   glPushMatrix() 
-  glColor(0.6, 0.1, 0.1)
   glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
   glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
   glMaterial(GL_FRONT, GL_SHININESS, 100.0)
@@ -660,6 +661,7 @@ def display():
 
     # draw particles as spheres or the ship if index == 0 :
     if i == 0:
+      glColor(shipColor)
       glCallList(obj.gl_list)
     else:  
       glutSolidSphere(p.r[i], SLICES, STACKS)
