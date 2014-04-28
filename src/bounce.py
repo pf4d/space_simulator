@@ -330,15 +330,11 @@ def print_ship_stats(dx, dy):
   glLoadIdentity()
   
   glColor(1.0,1.0,1.0,1.0) 
-  glRasterPos2f(L-dx, L-dy)
   font = BitmapFont('ProggySquareSZ.ttf')
   font.FaceSize(16)
   #font = TextureFont('ProggySquareSZ.ttf')
   #font.FaceSize(13)
   #glScale(0.05, 0.05, 0.05)
-  font.Render("n = %i" % p.N)
-  glRasterPos2f(-L+dy, L-dy)
-  font.Render("%i FPS" % fps)
   t1 = 'ship statistics (x,y,z) :'
   t2 = 'theta        : %.2E, %.2E, %.2E' % (p.thetax[0],p.thetay[0],p.thetaz[0])
   t3 = 'omega        : %.2E, %.2E, %.2E' % (p.omegax[0],p.omegay[0],p.omegaz[0])
@@ -360,6 +356,46 @@ def print_ship_stats(dx, dy):
   font.Render(t6)
   glRasterPos2f(-L+dy,-(L-5)+dy*0.0)
   font.Render(t7)
+  glPopMatrix()
+  
+  # re-enable lighting :
+  glEnable(GL_LIGHTING)
+
+  # get back to old perspective matrix :
+  glMatrixMode(GL_PROJECTION)
+  glPopMatrix()
+  glMatrixMode(GL_MODELVIEW)
+  
+def print_stats(dx, dy):
+  """
+  """
+  # save projection matrix
+  glMatrixMode(GL_PROJECTION)
+  glPushMatrix()
+
+  # switch to orthographic projection :
+  glLoadIdentity()
+  glOrtho(-L, L, -L, L, -4*L, 4*L)
+
+  # back to the modelview matrix mode, so that we can translate/scale text :
+  glMatrixMode(GL_MODELVIEW)
+
+  glDisable(GL_LIGHTING)   # disable lighting
+  
+  # print statistics :
+  glPushMatrix()
+  glLoadIdentity()
+  
+  glColor(1.0,1.0,1.0,1.0) 
+  glRasterPos2f(L-dx, L-dy)
+  font = BitmapFont('ProggySquareSZ.ttf')
+  font.FaceSize(16)
+  #font = TextureFont('ProggySquareSZ.ttf')
+  #font.FaceSize(13)
+  #glScale(0.05, 0.05, 0.05)
+  font.Render("n = %i" % p.N)
+  glRasterPos2f(-L+dy, L-dy)
+  font.Render("%i FPS" % fps)
   glPopMatrix()
   
   # re-enable lighting :
@@ -609,8 +645,11 @@ def display():
   #draw_angular_velocity_vectors()
   #draw_angular_acceleration_vectors()   
 
+  # print statistics :
+  print_stats(dx,dy)
+
   # print ship stats :
-  print_ship_stats(dx,dy)
+  #print_ship_stats(dx,dy)
 
   # draw ship vectors :
   draw_ship_vectors(dx,dy)
