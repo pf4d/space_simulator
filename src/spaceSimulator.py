@@ -228,14 +228,14 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xt, yt, zt)
-  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = R
-  vec = dot(M, vv)
-  glLoadMatrixf(mvm)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)   # current rotation / translation
+  mvm[:3,:3] = R                           # rotate the view by R
+  vec = dot(p.theta[0], vv)                # find components of velocity
+  glLoadMatrixf(mvm)                       # reload the modelView matrix
   glColor(shipColor)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
-  
+
   glColor(vColor)
   glRasterPos3f(sign(vec[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
   font.Render("%.1f" % vec[0])
@@ -260,9 +260,9 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
-  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = R
-  glLoadMatrixf(mvm)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)   # current rotation / translation
+  mvm[:3,:3] = R                           # rotate the view by R
+  glLoadMatrixf(mvm)                       # reload the modelView matrix
   glColor(shipColor)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
@@ -292,9 +292,9 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xt, yt, zt)
-  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = M
-  glLoadMatrixf(mvm)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)   # current rotation / translation
+  mvm[:3,:3] = M                           # rotate the view by M
+  glLoadMatrixf(mvm)                       # reload the modelView matrix
   glLineWidth(2.0)
   glBegin(GL_LINES)
  
@@ -320,9 +320,9 @@ def draw_ship_vectors(dx, dy):
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
-  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = M
-  glLoadMatrixf(mvm)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)   # current rotation / translation
+  mvm[:3,:3] = M                           # rotate the view by M
+  glLoadMatrixf(mvm)                       # reload the modelView matrix
   glBegin(GL_LINES)
  
   # angular acceleration vectors :
@@ -409,6 +409,7 @@ def print_ship_stats(dx, dy):
   glPopMatrix()
   glMatrixMode(GL_MODELVIEW)
   
+
 def print_stats(dx, dy):
   """
   """
@@ -449,13 +450,16 @@ def print_stats(dx, dy):
   glPopMatrix()
   glMatrixMode(GL_MODELVIEW)
 
+
 def draw_velocity_vectors():
   """
   draw velocity vectors.
   """
+  global vColor
+
   glLineWidth(1.0)
   glPopMatrix()  
-  glColor4f(1.0,1.0,1.0,1.0)
+  glColor(vColor)
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
@@ -470,13 +474,16 @@ def draw_velocity_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
+
 def draw_acceleration_vectors():
   """
   draw acceleration vectors.
   """
+  global aColor
+
   glLineWidth(1.0)
   glPopMatrix()  
-  glColor4f(1.0,0.0,0.0,1.0)
+  glColor(aColor)
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
@@ -491,30 +498,6 @@ def draw_acceleration_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
-def rotate_vector(r):
-  """
-  rotate vector <v> about the x, y, and z axes by angles provided in <r> array.
-  """
-  rx = r[0]
-  ry = r[1]
-  rz = r[2]
-  c  = cos(rx)
-  s  = sin(rx)
-  Rx = array([[1, 0,  0],
-              [0, c, -s],
-              [0, s,  c]])
-  c  = cos(ry)
-  s  = sin(ry)
-  Ry = array([[ c, 0, s],
-              [ 0, 1, 0],
-              [-s, 0, c]])
-  c  = cos(rz)
-  s  = sin(rz)
-  Rz = array([[c, -s, 0],
-              [s,  c, 0],
-              [0,  0, 1]])
-  R  = dot(Rx, dot(Ry, Rz))
-  return R
 
 def draw_rotation_vectors():
   """
@@ -545,13 +528,16 @@ def draw_rotation_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
+
 def draw_angular_velocity_vectors():  
   """
   draw angular velocity vectors.
   """
+  global omegaColor
+  
   glLineWidth(1.0)
   glPopMatrix()
-  glColor4f(0.0,1.0,0.0,1.0)
+  glColor(omegaColor)
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
@@ -565,14 +551,17 @@ def draw_angular_velocity_vectors():
   glEnd()
   glEnable(GL_LIGHTING)
   glPushMatrix()
+
   
 def draw_angular_acceleration_vectors():
   """
   draw angular acceleration vectors.
   """ 
+  global alphaColor
+
   glLineWidth(1.0)
   glPopMatrix()
-  glColor4f(1.0,1.0,0.0,1.0)
+  glColor(alphaColor)
   glDisable(GL_LIGHTING)
   glBegin(GL_LINES)
   for i in range(p.N):
@@ -586,6 +575,32 @@ def draw_angular_acceleration_vectors():
   glEnd()
   glEnable(GL_LIGHTING)
   glPushMatrix()
+
+
+def rotate_vector(r):
+  """
+  rotate vector <v> about the x, y, and z axes by angles provided in <r> array.
+  """
+  rx = r[0]
+  ry = r[1]
+  rz = r[2]
+  c  = cos(rx)
+  s  = sin(rx)
+  Rx = array([[1, 0,  0],
+              [0, c, -s],
+              [0, s,  c]])
+  c  = cos(ry)
+  s  = sin(ry)
+  Ry = array([[ c, 0, s],
+              [ 0, 1, 0],
+              [-s, 0, c]])
+  c  = cos(rz)
+  s  = sin(rz)
+  Rz = array([[c, -s, 0],
+              [s,  c, 0],
+              [0,  0, 1]])
+  R  = dot(Rx, dot(Ry, Rz))
+  return R
 
 
 def draw_specter_field(S, r):
@@ -657,9 +672,9 @@ def display():
     glTranslate(p.x[i], p.y[i], p.z[i])
     
     # rotation :
-    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
-    glLoadMatrixf(mvm)
+    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)    # current rotation / translation
+    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])  # rotate the view by theta[i]
+    glLoadMatrixf(mvm)                        # reload the modelView matrix
     
     ## draw particles as points :
     #glBegin(GL_POINTS)
@@ -737,6 +752,7 @@ def display():
   glutSwapBuffers()
   glFlush()
 
+
 def reshape(width, height):
   """
   """
@@ -747,6 +763,7 @@ def reshape(width, height):
   #glOrtho(-L, L, -L, L, -4*L, 4*L)
   glMatrixMode(GL_MODELVIEW)
   glLoadIdentity()
+
 
 def idle():
   """
@@ -867,6 +884,7 @@ def idle():
     lastTime += 1.0
     #print fps
 
+
 def key(k, x, y):
   """
   """
@@ -909,6 +927,7 @@ def key(k, x, y):
   # yaw left :
   if k == 'q':
     yawLeft = True
+
 
 def keyUp(k,x,y):
   """
@@ -968,6 +987,7 @@ def special(k, x, y):
   # ascend :
   if k == GLUT_KEY_PAGE_UP:
     ascend = True
+
   
 def specialUp(k,x,y):
   global up, down, rollLeft, rollRight, ascend, descend
@@ -996,6 +1016,7 @@ def specialUp(k,x,y):
   if k == GLUT_KEY_PAGE_UP:
     ascend = False
 
+
 def mouse(button,state,x,y):
   """
   """
@@ -1015,6 +1036,7 @@ def mouse(button,state,x,y):
   if button == 3:
     if camDist >= 0.2:
       camDist -= 0.2
+
 
 def motion(x,y):
   """
