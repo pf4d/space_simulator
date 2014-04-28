@@ -42,7 +42,6 @@ class Camera(object):
     R  = dot(Rx, dot(Ry, Rz))
     
     self.M = dot(self.M, R)
-    print self.M
 
 
 fwd       = False  # craft moving forward
@@ -180,32 +179,30 @@ def draw_ship_vectors(dx, dy):
   yr =  yt
   zr =  zt
   
-  thetax = -pi/4
-  thetay = 0#-pi/4
-  thetaz = pi
-  
-  #pt = array([p.x[0], p.y[0], p.z[0]])
-  #pr = array([0, 0, 1])            # initial rotation vector
-  #pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-  #vf = rotate_vector(pr, pa)
-  #pf = vf / norm(vf) * taccel
+  # vectors of orientation :
+  R  = rotate_vector(array([pi/6, -pi/6, 0]))
+  M  = dot(p.theta[0].T, R)
+  rt = M[:,0]
+  up = M[:,1]
+  fr = M[:,2]
+  xyz1 = zeros(3)
+  av = array([p.ax[0], p.ay[0], p.az[0]])
+  vv = array([p.vx[0], p.vy[0], p.vz[0]])
   
   # draw the 'ship' :
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xt, yt, zt)
-  glRotate(thetax*180/pi, 1,0,0)
-  glRotate(thetay*180/pi, 0,1,0)
-  glRotate(thetaz*180/pi, 0,0,1)
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  glLoadMatrixf(mvm)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
+  
   glPushMatrix()
   glLoadIdentity()
   glTranslate(xr, yr, zr)
-  glRotate(thetax*180/pi, 1,0,0)
-  glRotate(thetay*180/pi, 0,1,0)
-  glRotate(thetaz*180/pi, 0,0,1)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
   glPopMatrix()
@@ -213,47 +210,52 @@ def draw_ship_vectors(dx, dy):
   # translational statistics :
   glPushMatrix()
   glLoadIdentity()
-  
   glTranslate(xt, yt, zt)
-  glRotate(thetax*180/pi, 1,0,0)
-  glRotate(thetay*180/pi, 0,1,0)
-  glRotate(thetaz*180/pi, 0,0,1)
-  xyz1 = array([0,0,0])
+  mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  glLoadMatrixf(mvm)
   glLineWidth(2.0)
   glBegin(GL_LINES)
  
   # acceleration vectors :
-  c = 1.0
+  c  = 10.0
+  
   glColor4f(0.0,0.0,1.0,1.0)
-  t = array([0.5,0.5,0.5])
-  axyz = c * array([p.ax[0], 0, 0])
+  axyz = c * dot(av, fr)
   xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  axyz = c * array([0, p.ay[0], 0])
-  xyz2 = xyz1 + axyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  axyz = c * array([0, 0, p.az[0]])
+  #glVertex3fv(xyz1)
+  #glVertex3fv(xyz2)
+  
+  glColor4f(0.0,1.0,0.0,1.0)
+  axyz = c * dot(av, rt)
   xyz2 = xyz1 + axyz
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
-  # velocity vectors :
-  c = 1.0
-  glColor4f(0.0,1.0,0.0,1.0)
-  vxyz = c * array([p.vx[0], 0, 0])
-  xyz2 = xyz1 + vxyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  vxyz = c * array([0, p.vy[0], 0])
-  xyz2 = xyz1 + vxyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
-  vxyz = c * array([0, 0, p.vz[0]])
-  xyz2 = xyz1 + vxyz
-  glVertex3fv(xyz1)
-  glVertex3fv(xyz2)
+  glColor4f(1.0,0.0,0.0,1.0)
+  axyz = c * array([1,0,0])
+  xyz2 = xyz1 + axyz
+  #glVertex3fv(xyz1)
+  #glVertex3fv(xyz2)
+  
+  ## velocity vectors :
+  #glColor4f(0.0,1.0,0.0,1.0)
+  #c  = 1.0
+
+  #axyz = c * dot(vr, vv)
+  #xyz2 = xyz1 + axyz
+  #glVertex3fv(xyz1)
+  #glVertex3fv(xyz2)
+  #
+  #axyz = c * dot(vu, vv)
+  #xyz2 = xyz1 + axyz
+  #glVertex3fv(xyz1)
+  #glVertex3fv(xyz2)
+  #
+  #axyz = c * dot(vf, vv)
+  #xyz2 = xyz1 + axyz
+  #glVertex3fv(xyz1)
+  #glVertex3fv(xyz2)
   
   glEnd()
   glPopMatrix()
@@ -261,18 +263,12 @@ def draw_ship_vectors(dx, dy):
   # rotational statistics : 
   glPushMatrix()
   glLoadIdentity()
-  
   glTranslate(xr, yr, zr)
-  glRotate(thetax*180/pi, 1,0,0)
-  glRotate(thetay*180/pi, 0,1,0)
-  glRotate(thetaz*180/pi, 0,0,1)
-  xyz1 = array([0,0,0])
   glBegin(GL_LINES)
  
   # angular acceleration vectors :
   c = 10.0
   glColor4f(1.0,0.0,0.0,1.0)
-  t = array([0.5,0.5,0.5])
   axyz = c * array([p.alphax[0], 0, 0])
   xyz2 = xyz1 + axyz
   glVertex3fv(xyz1)
@@ -416,7 +412,7 @@ def draw_acceleration_vectors():
   glEnable(GL_LIGHTING)
   glPushMatrix()
 
-def rotate_vector(v, r):
+def rotate_vector(r):
   """
   rotate vector <v> about the x, y, and z axes by angles provided in <r> array.
   """
@@ -439,13 +435,13 @@ def rotate_vector(v, r):
               [s,  c, 0],
               [0,  0, 1]])
   R  = dot(Rx, dot(Ry, Rz))
-  vn = dot(R, v)
-  return vn
+  return R
 
 def draw_rotation_vectors():
   """
   draw rotation vectors.
   """
+  # FIXME: broken
   glLineWidth(1.0)
   glPopMatrix()  
   glColor4f(0.0,1.0,1.0,1.0)
@@ -538,7 +534,7 @@ def display():
  
   # camera viewpoint :
   glLoadIdentity()
-  M  = camera.M
+  M  = dot(p.theta[0].T, camera.M)
   pt = array([p.x[0], p.y[0], p.z[0]]) + 1e-15
   rt = M[:,0]
   #up = cross(M[:,2], rt)
@@ -548,6 +544,10 @@ def display():
   gluLookAt(pt[0], pt[1], pt[2],              # Camera Position
             fr[0], fr[1], fr[2],              # Point the Camera looks at
             up[0], up[1], up[2])              # the Up-Vector
+  
+  #mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+  #mvm[:3,:3] = dot(p.theta[0], mvm[:3,:3])
+  #glLoadMatrixf(mvm)
   
   ## use fixed camera at center of domain :
   #gluLookAt(0,0,L*camDist,                   # Camera Position
@@ -580,8 +580,7 @@ def display():
     
     # rotation :
     mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-    M   = dot(p.theta[i], mvm[:3,:3])
-    mvm[:3,:3] = M
+    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
     glLoadMatrixf(mvm)
     
     ## draw particles as points :
@@ -605,10 +604,10 @@ def display():
 
   # draw vectors on particles :
   #draw_velocity_vectors()
-  draw_acceleration_vectors()
+  #draw_acceleration_vectors()
   #draw_rotation_vectors()
   #draw_angular_velocity_vectors()
-  draw_angular_acceleration_vectors()   
+  #draw_angular_acceleration_vectors()   
 
   # print ship stats :
   print_ship_stats(dx,dy)
@@ -680,10 +679,7 @@ def idle():
   
   # move forward :
   if fwd == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([0, 0, 1])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][2,:]
     pf = vf / norm(vf) * taccel
     p.ax[0] += pf[0]
     p.ay[0] += pf[1]
@@ -691,10 +687,7 @@ def idle():
   
   # move backward :
   elif back == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([0, 0, 1])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][2,:]
     pf = vf / norm(vf) * taccel
     p.ax[0] -= pf[0]
     p.ay[0] -= pf[1]
@@ -702,10 +695,7 @@ def idle():
   
   # move left :
   if left == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([1, 0, 0])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][0,:]
     pf = vf / norm(vf) * taccel
     p.ax[0] += pf[0]
     p.ay[0] += pf[1]
@@ -713,32 +703,23 @@ def idle():
   
   # move right :
   elif right == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([1, 0, 0])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][0,:]
     pf = vf / norm(vf) * taccel
     p.ax[0] -= pf[0]
     p.ay[0] -= pf[1]
     p.az[0] -= pf[2]
 
-  # move up :
+  # pitch up :
   if up == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([1, 0, 0])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][0,:]
     pf = vf / norm(vf) * raccel
     p.alphax[0] += pf[0]
     p.alphay[0] += pf[1]
     p.alphaz[0] += pf[2]
   
-  # move down :
+  # pitch down :
   elif down == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([1, 0, 0])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][0,:]
     pf = vf / norm(vf) * raccel
     p.alphax[0] -= pf[0]
     p.alphay[0] -= pf[1]
@@ -746,10 +727,7 @@ def idle():
 
   # roll left :
   if rollLeft == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([0, 0, 1])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][2,:]
     pf = vf / norm(vf) * raccel
     p.alphax[0] -= pf[0]
     p.alphay[0] -= pf[1]
@@ -757,10 +735,7 @@ def idle():
   
   # roll right :
   elif rollRight == True:
-    pt = array([p.x[0], p.y[0], p.z[0]])
-    pr = array([0, 0, 1])            # initial rotation vector
-    pa = array([p.thetax[0], p.thetay[0], p.thetaz[0]])
-    vf = rotate_vector(pr, pa)
+    vf = p.theta[0][2,:]
     pf = vf / norm(vf) * raccel
     p.alphax[0] += pf[0]
     p.alphay[0] += pf[1]
