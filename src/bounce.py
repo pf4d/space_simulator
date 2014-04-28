@@ -52,6 +52,11 @@ up        = False  #   "     "    up
 down      = False  #   "     "    down
 rollLeft  = False  #   "   rolling left 
 rollRight = False  #   "     "     right
+yawLeft   = False  #   "   rotating left
+yawRight  = False  #   "   rotating right
+ascend    = False  #   "   ascending
+descend   = False  #   "   descending
+
 
 taccel    = 20.0   # translational acceleration to apply 
 raccel    = 1.0    # rotational acceleration to apply
@@ -708,7 +713,7 @@ def reshape(width, height):
 def idle():
   """
   """
-  global COUNT, frames, lastTime, fps
+  global COUNT, frames, lastTime, fps, yawLeft, yawRight, ascend, descend
   global fwd, back, left, right, up, down, taccel, raccel, rollLeft, rollRight
   
   # integrate the system forward in time :
@@ -780,6 +785,38 @@ def idle():
     p.alphay[0] += pf[1]
     p.alphaz[0] += pf[2]
 
+  # yaw left :
+  if yawLeft == True:
+    vf = p.theta[0][1,:]
+    pf = vf / norm(vf) * raccel
+    p.alphax[0] += pf[0]
+    p.alphay[0] += pf[1]
+    p.alphaz[0] += pf[2]
+  
+  # yaw right :
+  elif yawRight == True:
+    vf = p.theta[0][1,:]
+    pf = vf / norm(vf) * raccel
+    p.alphax[0] -= pf[0]
+    p.alphay[0] -= pf[1]
+    p.alphaz[0] -= pf[2]
+
+  # ascend :
+  if ascend == True:
+    vf = p.theta[0][1,:]
+    pf = vf / norm(vf) * taccel
+    p.ax[0] += pf[0]
+    p.ay[0] += pf[1]
+    p.az[0] += pf[2]
+  
+  # descend :
+  elif descend == True:
+    vf = p.theta[0][1,:]
+    pf = vf / norm(vf) * taccel
+    p.ax[0] -= pf[0]
+    p.ay[0] -= pf[1]
+    p.az[0] -= pf[2]
+
   # redraw the screen :
   glutPostRedisplay()
 
@@ -795,7 +832,7 @@ def idle():
 def key(k, x, y):
   """
   """
-  global rotx, roty, rotz, fwd, back, left, right
+  global rotx, roty, rotz, fwd, back, left, right, yawLeft, yawRight
   
   # reset the camera :
   if k == 'c':
@@ -805,8 +842,8 @@ def key(k, x, y):
     rotz = 0      # camera z rotation
   
   # quit the game :
-  if k == 'q':
-    print "'q' was pressed"
+  if k == 'p':
+    print "'p' was pressed"
     exit(0)
   
   # print the number of particles :
@@ -829,10 +866,18 @@ def key(k, x, y):
   if k == 'd':
     right = True
 
+  # yaw right :
+  if k == 'e':
+    yawRight = True
+
+  # yaw left :
+  if k == 'q':
+    yawLeft = True
+
 def keyUp(k,x,y):
   """
   """
-  global fwd, back, left, right
+  global fwd, back, left, right, yawLeft, yawRight
   
   # stop moving forward :
   if k == 'w':
@@ -849,12 +894,20 @@ def keyUp(k,x,y):
   # stop moving right :
   if k == 'd':
     right = False
+
+  # stop yaw left :
+  if k == 'q':
+    yawLeft = False
+
+  # stop yaw right :
+  if k == 'e':
+    yawRight = False
     
 
 def special(k, x, y):
   """
   """
-  global up, down, rollLeft, rollRight
+  global up, down, rollLeft, rollRight, ascend, descend
   
   # pitch up :
   if k == GLUT_KEY_UP:
@@ -871,9 +924,17 @@ def special(k, x, y):
   # roll left :
   if k == GLUT_KEY_LEFT:
     rollLeft = True
+
+  # descend :
+  if k == GLUT_KEY_PAGE_DOWN:
+    descend = True
+  
+  # ascend :
+  if k == GLUT_KEY_PAGE_UP:
+    ascend = True
   
 def specialUp(k,x,y):
-  global up, down, rollLeft, rollRight
+  global up, down, rollLeft, rollRight, ascend, descend
 
   # stop pitching up :
   if k == GLUT_KEY_UP:
@@ -890,6 +951,14 @@ def specialUp(k,x,y):
   # stop rolling left :
   if k == GLUT_KEY_LEFT:
     rollLeft = False
+
+  # stop descending :
+  if k == GLUT_KEY_PAGE_DOWN:
+    descend = False
+  
+  # stop ascending :
+  if k == GLUT_KEY_PAGE_UP:
+    ascend = False
 
 def mouse(button,state,x,y):
   """
