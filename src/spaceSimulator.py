@@ -1009,7 +1009,7 @@ if __name__ == '__main__':
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
   glutInitWindowPosition(sx, sy)
   glutInitWindowSize(w, h)
-  glutCreateWindow("bounce")
+  glutCreateWindow("spaceSimulator")
   glutDisplayFunc(display)
   glutMouseFunc(mouse)
   glutMotionFunc(motion)
