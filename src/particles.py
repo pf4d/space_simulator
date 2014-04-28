@@ -123,9 +123,9 @@ class GranularMaterialForce(object):
     kappa            = self.f * p.r
    
     # project onto components, sum all angular forces on each particle
-    p.alphax = + sum(-(k*taux + f*epix) / I + kappa*dox, axis=1) - g*p.omegax
-    p.alphay = + sum(-(k*tauy + f*epiy) / I + kappa*doy, axis=1) - g*p.omegay
-    p.alphaz = + sum(-(k*tauz + f*epiz) / I + kappa*doz, axis=1) - g*p.omegaz
+    p.alphax = sum((k*taux + f*epix) / I + kappa*dox, axis=1) - g*p.omegax
+    p.alphay = sum((k*tauy + f*epiy) / I + kappa*doy, axis=1) - g*p.omegay
+    p.alphaz = sum((k*tauz + f*epiz) / I + kappa*doz, axis=1) - g*p.omegaz
    
 
 class NebulaGranularMaterialForce(object):
@@ -187,9 +187,9 @@ class VerletIntegrator(object):
     p.z = p.z + p.vz*dt + 0.5*p.az*dt**2
 
     # angular roation update :
-    p.thetax = -(p.omegax*dt + 0.5*p.alphax*dt**2)
-    p.thetay = -(p.omegay*dt + 0.5*p.alphay*dt**2)
-    p.thetaz = -(p.omegaz*dt + 0.5*p.alphaz*dt**2)
+    p.thetax = p.omegax*dt + 0.5*p.alphax*dt**2
+    p.thetay = p.omegay*dt + 0.5*p.alphay*dt**2
+    p.thetaz = p.omegaz*dt + 0.5*p.alphaz*dt**2
     p.update_theta()
 
     # update periodic BC

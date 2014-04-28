@@ -74,30 +74,37 @@ camDist   = 4.0            # camera distance coef.
 # create viewpoint camera :
 camera    = Camera()
 
-# variable uesed :
-shipColor = 0.5*ones(3)    # color of the ship
-frames    = 0              # for spf calculation
-lastTime  = time()         # current time
-fps       = 1.0            # current frames per second
-w         = 700            # screen width
-h         = 700            # screen height
-                           
-dt        = 0.10           # time step
-L         = 120.0          # size of the box
-t         = 0              # initial time
-                           
-# "pool balls" :           
-k         = 30.0           # elastic 'bounce'
-gamma     = 0.1            # energy dissipation/loss
-# "squishy balls" :
-k         = 1.5            # elastic 'bounce'
-gamma     = 0.1            # energy dissipation/loss
-# "space balls" :          
-k         = 60.0           # elastic 'bounce'
-gamma     = 1.5            # energy dissipation/loss
-                           
-rho       = 1e4            # particle denisty
-g         = 0.00           # downward acceleration
+# colors used :
+shipColor  = 0.5*ones(3)             # color of the ship
+axesColor  = array([0.2, 0.2, 0.2])  # color of the readout axes
+aColor     = array([0.0, 0.0, 1.0])  # acceleration vector color
+vColor     = array([0.0, 1.0, 0.0])  # velocity vector color
+alphaColor = array([1.0, 0.0, 0.0])  # angular acceleration vector color
+omegaColor = array([1.0, 1.0, 0.0])  # angular velocity vector color
+
+# variable used :
+frames     = 0                       # for spf calculation
+lastTime   = time()                  # current time
+fps        = 1.0                     # current frames per second
+w          = 700                     # screen width
+h          = 700                     # screen height
+                                     
+dt         = 0.10                    # time step
+L          = 120.0                   # size of the box
+t          = 0                       # initial time
+                                    
+# "pool balls" :                    
+k          = 30.0                    # elastic 'bounce'
+gamma      = 0.1                     # energy dissipation/loss
+# "squishy balls" :                  
+k          = 1.5                     # elastic 'bounce'
+gamma      = 0.1                     # energy dissipation/loss
+# "space balls" :                   
+k          = 60.0                    # elastic 'bounce'
+gamma      = 1.5                     # energy dissipation/loss
+                                    
+rho        = 1e4                     # particle denisty
+g          = 0.00                    # downward acceleration
 
 # particle update data:
 COUNT         = 1          # number of time steps computed
@@ -166,7 +173,7 @@ def init():
 def draw_ship_vectors(dx, dy):
   """
   """
-  global shipColor
+  global shipColor, axesColor, aColor, vColor, alphaColor, omegaColor
 
   # save projection matrix
   glMatrixMode(GL_PROJECTION)
@@ -222,20 +229,23 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xt, yt, zt)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  mvm[:3,:3] = R
+  vec = dot(M, vv)
   glLoadMatrixf(mvm)
   glColor(shipColor)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
-  glColor4f(0.2,0.2,0.2,1.0)
-  glLineWidth(1.0)
-  glRasterPos3f(sign(vv[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
-  font.Render("%.1f" % vv[0])
-  glRasterPos3f(xyz2_y[0], sign(vv[1])*xyz2_y[1], xyz2_y[2])
-  font.Render("%.1f" % vv[1])
-  glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(vv[2])*xyz2_z[2])
-  font.Render("%.1f" % vv[2])
   
+  glColor(vColor)
+  glRasterPos3f(sign(vec[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
+  font.Render("%.1f" % vec[0])
+  glRasterPos3f(xyz2_y[0], sign(vec[1])*xyz2_y[1], xyz2_y[2])
+  font.Render("%.1f" % vec[1])
+  glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(vec[2])*xyz2_z[2])
+  font.Render("%.1f" % vec[2])
+  
+  glLineWidth(1.0)
+  glColor(axesColor)
   glBegin(GL_LINES)
   glVertex3fv(xyz1 - xyz2_x)
   glVertex3fv(xyz2_x)
@@ -251,14 +261,13 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xr, yr, zr)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], R)
+  mvm[:3,:3] = R
   glLoadMatrixf(mvm)
   glColor(shipColor)
   glCallList(obj.gl_list)
   #glutSolidSphere(2, SLICES, STACKS)
-  glColor4f(0.2,0.2,0.2,1.0)
-  glLineWidth(1.0)
-  c   = 15.0
+  
+  glColor(omegaColor)
   glRasterPos3f(sign(omegav[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
   font.Render("%.1f" % omegav[0])
   glRasterPos3f(xyz2_y[0], sign(omegav[1])*xyz2_y[1], xyz2_y[2])
@@ -266,6 +275,8 @@ def draw_ship_vectors(dx, dy):
   glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(omegav[2])*xyz2_z[2])
   font.Render("%.1f" % omegav[2])
   
+  glLineWidth(1.0)
+  glColor(axesColor)
   glBegin(GL_LINES)
   glVertex3fv(xyz1 - xyz2_x)
   glVertex3fv(xyz2_x)
@@ -282,24 +293,22 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xt, yt, zt)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], M)
+  mvm[:3,:3] = M
   glLoadMatrixf(mvm)
   glLineWidth(2.0)
   glBegin(GL_LINES)
  
   # acceleration vectors :
-  glColor4f(0.0,0.0,1.0,1.0)
+  glColor(aColor)
   c    = 1.0
-  axyz = c * av
-  xyz2 = xyz1 + axyz
+  xyz2 = xyz1 + c*av
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
   # velocity vectors :
-  glColor4f(0.0,1.0,0.0,1.0)
+  glColor(vColor)
   c    = 1.0
-  axyz = c * vv
-  xyz2 = xyz1 + axyz
+  xyz2 = xyz1 + c*vv
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
@@ -312,23 +321,21 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xr, yr, zr)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-  mvm[:3,:3] = dot(mvm[:3,:3], M)
+  mvm[:3,:3] = M
   glLoadMatrixf(mvm)
   glBegin(GL_LINES)
  
   # angular acceleration vectors :
-  glColor4f(1.0,0.0,0.0,1.0)
+  glColor(alphaColor)
   c    = 10.0
-  axyz = c * alphav
-  xyz2 = xyz1 + axyz
+  xyz2 = xyz1 + c*alphav 
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
   # angular velocity vectors :
-  glColor4f(1.0,1.0,0.0,1.0)
+  glColor(omegaColor)
   c    = 10.0
-  vxyz = c * omegav
-  xyz2 = xyz1 + vxyz
+  xyz2 = xyz1 + c*omegav
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
@@ -788,49 +795,49 @@ def idle():
   if up == True:
     vf = p.theta[0][0,:]
     pf = vf / norm(vf) * raccel
-    p.alphax[0] += pf[0]
-    p.alphay[0] += pf[1]
-    p.alphaz[0] += pf[2]
+    p.alphax[0] -= pf[0]
+    p.alphay[0] -= pf[1]
+    p.alphaz[0] -= pf[2]
   
   # pitch down :
   elif down == True:
     vf = p.theta[0][0,:]
     pf = vf / norm(vf) * raccel
-    p.alphax[0] -= pf[0]
-    p.alphay[0] -= pf[1]
-    p.alphaz[0] -= pf[2]
+    p.alphax[0] += pf[0]
+    p.alphay[0] += pf[1]
+    p.alphaz[0] += pf[2]
 
   # roll left :
   if rollLeft == True:
     vf = p.theta[0][2,:]
     pf = vf / norm(vf) * raccel
-    p.alphax[0] -= pf[0]
-    p.alphay[0] -= pf[1]
-    p.alphaz[0] -= pf[2]
+    p.alphax[0] += pf[0]
+    p.alphay[0] += pf[1]
+    p.alphaz[0] += pf[2]
   
   # roll right :
   elif rollRight == True:
     vf = p.theta[0][2,:]
     pf = vf / norm(vf) * raccel
-    p.alphax[0] += pf[0]
-    p.alphay[0] += pf[1]
-    p.alphaz[0] += pf[2]
+    p.alphax[0] -= pf[0]
+    p.alphay[0] -= pf[1]
+    p.alphaz[0] -= pf[2]
 
   # yaw left :
   if yawLeft == True:
     vf = p.theta[0][1,:]
     pf = vf / norm(vf) * raccel
-    p.alphax[0] += pf[0]
-    p.alphay[0] += pf[1]
-    p.alphaz[0] += pf[2]
+    p.alphax[0] -= pf[0]
+    p.alphay[0] -= pf[1]
+    p.alphaz[0] -= pf[2]
   
   # yaw right :
   elif yawRight == True:
     vf = p.theta[0][1,:]
     pf = vf / norm(vf) * raccel
-    p.alphax[0] -= pf[0]
-    p.alphay[0] -= pf[1]
-    p.alphaz[0] -= pf[2]
+    p.alphax[0] += pf[0]
+    p.alphay[0] += pf[1]
+    p.alphaz[0] += pf[2]
 
   # ascend :
   if ascend == True:
