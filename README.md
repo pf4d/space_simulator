@@ -56,6 +56,7 @@ Controls :
 * ```arrow down``` : fire top nose thruster (pitch down)
 * ```arrow left``` : fire bottom right wing thruster (roll left)
 * ```arrow right``` : fire bottom left wing thruster (roll right)
+* ```p``` : quit the game
 
 To move the camera, press the left mouse button and drag up and down, and zoom in and out with the mouse wheel.  
 
