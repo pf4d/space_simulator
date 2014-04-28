@@ -14,6 +14,12 @@ class Camera(object):
   def __init__(self):
     """
     """
+    self.initialize()
+
+  def initialize(self):
+    """
+    reset the rotation to the identiy matrix.
+    """
     self.M = identity(3)
 
   def update(self, v):
@@ -801,14 +807,12 @@ def idle():
 def key(k, x, y):
   """
   """
-  global rotx, roty, rotz, fwd, back, left, right, yawLeft, yawRight
+  global camera, fwd, back, left, right, yawLeft, yawRight
   
   # reset the camera :
   if k == 'c':
     print "'c' was pressed, reseting camera"
-    rotx = 0      # camera x rotation
-    roty = 0      # camera y rotation
-    rotz = 0      # camera z rotation
+    camera.initialize()
   
   # quit the game :
   if k == 'p':
