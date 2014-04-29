@@ -475,6 +475,10 @@ def print_paused(dx,dy):
   glRasterPos2f(-L+dy+20, L-dy-140)
   font.Render("Pause/Resume: p")
   glRasterPos2f(-L+dy+20, L-dy-150)
+  font.Render("Rotate Camera: Left-click")
+  glRasterPos2f(-L+dy+20, L-dy-160)
+  font.Render("Zoom In/Out: Scroll Wheel")
+  glRasterPos2f(-L+dy+20, L-dy-170)
   font.Render("Exit: x")
   glPopMatrix()
   
@@ -516,6 +520,8 @@ def print_stats(dx, dy):
   font.Render("n = %i" % p.N)
   glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
+  glRasterPos2f(-L+dy, -L+dy)
+  font.Render("Press 'p' to pause")
   glPopMatrix()
   
   # re-enable lighting :
@@ -771,7 +777,7 @@ def display():
         glColor3f(p.az[i],p.vz[i],0.0)
       glBegin(GL_POLYGON)
       for j in numpy.arange(0, 2*PI, PI/6):
-        glVertex3f(cos(j) * 4, sin(j) * 4, 0.0)
+        glVertex3f(cos(j) * nebRadius, sin(j) * nebRadius, 0.0)
 
       #draw_circle(2, 20)
       #glPointSize(10.0)
