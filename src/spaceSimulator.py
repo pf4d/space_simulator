@@ -8,6 +8,8 @@ from pylab          import *
 from objLoader      import *
 from time           import time
 import sys
+import numpy
+from numpy          import *
 
 class Camera(object):
 
@@ -108,6 +110,8 @@ UPDATE_FRAMES = 1          # how often to redraw screen
 STACKS = 10
 SLICES = 15
 
+PI = 3.14159265
+
 # create specter field :
 specter = Specter(1e3, 4*L)
 
@@ -162,6 +166,15 @@ def init():
   glEnable(GL_POINT_SMOOTH)
   glEnable(GL_BLEND)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+def draw_circle(r, num_segments):
+  glBegin(GL_LINE_LOOP)
+  for i in numpy.arange(0, 360, i/360):
+    heading = i*3.1459265 / 180
+    glVertex2d(cos(heading) * r, sin(heading) *r)
+
+  glEnd()
+  glFlush()
   
 def draw_ship_vectors(dx, dy):
   """
@@ -651,19 +664,26 @@ def display():
     # rotation :
     mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
     mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
+
     glLoadMatrixf(mvm)
     
     # draw particles as points :
     if i != 0:
-      glPointSize(10.0)
-      glBegin(GL_POINTS)
-      glVertex3f(p.x[i], p.y[i], p.z[i])
+      glColor3f(0.0,0.0,1.0)
+      glBegin(GL_POLYGON)
+      for j in numpy.arange(0, 2*PI, PI/6):
+        glVertex3f(cos(j) * 4, sin(j) * 4, 0.0)
+      #draw_circle(2, 20)
+      #glPointSize(10.0)
+      #glBegin(GL_POINTS)
+      #glVertex3f(p.x[i], p.y[i], p.z[i])
       glEnd()
 
     # draw particles as spheres or the ship if index == 0 :
     if i == 0:
       glColor(shipColor)
       glCallList(obj.gl_list)
+
     #else:
     #  glutSolidSphere(p.r[i], SLICES, STACKS)
     
