@@ -105,7 +105,7 @@ t          = 0                       # initial time
 k          = 1.0                     # elastic 'bounce'
 gamma      = 10.5                    # energy dissipation/loss
                                     
-rho        = 1e3                     # particle denisty
+rho        = 1e9                     # particle denisty
 g          = 0.00                    # downward acceleration
 
 # particle update data:
@@ -134,15 +134,15 @@ p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r, rho,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#p.addParticle(0,0,-L,0,0,0,3,10,0,0,0,0,0,0)
-#initialize_grid(p, 4, 4.0, rho, 2*L)
-#initialize_random(p, 100, 4, rho, L/2)
+p.addParticle(0,0,-2*L,0,0,0,3,10,0,0,0,0,0,0)
+#initialize_grid(p, 4, 3.0, rho, L)
+initialize_random(p, 100, 3.0, rho, L/2)
 #p.addParticle(au + 6.3781e6 + 1e5,0,0,0,0,0,3,0,0,0,0,0,0,0)
 #initialize_system(p)
 #p.addParticle(0,0,r_earth + 1e2,0,0,0,3,0,0,0,0,0,0,0)
 #initialize_earth(p)
-p.addParticle(0,0, -40000, 0,0,0,3,1e-16,0,0,0,0,0,0)
-initialize_planet(p)
+#p.addParticle(0,0, -40000, 0,0,0,3,1e-16,0,0,0,0,0,0)
+#initialize_planet(p)
 
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
