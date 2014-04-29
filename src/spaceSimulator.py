@@ -130,7 +130,7 @@ p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
 p.addParticle(0,0,-L,0,0,0,3,0,0,0,0,0,0)
-initialize_grid(p, 6, 1.0, L/4.0)
+initialize_grid(p, 5, 1.0, L/4.0)
 #initialize_grid(p, 4, 4.0, 2*L)
 #initialize_random(p, 100, 4, L/2)
 
@@ -659,30 +659,53 @@ def display():
       glColor(1, 1/2.0, 0.0, 1.0)
     
     glPushMatrix()
-    glTranslate(p.x[i], p.y[i], p.z[i])
+    #glTranslate(p.x[i], p.y[i], p.z[i])
     
     # rotation :
-    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
+    #mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+    #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
 
-    glLoadMatrixf(mvm)
+    #glLoadMatrixf(mvm)
     
     # draw particles as points :
     if i != 0:
+      glTranslate(p.x[i], p.y[i], p.z[i])
+    
+      # rotation :
+      mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+      #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
+      for j in range(0,3):
+        for k in range(0,3):
+          if(i==j):
+            mvm[j][k] = 1.0
+          else:
+            mvm[j][k] = 0.0
+
+      glLoadMatrixf(mvm)
       glColor3f(0.0,0.0,1.0)
       glBegin(GL_POLYGON)
       for j in numpy.arange(0, 2*PI, PI/6):
         glVertex3f(cos(j) * 4, sin(j) * 4, 0.0)
+
       #draw_circle(2, 20)
       #glPointSize(10.0)
       #glBegin(GL_POINTS)
       #glVertex3f(p.x[i], p.y[i], p.z[i])
       glEnd()
+      #glPopMatrix()
 
     # draw particles as spheres or the ship if index == 0 :
     if i == 0:
+      #glPushMatrix()
+      glTranslate(p.x[i], p.y[i], p.z[i])
+    
+      # rotation :
+      mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+      mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
+      glLoadMatrixf(mvm)
       glColor(shipColor)
       glCallList(obj.gl_list)
+      #glPopMatrix()
 
     #else:
     #  glutSolidSphere(p.r[i], SLICES, STACKS)
