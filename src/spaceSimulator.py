@@ -120,6 +120,9 @@ specter = Specter(1e3, 4*L)
 # create star field :
 star    = Specter(1e3, 100*L)
 
+# nebula particle radius
+nebRadius = 4.0
+
 # instantiate the forces function between particles
 #f = GranularMaterialForce(k=k, gamma=gamma)
 f = NebulaGranularMaterialForce(k=k, gamma=gamma)
@@ -132,7 +135,7 @@ p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
 p.addParticle(0,0,-L,0,0,0,3,0,0,0,0,0,0)
-initialize_grid(p, 5, 1.0, L/4.0)
+initialize_grid(p, 5, nebRadius, L/4.0)
 #initialize_grid(p, 4, 4.0, 2*L)
 #initialize_random(p, 100, 4, L/2)
 
@@ -733,20 +736,20 @@ def display():
       glColor(1, 1/2.0, 0.0, 1.0)
     
     glPushMatrix()
-    #glTranslate(p.x[i], p.y[i], p.z[i])
+    glTranslate(p.x[i], p.y[i], p.z[i])
     
     # rotation :
-    #mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-    #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
+    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
 
-    #glLoadMatrixf(mvm)
+    glLoadMatrixf(mvm)
     
     # draw particles as points :
     if i != 0:
       glTranslate(p.x[i], p.y[i], p.z[i])
     
       # rotation :
-      mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+      #mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
       #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
       #for j in range(0,3):
         #for k in range(0,3):
@@ -754,15 +757,18 @@ def display():
             #mvm[j:k] = 1.0
           #else:
             #mvm[j:k] = 0.0
-      for j in xrange(len(mvm)):
-        for k in xrange(len(mvm[j])):
-          if(i==j):
-            mvm[j][k] = 1.0
-          else:
-            mvm[j][k] = 0.0
+      #for j in xrange(len(mvm)):
+      #  for k in xrange(len(mvm[j])):
+      #    if(i==j):
+      #      mvm[j][k] = 1.0
+      #    else:
+      #      mvm[j][k] = 0.0
 
-      glLoadMatrixf(mvm)
-      glColor3f(0.0,0.0,1.0)
+      #glLoadMatrixf(mvm)
+      if(p.az[i] == 0):
+        glColor3f(0.0,0.0,1.0)
+      else:
+        glColor3f(p.az[i],p.vz[i],0.0)
       glBegin(GL_POLYGON)
       for j in numpy.arange(0, 2*PI, PI/6):
         glVertex3f(cos(j) * 4, sin(j) * 4, 0.0)
@@ -777,12 +783,12 @@ def display():
     # draw particles as spheres or the ship if index == 0 :
     if i == 0:
       #glPushMatrix()
-      glTranslate(p.x[i], p.y[i], p.z[i])
+      #glTranslate(p.x[i], p.y[i], p.z[i])
     
       # rotation :
-      mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
-      mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
-      glLoadMatrixf(mvm)
+      #mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
+      #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
+      #glLoadMatrixf(mvm)
       glColor(shipColor)
       glCallList(obj.gl_list)
       #glPopMatrix()
