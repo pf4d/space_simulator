@@ -118,7 +118,7 @@ SLICES = 15
 specter = Specter(1e3, 4*L)
 
 # create star field :
-star    = Specter(1e3, 100*L)
+star    = Specter(1e3, 1000*L)
 
 # instantiate the forces function between particles
 f = GranularMaterialForce(k=k, gamma=gamma)
@@ -175,13 +175,17 @@ def draw_ship_vectors(dx, dy):
   """
   global shipColor, axesColor, aColor, vColor, alphaColor, omegaColor
 
+  w = float(glutGet(GLUT_WINDOW_WIDTH))
+  h = float(glutGet(GLUT_WINDOW_HEIGHT))
+  ar = w / h
+
   # save projection matrix
   glMatrixMode(GL_PROJECTION)
   glPushMatrix()
 
   # switch to orthographic projection :
   glLoadIdentity()
-  glOrtho(-L, L, -L, L, -4*L, 4*L)
+  glOrtho(-L*ar, L*ar, -L, L, -4*L, 4*L)
 
   # back to the modelview matrix mode, so that we can translate/scale text :
   glMatrixMode(GL_MODELVIEW)
@@ -193,16 +197,16 @@ def draw_ship_vectors(dx, dy):
   glDisable(GL_LIGHTING)   # disable lighting
   
   # parameters for positioning :
-  xt =  L-1.5*dx
+  xt =  ar*L-1.5*dx
   yt = -L+2*dy
   zt =  L
-  xr =  L-3.5*dx
+  xr =  ar*L-3.5*dx
   yr =  yt
   zr =  zt
   
   # font parameters :
   font = BitmapFont('ProggyTinySZ.ttf')
-  font.FaceSize(14)
+  font.FaceSize(15)
   
   # vectors of orientation :
   R      = rotate_vector(array([pi/6, -pi/6, 0]))
@@ -334,7 +338,7 @@ def draw_ship_vectors(dx, dy):
   
   # angular velocity vectors :
   glColor(omegaColor)
-  c    = 10.0
+  c    = 20.0
   xyz2 = xyz1 + c*omegav
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
@@ -759,8 +763,9 @@ def reshape(width, height):
   glViewport(0, 0, width, height)
   glMatrixMode(GL_PROJECTION)
   glLoadIdentity()
-  gluPerspective(90.0, width/float(height), 1, 1000*L)
-  #glOrtho(-L, L, -L, L, -4*L, 4*L)
+  ar = width/float(height)
+  gluPerspective(90.0, ar, 1, 1000*L)
+  #glOrtho(-L*ar, L*ar, -L, L, -4*L, 4*L)
   glMatrixMode(GL_MODELVIEW)
   glLoadIdentity()
 
@@ -988,8 +993,10 @@ def special(k, x, y):
   if k == GLUT_KEY_PAGE_UP:
     ascend = True
 
-  
+
 def specialUp(k,x,y):
+  """
+  """
   global up, down, rollLeft, rollRight, ascend, descend
 
   # stop pitching up :
