@@ -89,21 +89,23 @@ fps        = 1.0                     # current frames per second
 w          = 700                     # screen width
 h          = 700                     # screen height
                                      
-dt         = 0.10                    # time step
+r_earth    = 6.3781e6
+au         = 1.49597871e11
+dt         = 0.1                     # time step
 L          = 120.0                   # size of the box
 t          = 0                       # initial time
                                     
-# "pool balls" :                    
-k          = 30.0                    # elastic 'bounce'
-gamma      = 0.1                     # energy dissipation/loss
-# "squishy balls" :                  
-k          = 1.5                     # elastic 'bounce'
-gamma      = 0.1                     # energy dissipation/loss
+## "pool balls" :                    
+#k          = 30.0                    # elastic 'bounce'
+#gamma      = 0.1                     # energy dissipation/loss
+## "squishy balls" :                  
+#k          = 1.5                     # elastic 'bounce'
+#gamma      = 0.1                     # energy dissipation/loss
 # "space balls" :                   
-k          = 60.0                    # elastic 'bounce'
-gamma      = 1.5                     # energy dissipation/loss
+k          = 1.0                     # elastic 'bounce'
+gamma      = 10.5                    # energy dissipation/loss
                                     
-rho        = 1e4                     # particle denisty
+rho        = 1e3                     # particle denisty
 g          = 0.00                    # downward acceleration
 
 # particle update data:
@@ -118,6 +120,7 @@ SLICES = 15
 specter = Specter(1e3, 4*L)
 
 # create star field :
+#star    = Specter(1e3, 10*r_earth)
 star    = Specter(1e3, 1000*L)
 
 # instantiate the forces function between particles
@@ -125,15 +128,21 @@ f = GranularMaterialForce(k=k, gamma=gamma)
 #f = NebulaGranularMaterialForce(k=k, gamma=gamma)
 
 # create some particles and a box
-p = Particles(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
-#p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
+p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
+#p = Nebula(L, f, periodicY=0, periodicZ=0, periodicX=0)
 
-#  addParticle(x, y, z, vx, vy, vz, r,
+#  addParticle(x, y, z, vx, vy, vz, r, rho,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-p.addParticle(0,0,-L,0,0,0,3,0,0,0,0,0,0)
-initialize_grid(p, 4, 4.0, 2*L)
-#initialize_random(p, 100, 4, L/2)
+#p.addParticle(0,0,-L,0,0,0,3,10,0,0,0,0,0,0)
+#initialize_grid(p, 4, 4.0, rho, 2*L)
+#initialize_random(p, 100, 4, rho, L/2)
+#p.addParticle(au + 6.3781e6 + 1e5,0,0,0,0,0,3,0,0,0,0,0,0,0)
+#initialize_system(p)
+#p.addParticle(0,0,r_earth + 1e2,0,0,0,3,0,0,0,0,0,0,0)
+#initialize_earth(p)
+p.addParticle(0,0, -40000, 0,0,0,3,1e-16,0,0,0,0,0,0)
+initialize_planet(p)
 
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
@@ -667,7 +676,8 @@ def display():
   glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
   glMaterial(GL_FRONT, GL_SHININESS, 100.0)
   for i in range(p.N):
-    if (p.ax[i] > 0.5 or p.ax[i] < -0.5) and i != 0:
+    a = array([p.ax[i], p.ay[i], p.az[i]])
+    if norm(a) > 20000.0 and i != 0:
       glColor(1/2.0, 1/2.0, 1/2.0, 1.0)
     elif i != 0:
       glColor(1, 1/2.0, 0.0, 1.0)
@@ -701,8 +711,8 @@ def display():
     glPopMatrix()
 
   # draw vectors on particles :
-  #draw_velocity_vectors()
-  #draw_acceleration_vectors()
+  draw_velocity_vectors()
+  draw_acceleration_vectors()
   #draw_rotation_vectors()
   #draw_angular_velocity_vectors()
   #draw_angular_acceleration_vectors()   
@@ -718,11 +728,11 @@ def display():
  
   # draw the lights : 
   lx1 = 0.0
-  ly1 = 2*L + 2
+  ly1 = 30000
   lz1 = 0.0
   
   lx2 = L
-  ly2 = 2*L + 2
+  ly2 = 30000
   lz2 = L
  
   glMaterial(GL_FRONT, GL_EMISSION,  [1.0, 1.0, 1.0, 0.0])
@@ -764,7 +774,7 @@ def reshape(width, height):
   glMatrixMode(GL_PROJECTION)
   glLoadIdentity()
   ar = width/float(height)
-  gluPerspective(90.0, ar, 1, 1000*L)
+  gluPerspective(90.0, ar, 1, 10*au)
   #glOrtho(-L*ar, L*ar, -L, L, -4*L, 4*L)
   glMatrixMode(GL_MODELVIEW)
   glLoadIdentity()

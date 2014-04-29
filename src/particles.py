@@ -1,24 +1,5 @@
 from pylab import *
 
-# PARTICLES MODULE:
-# This set of classes was developed to model interacting spherical particles in
-# 3 dimensions. There are presently two types of interaction forces possible. 
-# Each is a class
-#
-# GranularMaterialsForce: This is a force that represents elastic forces between
-# particles that are overlapping, and a damping, or dissipative force. It does
-# not include the often used rotational degrees of freedom. Also note that the
-# constraint forces are taken care of with an extra function call.
-# 
-# LennardJonesForce: This force describes the weak attraction at large distances
-# and strong repulsion experienced at close distances by mono-atomic gases.
-#
-# The equation of motion are integrated by the Verlet method, which is presently
-# the only integration scheme supported.
-#
-# All particle data (position, velocity, acceleration, radii, and distances) are
-# stored in the Particles class. 
-
 # 9/23/08 JVJ and Tim Bocek
 
 class GranularMaterialForce(object):
@@ -57,13 +38,13 @@ class GranularMaterialForce(object):
     mag_r += self.gamma * vijDotrij / d
 
     # gravitational pull between particles :
-    F = self.G * p.mi_mj / d**2
-    F[d < 0.0] = 0
+    a_g = self.G * p.mi / d**2
+    a_g[d < 0.0] = 0
 
     # Project onto components, sum all forces on each particle
-    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1)
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1)
-    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1)
+    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + a_g*dx/d, axis=1)
+    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + a_g*dy/d, axis=1)
+    p.az = sum(mag_r * dz/d * p.ratioOfRadii + a_g*dz/d, axis=1)
     
     # differences in angular velocities :
     do, dox, doy, doz = p.distanceMatrix(p.omegax, p.omegay, p.omegaz)
@@ -163,7 +144,7 @@ class NebulaGranularMaterialForce(object):
     mag_r += self.gamma * vijDotrij / d
 
     # gravitational pull between particles :
-    F = self.G * p.mi_mj / d**2
+    F = self.G * p.mi / d**2
     F[d < 0.0] = 0
 
     # Project onto components, sum all forces on each particle
@@ -250,7 +231,7 @@ class NebulaVerletIntegrator(object):
 
 class Particles(object):
 
-  def __init__(self, L, rho, force, periodicX=1, periodicY=1, periodicZ=1):
+  def __init__(self, L, force, periodicX=1, periodicY=1, periodicZ=1):
     """
     """
     # container size
@@ -295,24 +276,25 @@ class Particles(object):
     # mass / gravity :
     self.m     = array([],dtype=self.type)
     self.V     = array([],dtype=self.type)
-    self.mi_mj = array([],dtype=self.type)
-    self.rho   = rho
+    self.mi    = array([],dtype=self.type)
+    self.rho   = array([],dtype=self.type)
      
-  def addParticle(self, x, y, z, vx, vy, vz, r,
+  def addParticle(self, x, y, z, vx, vy, vz, r, rho,
                   thetax, thetay, thetaz, 
                   omegax, omegay, omegaz): 
     """
     """
-    self.x  = hstack((self.x,x))
-    self.y  = hstack((self.y,y))
-    self.z  = hstack((self.z,z))
-    self.vx = hstack((self.vx,vx))
-    self.vy = hstack((self.vy,vy))
-    self.vz = hstack((self.vz,vz))
-    self.ax = hstack((self.ax,0))
-    self.ay = hstack((self.ay,0))
-    self.az = hstack((self.az,0))
-    self.r  = hstack((self.r,r))
+    self.x   = hstack((self.x,x))
+    self.y   = hstack((self.y,y))
+    self.z   = hstack((self.z,z))
+    self.vx  = hstack((self.vx,vx))
+    self.vy  = hstack((self.vy,vy))
+    self.vz  = hstack((self.vz,vz))
+    self.ax  = hstack((self.ax,0))
+    self.ay  = hstack((self.ay,0))
+    self.az  = hstack((self.az,0))
+    self.r   = hstack((self.r,r))
+    self.rho = hstack((self.rho,rho))
     self.theta.append(identity(3))
     self.thetax = hstack((self.thetax,thetax))
     self.thetay = hstack((self.thetay,thetay))
@@ -328,13 +310,11 @@ class Particles(object):
     self.sumOfRadii   = temp + temp.T
     self.ratioOfRadii = temp / temp.T
     # gravitational pull :
-    if self.N == 1:
-      V          = 0
-    else:
-      V          = 4.0/3.0 * pi * r**3
+    V          = 4.0/3.0 * pi * r**3
     self.V     = hstack((self.V, V))
     self.m     = self.rho * self.V
-    self.mi_mj = outer(self.m, self.m)
+    self.mi    = tile(self.m, (self.N,1))
+    fill_diagonal(self.mi, zeros(self.N))
     self.f(self)
 
   def update_theta(self):
@@ -422,32 +402,32 @@ class Particles(object):
 
 class Nebula(Particles):
 
-  def __init__(self, L, rho, force, periodicX=1, periodicY=1, periodicZ=1):
-    super(Nebula, self).__init__(L, rho, force, periodicX, 
-                                 periodicY, periodicZ)
+  def __init__(self, L, force, periodicX=1, periodicY=1, periodicZ=1):
+    super(Nebula, self).__init__(L, force, periodicX, periodicY, periodicZ)
      
-  def addParticle(self, x, y, z, vx, vy, vz, r,
+  def addParticle(self, x, y, z, vx, vy, vz, r, rho,
                   thetax, thetay, thetaz, 
                   omegax, omegay, omegaz): 
-    self.x  = hstack((self.x,x))
-    self.y  = hstack((self.y,y))
-    self.z  = hstack((self.z,z))
-    self.vx = hstack((self.vx,vx))
-    self.vy = hstack((self.vy,vy))
-    self.vz = hstack((self.vz,vz))
-    self.ax = hstack((self.ax,0))
-    self.ay = hstack((self.ay,0))
-    self.az = hstack((self.az,0))
-    self.r  = hstack((self.r,r))
-    self.N  = self.N+1
-    temp    = tile(self.r,(self.N,1))
+    self.x   = hstack((self.x,x))
+    self.y   = hstack((self.y,y))
+    self.z   = hstack((self.z,z))
+    self.vx  = hstack((self.vx,vx))
+    self.vy  = hstack((self.vy,vy))
+    self.vz  = hstack((self.vz,vz))
+    self.ax  = hstack((self.ax,0))
+    self.ay  = hstack((self.ay,0))
+    self.az  = hstack((self.az,0))
+    self.r   = hstack((self.r,r))
+    self.rho = hstack((self.rho,rho))
+    self.N   = self.N+1
+    temp     = tile(self.r,(self.N,1))
     self.sumOfRadii   = temp + temp.T
     self.ratioOfRadii = temp / temp.T
     # gravitational pull :
     V          = 4.0/3.0 * pi * r**3
     self.V     = hstack((self.V, V))
     self.m     = self.rho * self.V
-    self.mi_mj = outer(self.m, self.m)
+    self.mi    = tile(self.m, (self.N,1))
     self.f(self)
 
   def pbcUpdate(self):
@@ -488,9 +468,9 @@ class Specter(object):
     self.z  = hstack((self.z,z))
 
 
-def initialize_grid(p, n, r, L):
+def initialize_grid(p, n, r, rho, L):
   """
-  addParticle(x, y, z, vx, vy, vz, r,
+  addParticle(x, y, z, vx, vy, vz, r, rho,
               thetax, thetay, thetaz, 
               omegax, omegay, omegaz): 
   """
@@ -500,24 +480,118 @@ def initialize_grid(p, n, r, L):
   for i in d:
     for j in d:
       for k in d:
-        p.addParticle(i,j,k,0,0,0,r,0,0,0,0,0,0)
+        p.addParticle(i,j,k,0,0,0,r,rho,0,0,0,0,0,0)
 
 
-def initialize_random(p, n, r, L):
+def initialize_random(p, n, r, rho, L):
   """
-  addParticle(x, y, z, vx, vy, vz, r,
+  addParticle(x, y, z, vx, vy, vz, r, rho,
               thetax, thetay, thetaz, 
               omegax, omegay, omegaz): 
   """
   for i in range(n):
     r     = 0.1*randn() + r
     x,y,z = L*randn(3)
-    p.addParticle(x,y,z,0,0,0,r,0,0,0,0,0,0)
+    p.addParticle(x,y,z,0,0,0,r,rho,0,0,0,0,0,0)
 
-def initialize_system():
+def initialize_system(p):
    """
    """
-   pass
+   G         = 6.67e-11
+   au        = 1.49597871e11
+   
+   r_sun     = 6.955e8
+   r_earth   = 6.3781e6
+   r_moon    = 1.7374e6
+   r_jupiter = 7.1492e7
+   r_saturn  = 6.0268e7
+   
+   d_earth   = au
+   d_moon    = 4.0e8
+   d_jupiter = 5.2*au
+   d_saturn  = 9.5*au
+
+   m_sun     = 1.98844e30
+   m_earth   = 5.97219e24
+   m_moon    = 7.2377e22
+   m_jupiter = 1.8986e27
+   m_saturn  = 5.6846e26
+
+   V_sun     = 4/3.0 * pi * r_sun**3
+   V_earth   = 4/3.0 * pi * r_earth**3
+   V_moon    = 4/3.0 * pi * r_moon**3
+   V_jupiter = 4/3.0 * pi * r_jupiter**3
+   V_saturn  = 4/3.0 * pi * r_saturn**3
+
+   rho_sun     = m_sun / V_sun
+   rho_earth   = m_earth / V_earth
+   rho_moon    = m_moon / V_moon
+   rho_jupiter = m_jupiter / V_jupiter
+   rho_saturn  = m_saturn / V_saturn
+
+   F_earth     = G * m_earth * m_sun / d_earth**2
+   F_moon      = G * m_earth * m_moon / d_moon**2
+   F_jupiter   = G * m_jupiter * m_sun / d_jupiter**2
+   F_saturn    = G * m_saturn * m_sun / d_saturn**2
+
+   vt_earth    = sqrt(G * m_sun / d_earth)
+   vt_moon     = sqrt(G * m_earth / d_moon)
+   vt_jupiter  = sqrt(G * m_sun / d_jupiter)
+   vt_saturn   = sqrt(G * m_sun / d_saturn)
+
+   #addParticle(x, y, z, vx, vy, vz, r, rho,
+   #            thetax, thetay, thetaz, 
+   #            omegax, omegay, omegaz): 
+   p.addParticle(0, 0, 0, 0, 0, 0, r_sun, rho_sun, 0, 0, 0, 0, 0, 0)
+   p.addParticle(d_earth, 0, 0, 0, 0, vt_earth, r_earth, rho_earth,
+                 0, 0, 0, 0, 0, 0)
+   p.addParticle(d_earth+d_moon, 0, 0, 0, 0, vt_moon, r_moon, rho_moon,
+                 0, 0, 0, 0, 0, 0)
+   p.addParticle(d_jupiter, 0, 0, 0, 0, vt_jupiter, r_jupiter, rho_jupiter,
+                 0, 0, 0, 0, 0, 0)
+   p.addParticle(d_saturn, 0, 0, 0, 0, vt_saturn, r_saturn, rho_saturn,
+                 0, 0, 0, 0, 0, 0)
+
+
+def initialize_earth(p):
+   """
+   """
+   r_earth   = 6.3781e6
+   m_earth   = 5.97219e24
+   V_earth   = 4/3.0 * pi * r_earth**3
+   rho_earth = m_earth / V_earth
+
+   #addParticle(x, y, z, vx, vy, vz, r, rho,
+   #            thetax, thetay, thetaz, 
+   #            omegax, omegay, omegaz): 
+   p.addParticle(0, 0, 0, 0, 0, 0, r_earth, rho_earth, 0, 0, 0, 0, 0, 0)
+
+
+def initialize_planet(p):
+   """
+   """
+   G         = p.f.G
+   r_earth   = 10000
+   rho_earth = 1000000
+   rho_moon  = 100
+   r_moon    = 750
+   d_moon    = r_earth + r_moon + 100
+   
+   V_earth   = 4.0/3.0 * pi * r_earth**3
+   V_moon    = 4.0/3.0 * pi * r_moon**3
+   m_earth   = rho_earth * V_earth
+   m_moon    = rho_moon * V_moon
+   vt_moon   = sqrt(G * m_earth / d_moon)
+   vt_earth  = sqrt(G * m_moon / d_moon)
+   print vt_moon
+
+   #addParticle(x, y, z, vx, vy, vz, r, rho,
+   #            thetax, thetay, thetaz,
+   #            omegax, omegay, omegaz):
+   p.addParticle(0, 0, 0, 0, 0, 0, r_earth, rho_earth, 
+                 0, 0, 0, 0, 0, 0)
+   p.addParticle(0, 0, -d_moon, -vt_moon, 0, 0, r_moon, rho_moon, 
+                 0, 0, 0, 0, 0, 0)
 
 
 
