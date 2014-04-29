@@ -218,10 +218,10 @@ def draw_ship_vectors(dx, dy):
   y      = array([0,1,0])
   z      = array([0,0,1])
   xyz1   = zeros(3)
-  c      = 15.0
-  xyz2_x = xyz1 + c*x
-  xyz2_y = xyz1 + c*y
-  xyz2_z = xyz1 + c*z
+  ca     = 15.0
+  xyz2_x = xyz1 + ca*x
+  xyz2_y = xyz1 + ca*y
+  xyz2_z = xyz1 + ca*z
   
   #=============================================================================
   # draw the translational info :
@@ -300,7 +300,7 @@ def draw_ship_vectors(dx, dy):
  
   # acceleration vectors :
   glColor(aColor)
-  c    = 1.0
+  c    = ca/taccel
   xyz2 = xyz1 + c*av
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
@@ -327,7 +327,7 @@ def draw_ship_vectors(dx, dy):
  
   # angular acceleration vectors :
   glColor(alphaColor)
-  c    = 10.0
+  c    = ca/raccel
   xyz2 = xyz1 + c*alphav 
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
