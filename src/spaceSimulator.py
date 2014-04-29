@@ -674,8 +674,14 @@ def display():
       # rotation :
       mvm = glGetFloatv(GL_MODELVIEW_MATRIX)
       #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
-      for j in range(0,3):
-        for k in range(0,3):
+      #for j in range(0,3):
+        #for k in range(0,3):
+          #if(i==j):
+            #mvm[j:k] = 1.0
+          #else:
+            #mvm[j:k] = 0.0
+      for j in xrange(len(mvm)):
+        for k in xrange(len(mvm[j])):
           if(i==j):
             mvm[j][k] = 1.0
           else:
