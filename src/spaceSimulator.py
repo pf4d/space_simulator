@@ -61,6 +61,8 @@ yawLeft   = False          #   "   rotating left
 yawRight  = False          #   "   rotating right
 ascend    = False          #   "   ascending
 descend   = False          #   "   descending
+
+paused    = False          # pauses the game
                            
                            
 taccel    = 20.0           # translational acceleration to apply 
@@ -421,7 +423,77 @@ def print_ship_stats(dx, dy):
   glMatrixMode(GL_PROJECTION)
   glPopMatrix()
   glMatrixMode(GL_MODELVIEW)
+
+def print_paused(dx,dy):
+  """
+  """
+  # save projection matrix
+  glMatrixMode(GL_PROJECTION)
+  glPushMatrix()
+
+  # switch to orthographic projection :
+  glLoadIdentity()
+  glOrtho(-L, L, -L, L, -4*L, 4*L)
+
+  # back to the modelview matrix mode, so that we can translate/scale text :
+  glMatrixMode(GL_MODELVIEW)
+
+  glDisable(GL_LIGHTING)   # disable lighting
   
+  # print statistics :
+  glPushMatrix()
+  glLoadIdentity()
+  
+  glColor(1.0,1.0,1.0,1.0) 
+  #glRasterPos2f(L-dx-10, L-dy)
+  font = BitmapFont('ProggySquareSZ.ttf')
+  font.FaceSize(30)
+  #font = TextureFont('ProggySquareSZ.ttf')
+  #font.FaceSize(13)
+  #glScale(0.05, 0.05, 0.05)
+  #font.Render("n = %i" % p.N)
+  
+  glRasterPos2f(-L+dy + 20, L-dy-20)
+  font.Render("Forward: w")
+  glRasterPos2f(-L+dy+20, L-dy-30)
+  font.Render("Back: s")
+  glRasterPos2f(-L+dy+20, L-dy-40)
+  font.Render("Left: d")
+  glRasterPos2f(-L+dy+20, L-dy-50)
+  font.Render("Right: a")
+  glRasterPos2f(-L+dy+20, L-dy-60)
+  font.Render("Yaw Left: q")
+  glRasterPos2f(-L+dy+20, L-dy-70)
+  font.Render("Yaw Right: e")
+  glRasterPos2f(-L+dy+20, L-dy-80)
+  font.Render("Pitch Up: Up Arrow")
+  glRasterPos2f(-L+dy+20, L-dy-90)
+  font.Render("Pitch Down: Down Arrow")
+  glRasterPos2f(-L+dy+20, L-dy-100)
+  font.Render("Roll Left: Left Arrow")
+  glRasterPos2f(-L+dy+20, L-dy-110)
+  font.Render("Roll Right: Right Arrow")
+  glRasterPos2f(-L+dy+20, L-dy-120)
+  font.Render("Descend: Page Down")
+  glRasterPos2f(-L+dy+20, L-dy-130)
+  font.Render("Ascend: Page Up")
+  glRasterPos2f(-L+dy+20, L-dy-140)
+  font.Render("Pause/Resume: p")
+  glRasterPos2f(-L+dy+20, L-dy-150)
+  font.Render("Rotate Camera: Left-click")
+  glRasterPos2f(-L+dy+20, L-dy-160)
+  font.Render("Zoom In/Out: Scroll Wheel")
+  glRasterPos2f(-L+dy+20, L-dy-170)
+  font.Render("Exit: x")
+  glPopMatrix()
+  
+  # re-enable lighting :
+  glEnable(GL_LIGHTING)
+
+  # get back to old perspective matrix :
+  glMatrixMode(GL_PROJECTION)
+  glPopMatrix()
+  glMatrixMode(GL_MODELVIEW)
 
 def print_stats(dx, dy):
   """
@@ -453,6 +525,8 @@ def print_stats(dx, dy):
   font.Render("n = %i" % p.N)
   glRasterPos2f(-L+dy, L-dy)
   font.Render("%i FPS" % fps)
+  glRasterPos2f(-L+dy, -L+dy)
+  font.Render("Press p to pause/view controls")
   glPopMatrix()
   
   # re-enable lighting :
@@ -638,7 +712,9 @@ def display():
 
   dx = 0.2 * L
   dy = 0.1 * L
- 
+  
+  if paused:
+    print_paused(dx,dy)
   # camera viewpoint :
   glLoadIdentity()
   M  = dot(p.theta[0].T, camera.M)
@@ -785,107 +861,109 @@ def idle():
   """
   global COUNT, frames, lastTime, fps, yawLeft, yawRight, ascend, descend
   global fwd, back, left, right, up, down, taccel, raccel, rollLeft, rollRight
+  global paused
   
-  # integrate the system forward in time :
-  for i in range(UPDATE_FRAMES):
-    integrate(f,p)
-    COUNT = COUNT + 1 
+  if not paused:
+    # integrate the system forward in time :
+    for i in range(UPDATE_FRAMES):
+      integrate(f,p)
+      COUNT = COUNT + 1 
   
-  # move forward :
-  if fwd == True:
-    vf = p.theta[0][2,:]
-    pf = vf / norm(vf) * taccel
-    p.ax[0] += pf[0]
-    p.ay[0] += pf[1]
-    p.az[0] += pf[2]
+    # move forward :
+    if fwd == True:
+      vf = p.theta[0][2,:]
+      pf = vf / norm(vf) * taccel
+      p.ax[0] += pf[0]
+      p.ay[0] += pf[1]
+      p.az[0] += pf[2]
   
-  # move backward :
-  elif back == True:
-    vf = p.theta[0][2,:]
-    pf = vf / norm(vf) * taccel
-    p.ax[0] -= pf[0]
-    p.ay[0] -= pf[1]
-    p.az[0] -= pf[2]
+    # move backward :
+    elif back == True:
+      vf = p.theta[0][2,:]
+      pf = vf / norm(vf) * taccel
+      p.ax[0] -= pf[0]
+      p.ay[0] -= pf[1]
+      p.az[0] -= pf[2]
   
-  # move left :
-  if left == True:
-    vf = p.theta[0][0,:]
-    pf = vf / norm(vf) * taccel
-    p.ax[0] += pf[0]
-    p.ay[0] += pf[1]
-    p.az[0] += pf[2]
+    # move left :
+    if left == True:
+      vf = p.theta[0][0,:]
+      pf = vf / norm(vf) * taccel
+      p.ax[0] += pf[0]
+      p.ay[0] += pf[1]
+      p.az[0] += pf[2]
   
-  # move right :
-  elif right == True:
-    vf = p.theta[0][0,:]
-    pf = vf / norm(vf) * taccel
-    p.ax[0] -= pf[0]
-    p.ay[0] -= pf[1]
-    p.az[0] -= pf[2]
+    # move right :
+    elif right == True:
+      vf = p.theta[0][0,:]
+      pf = vf / norm(vf) * taccel
+      p.ax[0] -= pf[0]
+      p.ay[0] -= pf[1]
+      p.az[0] -= pf[2]
 
-  # pitch up :
-  if up == True:
-    vf = p.theta[0][0,:]
-    pf = vf / norm(vf) * raccel
-    p.alphax[0] -= pf[0]
-    p.alphay[0] -= pf[1]
-    p.alphaz[0] -= pf[2]
+    # pitch up :
+    if up == True:
+      vf = p.theta[0][0,:]
+      pf = vf / norm(vf) * raccel
+      p.alphax[0] -= pf[0]
+      p.alphay[0] -= pf[1]
+      p.alphaz[0] -= pf[2]
   
-  # pitch down :
-  elif down == True:
-    vf = p.theta[0][0,:]
-    pf = vf / norm(vf) * raccel
-    p.alphax[0] += pf[0]
-    p.alphay[0] += pf[1]
-    p.alphaz[0] += pf[2]
+    # pitch down :
+    elif down == True:
+      vf = p.theta[0][0,:]
+      pf = vf / norm(vf) * raccel
+      p.alphax[0] += pf[0]
+      p.alphay[0] += pf[1]
+      p.alphaz[0] += pf[2]
 
-  # roll left :
-  if rollLeft == True:
-    vf = p.theta[0][2,:]
-    pf = vf / norm(vf) * raccel
-    p.alphax[0] += pf[0]
-    p.alphay[0] += pf[1]
-    p.alphaz[0] += pf[2]
+    # roll left :
+    if rollLeft == True:
+      vf = p.theta[0][2,:]
+      pf = vf / norm(vf) * raccel
+      p.alphax[0] += pf[0]
+      p.alphay[0] += pf[1]
+      p.alphaz[0] += pf[2]
   
-  # roll right :
-  elif rollRight == True:
-    vf = p.theta[0][2,:]
-    pf = vf / norm(vf) * raccel
-    p.alphax[0] -= pf[0]
-    p.alphay[0] -= pf[1]
-    p.alphaz[0] -= pf[2]
+    # roll right :
+    elif rollRight == True:
+      vf = p.theta[0][2,:]
+      pf = vf / norm(vf) * raccel
+      p.alphax[0] -= pf[0]
+      p.alphay[0] -= pf[1]
+      p.alphaz[0] -= pf[2]
 
-  # yaw left :
-  if yawLeft == True:
-    vf = p.theta[0][1,:]
-    pf = vf / norm(vf) * raccel
-    p.alphax[0] -= pf[0]
-    p.alphay[0] -= pf[1]
-    p.alphaz[0] -= pf[2]
+    # yaw left :
+    if yawLeft == True:
+      vf = p.theta[0][1,:]
+      pf = vf / norm(vf) * raccel
+      p.alphax[0] -= pf[0]
+      p.alphay[0] -= pf[1]
+      p.alphaz[0] -= pf[2]
   
-  # yaw right :
-  elif yawRight == True:
-    vf = p.theta[0][1,:]
-    pf = vf / norm(vf) * raccel
-    p.alphax[0] += pf[0]
-    p.alphay[0] += pf[1]
-    p.alphaz[0] += pf[2]
+    # yaw right :
+    elif yawRight == True:
+      vf = p.theta[0][1,:]
+      pf = vf / norm(vf) * raccel
+      p.alphax[0] += pf[0]
+      p.alphay[0] += pf[1]
+      p.alphaz[0] += pf[2]
 
-  # ascend :
-  if ascend == True:
-    vf = p.theta[0][1,:]
-    pf = vf / norm(vf) * taccel
-    p.ax[0] += pf[0]
-    p.ay[0] += pf[1]
-    p.az[0] += pf[2]
+    # ascend :
+    if ascend == True:
+      vf = p.theta[0][1,:]
+      pf = vf / norm(vf) * taccel
+      p.ax[0] += pf[0]
+      p.ay[0] += pf[1]
+      p.az[0] += pf[2]
   
-  # descend :
-  elif descend == True:
-    vf = p.theta[0][1,:]
-    pf = vf / norm(vf) * taccel
-    p.ax[0] -= pf[0]
-    p.ay[0] -= pf[1]
-    p.az[0] -= pf[2]
+    # descend :
+    elif descend == True:
+      vf = p.theta[0][1,:]
+      pf = vf / norm(vf) * taccel
+      p.ax[0] -= pf[0]
+      p.ay[0] -= pf[1]
+      p.az[0] -= pf[2]
 
   # redraw the screen :
   glutPostRedisplay()
@@ -903,7 +981,7 @@ def idle():
 def key(k, x, y):
   """
   """
-  global camera, fwd, back, left, right, yawLeft, yawRight
+  global camera, fwd, back, left, right, yawLeft, yawRight, paused
   
   # reset the camera :
   if k == 'c':
@@ -911,9 +989,16 @@ def key(k, x, y):
     camera.initialize()
   
   # quit the game :
+  if k == 'x':
+    print "'x' was pressed"
+    exit(0)
+
   if k == 'p':
     print "'p' was pressed"
-    exit(0)
+    if paused:
+      paused = False
+    else:
+      paused = True
   
   # print the number of particles :
   if k == 'n':
