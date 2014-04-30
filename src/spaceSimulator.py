@@ -121,7 +121,9 @@ specter = Specter(1e3, 4*L)
 star    = Specter(1e3, 100*L)
 
 # nebula particle radius
-nebRadius = 4.0
+nebRadius = 1.0
+
+vertices = []
 
 # instantiate the forces function between particles
 #f = GranularMaterialForce(k=k, gamma=gamma)
@@ -135,7 +137,7 @@ p = Nebula(L, rho, f, periodicY=0, periodicZ=0, periodicX=0)
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
 p.addParticle(0,0,-L,0,0,0,3,0,0,0,0,0,0)
-initialize_grid(p, 5, nebRadius, L/4.0)
+initialize_grid(p, 6, nebRadius, L/12.0)
 #initialize_grid(p, 4, 4.0, 2*L)
 #initialize_random(p, 100, 4, L/2)
 
@@ -689,7 +691,7 @@ def draw_specter_field(S, r):
 def display():
   """
   """
- 
+  global vertices
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -775,15 +777,13 @@ def display():
         glColor3f(0.0,0.0,1.0)
       else:
         glColor3f(p.az[i],p.vz[i],0.0)
-      glBegin(GL_POLYGON)
-      for j in numpy.arange(0, 2*PI, PI/6):
-        glVertex3f(cos(j) * nebRadius, sin(j) * nebRadius, 0.0)
-
-      #draw_circle(2, 20)
-      #glPointSize(10.0)
-      #glBegin(GL_POINTS)
-      #glVertex3f(p.x[i], p.y[i], p.z[i])
-      glEnd()
+      #glBegin(GL_POLYGON)
+      #for j in numpy.arange(0, 2*PI, PI/6):
+        #glVertex3f(cos(j) * nebRadius, sin(j) * nebRadius, 0.0)
+        #glEnableClientState(GL_VERTEX_ARRAY)
+      glDrawArrays(GL_POLYGON, 0, len(vertices))
+        
+      #glEnd()
       #glPopMatrix()
 
     # draw particles as spheres or the ship if index == 0 :
@@ -796,6 +796,8 @@ def display():
       #mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])
       #glLoadMatrixf(mvm)
       glColor(shipColor)
+
+      #glDrawArrays(GL_TRIANGLES, 0, len(obj.vertices))
       glCallList(obj.gl_list)
       #glPopMatrix()
 
@@ -1173,6 +1175,20 @@ def motion(x,y):
     camera.update(array([-diffy, -diffx, 0]))
     glutPostRedisplay()
     #print "Mouse movement <x,y> : <%i,%i>" % (x,y)
+
+def load_array_buffer():
+  global vertices
+  for j in numpy.arange(0, 2*PI, PI/6):
+    vertex = map(float,(cos(j) * nebRadius, sin(j) * nebRadius, 0.0))
+    vertices.append(vertex)
+
+  #glVertexPointerd(obj.vertices)
+  glVertexPointerd(vertices)
+  #glVertexPointerd(obj.vertices)
+  #glNormalPointerf(obj.normals)
+  glEnableClientState(GL_VERTEX_ARRAY)
+  #glEnableClientState(GL_NORMAL_ARRAY) 
+
   
 
 # main method :
@@ -1197,8 +1213,12 @@ if __name__ == '__main__':
   glutKeyboardUpFunc(keyUp)
   glutSpecialFunc(special)
   glutSpecialUpFunc(specialUp)
-
   obj = OBJ('SpaceShip.obj', swapyz=False)
+  load_array_buffer()
+
+  #vertices = []
+  
+  
   
   # initialize
   init()
