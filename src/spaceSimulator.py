@@ -21,6 +21,7 @@ class Camera(object):
     reset the rotation to the identiy matrix.
     """
     self.M = identity(3)
+    #self.update([.2, 0, 0])  # provide an initial rotation up
 
   def update(self, v):
     """
@@ -124,24 +125,21 @@ specter = Specter(1e3, 4*L)
 star    = Specter(1e3, 1000*L)
 
 # instantiate the forces function between particles
-f = GranularMaterialForce(k=k, gamma=gamma)
-#f = NebulaGranularMaterialForce(k=k, gamma=gamma)
+#f = GranularMaterialForce(k=k, gamma=gamma)
+f = NebulaGranularMaterialForce(k=k, gamma=gamma)
 
 # create some particles and a box
-p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
-#p = Nebula(L, f, periodicY=0, periodicZ=0, periodicX=0)
+#p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
+p = Nebula(L, f, periodicY=0, periodicZ=0, periodicX=0)
 
 #  addParticle(x, y, z, vx, vy, vz, r, rho,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-p.addParticle(0,0,-2*L,0,0,0,3,10,0,0,0,0,0,0)
 #initialize_grid(p, 4, 3.0, rho, L)
-initialize_random(p, 100, 3.0, rho, L/2)
-#p.addParticle(au + 6.3781e6 + 1e5,0,0,0,0,0,3,0,0,0,0,0,0,0)
+initialize_nebula(p, 5, 8.0, L/2)
+#initialize_random(p, 100, 3.0, rho, L/2)
 #initialize_system(p)
-#p.addParticle(0,0,r_earth + 1e2,0,0,0,3,0,0,0,0,0,0,0)
 #initialize_earth(p)
-#p.addParticle(0,0, -40000, 0,0,0,3,1e-16,0,0,0,0,0,0)
 #initialize_planet(p)
 
 # instantiate Integrator

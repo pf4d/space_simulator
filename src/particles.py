@@ -115,8 +115,6 @@ class NebulaGranularMaterialForce(object):
     # parameters in force model
     self.k     = k           # elastic 'bounce'
     self.gamma = gamma       # energy dissipation/loss
-    self.rho   = 1.0         # density
-    self.G     = 6.67384E-11 # gravitational constant
 
   def __call__(self, p):
     # find position differences :
@@ -124,7 +122,7 @@ class NebulaGranularMaterialForce(object):
 
     # compute overlap :
     dr = d - p.sumOfRadii
-    fill_diagonal(dr, 0)
+    dr[0] = 0
 
     # no forces arising in no overlap cases :
     dr[dr > 0] = 0
@@ -137,20 +135,16 @@ class NebulaGranularMaterialForce(object):
     da, dax, day, daz = p.distanceMatrix(p.ax, p.ay, p.az)
     
     # damping terms :
-    vijDotrij             = dvx*dx + dvy*dy + dvz*dz
-    vijDotrij[dr==0]      = 0 
+    vijDotrij         = dvx*dx + dvy*dy + dvz*dz
+    vijDotrij[dr==0]  = 0 
 
     # damping is subtracted from force :
     mag_r += self.gamma * vijDotrij / d
 
-    # gravitational pull between particles :
-    F = self.G * p.mi / d**2
-    F[d < 0.0] = 0
-
     # Project onto components, sum all forces on each particle
-    p.ax = sum(mag_r * dx/d * p.ratioOfRadii + F*dx/d, axis=1)
-    p.ay = sum(mag_r * dy/d * p.ratioOfRadii + F*dy/d, axis=1)
-    p.az = sum(mag_r * dz/d * p.ratioOfRadii + F*dz/d, axis=1)
+    p.ax = mag_r * dx/d * p.ratioOfRadii
+    p.ay = mag_r * dy/d * p.ratioOfRadii
+    p.az = mag_r * dz/d * p.ratioOfRadii
     
 
 class VerletIntegrator(object):
@@ -405,9 +399,7 @@ class Nebula(Particles):
   def __init__(self, L, force, periodicX=1, periodicY=1, periodicZ=1):
     super(Nebula, self).__init__(L, force, periodicX, periodicY, periodicZ)
      
-  def addParticle(self, x, y, z, vx, vy, vz, r, rho,
-                  thetax, thetay, thetaz, 
-                  omegax, omegay, omegaz): 
+  def addParticle(self, x, y, z, vx, vy, vz, r): 
     self.x   = hstack((self.x,x))
     self.y   = hstack((self.y,y))
     self.z   = hstack((self.z,z))
@@ -417,18 +409,33 @@ class Nebula(Particles):
     self.ax  = hstack((self.ax,0))
     self.ay  = hstack((self.ay,0))
     self.az  = hstack((self.az,0))
+    self.thetax = hstack((self.thetax,0))
+    self.thetay = hstack((self.thetay,0))
+    self.thetaz = hstack((self.thetaz,0))
+    self.omegax = hstack((self.omegax,0))
+    self.omegay = hstack((self.omegay,0))
+    self.omegaz = hstack((self.omegaz,0))
+    self.alphax = hstack((self.alphax,0))
+    self.alphay = hstack((self.alphay,0))
+    self.alphaz = hstack((self.alphaz,0))
+    self.theta.append(identity(3))
     self.r   = hstack((self.r,r))
-    self.rho = hstack((self.rho,rho))
     self.N   = self.N+1
-    temp     = tile(self.r,(self.N,1))
-    self.sumOfRadii   = temp + temp.T
-    self.ratioOfRadii = temp / temp.T
-    # gravitational pull :
-    V          = 4.0/3.0 * pi * r**3
-    self.V     = hstack((self.V, V))
-    self.m     = self.rho * self.V
-    self.mi    = tile(self.m, (self.N,1))
+    self.sumOfRadii   = self.r[0] + self.r
+    self.ratioOfRadii = self.r[0] / self.r
     self.f(self)
+
+  def update_theta(self):
+    """
+    """
+    super(Nebula, self).update_theta()
+
+  def rotate(self, M, v):
+    """
+    rotate the particle's orientation matrix <M> about the x, y, and z axes by 
+    angles provided in <v> array.
+    """
+    return super(Nebula, self).rotate(M, v)
 
   def pbcUpdate(self):
     """
@@ -441,8 +448,29 @@ class Nebula(Particles):
     Computes distances between all particles and places the result in a 
     matrix such that the ij th matrix entry corresponds to the distance 
     between particle i and j
-    """ 
-    return super(Nebula, self).distanceMatrix(x, y, z)
+    """
+    dx = x[0] - x
+    dy = y[0] - y
+    dz = z[0] - z
+  
+    # Particles 'feel' each other across the periodic boundaries
+    if self.periodicX:
+      dx[dx >  self.L/2] = dx[dx >  self.L/2] - self.L
+      dx[dx < -self.L/2] = dx[dx < -self.L/2] + self.L
+    if self.periodicY:
+      dy[dy >  self.L/2] = dy[dy >  self.L/2] - self.L
+      dy[dy < -self.L/2] = dy[dy < -self.L/2] + self.L
+    if self.periodicZ:
+      dz[dz >  self.L/2] = dz[dz >  self.L/2] - self.L
+      dz[dz < -self.L/2] = dz[dz < -self.L/2] + self.L
+
+    # Total Distances
+    d = sqrt(dx**2 + dy**2 + dz**2)
+
+    # Mark zero entry with negative 1 to avoid divergences
+    d[0] = -1
+
+    return d, dx, dy, dz
 
 
 class Specter(object):
@@ -477,6 +505,7 @@ def initialize_grid(p, n, r, rho, L):
   dx = 2.0*L / n
   d  = linspace(dx/2.0 - L, L - dx/2.0, n)
 
+  p.addParticle(0,0,-2*L,0,0,0,3,10,0,0,0,0,0,0)
   for i in d:
     for j in d:
       for k in d:
@@ -489,6 +518,7 @@ def initialize_random(p, n, r, rho, L):
               thetax, thetay, thetaz, 
               omegax, omegay, omegaz): 
   """
+  p.addParticle(0,0,-2*L,0,0,0,3,10,0,0,0,0,0,0)
   for i in range(n):
     r     = 0.1*randn() + r
     x,y,z = L*randn(3)
@@ -542,6 +572,7 @@ def initialize_system(p):
    #addParticle(x, y, z, vx, vy, vz, r, rho,
    #            thetax, thetay, thetaz, 
    #            omegax, omegay, omegaz): 
+   p.addParticle(au + 6.3781e6 + 1e5,0,0,0,0,0,3,0,0,0,0,0,0,0)
    p.addParticle(0, 0, 0, 0, 0, 0, r_sun, rho_sun, 0, 0, 0, 0, 0, 0)
    p.addParticle(d_earth, 0, 0, 0, 0, vt_earth, r_earth, rho_earth,
                  0, 0, 0, 0, 0, 0)
@@ -564,6 +595,7 @@ def initialize_earth(p):
    #addParticle(x, y, z, vx, vy, vz, r, rho,
    #            thetax, thetay, thetaz, 
    #            omegax, omegay, omegaz): 
+   p.addParticle(0,0,r_earth + 1e2,0,0,0,3,0,0,0,0,0,0,0)
    p.addParticle(0, 0, 0, 0, 0, 0, r_earth, rho_earth, 0, 0, 0, 0, 0, 0)
 
 
@@ -588,10 +620,23 @@ def initialize_planet(p):
    #addParticle(x, y, z, vx, vy, vz, r, rho,
    #            thetax, thetay, thetaz,
    #            omegax, omegay, omegaz):
+   p.addParticle(0,0, -40000, 0,0,0,3,1e-16,0,0,0,0,0,0)
    p.addParticle(0, 0, 0, 0, 0, 0, r_earth, rho_earth, 
                  0, 0, 0, 0, 0, 0)
    p.addParticle(0, 0, -d_moon, -vt_moon, 0, 0, r_moon, rho_moon, 
                  0, 0, 0, 0, 0, 0)
+
+def initialize_nebula(p, n, r, L):
+  """
+  """
+  dx = 2.0*L / n
+  d  = linspace(dx/2.0 - L, L - dx/2.0, n)
+
+  p.addParticle(0,0,-2*L,0,0,0,3)
+  for i in d:
+    for j in d:
+      for k in d:
+        p.addParticle(i,j,k,0,0,0,r)
 
 
 
