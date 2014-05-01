@@ -62,7 +62,6 @@ yawLeft   = False          #   "   rotating left
 yawRight  = False          #   "   rotating right
 ascend    = False          #   "   ascending
 descend   = False          #   "   descending
-
 paused    = False          # pauses the game
                            
                            
@@ -105,11 +104,11 @@ t          = 0                       # initial time
 #k          = 1.5                     # elastic 'bounce'
 #gamma      = 0.1                     # energy dissipation/loss
 # "space balls" :                   
-k          = 1.0                     # elastic 'bounce'
-gamma      = 10.5                    # energy dissipation/loss
+k          = 30.0                    # elastic 'bounce'
+gamma      = 0.4                     # energy dissipation/loss
                                     
 rho        = 1e9                     # particle denisty
-g          = 0.00                    # downward acceleration
+g          = 0.0                     # downward acceleration
 
 # particle update data:
 COUNT         = 1          # number of time steps computed
@@ -127,18 +126,20 @@ specter = Specter(1e3, 4*L)
 star    = Specter(1e3, 1000*L)
 
 # instantiate the forces function between particles
-#f = GranularMaterialForce(k=k, gamma=gamma)
-f = NebulaGranularMaterialForce(k=k, gamma=gamma)
+f = GranularMaterialForce(k=k, gamma=gamma)
+#f = NebulaGranularMaterialForce(k=k, gamma=gamma)
 
 # create some particles and a box
-#p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
-p = Nebula(L, f, periodicY=0, periodicZ=0, periodicX=0)
+p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
+#p = Nebula(L, f, periodicY=0, periodicZ=0, periodicX=0)
 
 #  addParticle(x, y, z, vx, vy, vz, r, rho,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-#initialize_grid(p, 4, 3.0, rho, L)
-initialize_nebula(p, 5, 8.0, L/2)
+initialize_grid(p, 4, 3.0, rho, L)
+#initialize_nebula(p, 5, 8.0, L/2)
+#k          = 30.0                    # elastic 'bounce'
+#gamma      = 0.1                     # energy dissipation/loss
 #initialize_random(p, 100, 3.0, rho, L/2)
 #initialize_system(p)
 #initialize_earth(p)
@@ -154,8 +155,8 @@ def init():
   # general properties :
   glEnable(GL_COLOR_MATERIAL)
   glEnable(GL_BLEND)
-  #glShadeModel(GL_SMOOTH)
-  glShadeModel(GL_FLAT)
+  glShadeModel(GL_SMOOTH)
+  #glShadeModel(GL_FLAT)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
 
@@ -785,8 +786,8 @@ def display():
     glPopMatrix()
 
   # draw vectors on particles :
-  draw_velocity_vectors()
-  draw_acceleration_vectors()
+  #draw_velocity_vectors()
+  #draw_acceleration_vectors()
   #draw_rotation_vectors()
   #draw_angular_velocity_vectors()
   #draw_angular_acceleration_vectors()   
