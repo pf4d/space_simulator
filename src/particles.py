@@ -309,7 +309,7 @@ class Particles(object):
     V          = 4.0/3.0 * pi * r**3
     self.V     = hstack((self.V, V))
     self.m     = self.rho * self.V
-    self.mi    = (self.m * tile(self.m, (self.N,1)).T).T
+    self.mi    = tile(self.m, (self.N,1))
     fill_diagonal(self.mi, zeros(self.N))
     self.f(self)
 
@@ -507,7 +507,7 @@ def initialize_grid(p, n, r, rho, L):
   dx = 2.0*L / n
   d  = linspace(dx/2.0 - L, L - dx/2.0, n)
 
-  p.addParticle(0,0,-2*L,0,0,0,3,10,0,0,0,0,0,0)
+  p.addParticle(0,0,2*L,0,0,0,3,10,0,0,0,0,0,0)
   for i in d:
     for j in d:
       for k in d:
@@ -574,7 +574,7 @@ def initialize_system(p):
    #addParticle(x, y, z, vx, vy, vz, r, rho,
    #            thetax, thetay, thetaz, 
    #            omegax, omegay, omegaz): 
-   p.addParticle(au + 6.3781e6 + 1e5,0,0,0,0,0,3,0,0,0,0,0,0,0)
+   p.addParticle(au + 6.3781e6 + 1e6,0,0,0,0,0,3,0,0,0,0,0,0,0)
    p.addParticle(0, 0, 0, 0, 0, 0, r_sun, rho_sun, 0, 0, 0, 0, 0, 0)
    p.addParticle(d_earth, 0, 0, 0, 0, vt_earth, r_earth, rho_earth,
                  0, 0, 0, 0, 0, 0)
@@ -606,10 +606,10 @@ def initialize_planet(p):
    """
    G         = p.f.G
    r_earth   = 10000
-   rho_earth = 1000000
-   rho_moon  = 100
+   rho_earth = 10000000
+   rho_moon  = 10000000
    r_moon    = 750
-   d_moon    = r_earth + r_moon + 100
+   d_moon    = r_earth + r_moon + 10000
    
    V_earth   = 4.0/3.0 * pi * r_earth**3
    V_moon    = 4.0/3.0 * pi * r_moon**3
@@ -622,10 +622,10 @@ def initialize_planet(p):
    #addParticle(x, y, z, vx, vy, vz, r, rho,
    #            thetax, thetay, thetaz,
    #            omegax, omegay, omegaz):
-   p.addParticle(0,0, -40000, 0,0,0,3,1e-16,0,0,0,0,0,0)
+   p.addParticle(0,0, 30000, 0,0,0,3,1e-16,0,0,0,0,0,0)
    p.addParticle(0, 0, 0, 0, 0, 0, r_earth, rho_earth, 
                  0, 0, 0, 0, 0, 0)
-   p.addParticle(0, 0, -d_moon, -vt_moon, 0, 0, r_moon, rho_moon, 
+   p.addParticle(0, 0, d_moon, vt_moon, 0, 0, r_moon, rho_moon, 
                  0, 0, 0, 0, 0, 0)
 
 def initialize_nebula(p, n, r, L):

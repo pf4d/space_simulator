@@ -108,7 +108,7 @@ t          = 0                       # initial time
 k          = 30.0                    # elastic 'bounce'
 gamma      = 0.4                     # energy dissipation/loss
                                     
-rho        = 1e4                     # particle denisty
+rho        = 1e9                     # particle denisty
 g          = 0.0                     # downward acceleration
 
 # particle update data:
@@ -449,37 +449,37 @@ def print_paused(dx,dy):
   #font.Render("n = %i" % p.N)
   
   glRasterPos2f(-L+dy + 20, L-dy-20)
-  font.Render("Forward: w")
+  font.Render("Forward:        w")
   glRasterPos2f(-L+dy+20, L-dy-30)
-  font.Render("Back: s")
+  font.Render("Back:           s")
   glRasterPos2f(-L+dy+20, L-dy-40)
-  font.Render("Left: d")
+  font.Render("Left:           d")
   glRasterPos2f(-L+dy+20, L-dy-50)
-  font.Render("Right: a")
+  font.Render("Right:          a")
   glRasterPos2f(-L+dy+20, L-dy-60)
-  font.Render("Yaw Left: q")
+  font.Render("Yaw Left:       q")
   glRasterPos2f(-L+dy+20, L-dy-70)
-  font.Render("Yaw Right: e")
+  font.Render("Yaw Right:      e")
   glRasterPos2f(-L+dy+20, L-dy-80)
-  font.Render("Pitch Up: Up Arrow")
+  font.Render("Pitch Up:       Up Arrow")
   glRasterPos2f(-L+dy+20, L-dy-90)
-  font.Render("Pitch Down: Down Arrow")
+  font.Render("Pitch Down:     Down Arrow")
   glRasterPos2f(-L+dy+20, L-dy-100)
-  font.Render("Roll Left: Left Arrow")
+  font.Render("Roll Left:      Left Arrow")
   glRasterPos2f(-L+dy+20, L-dy-110)
-  font.Render("Roll Right: Right Arrow")
+  font.Render("Roll Right:     Right Arrow")
   glRasterPos2f(-L+dy+20, L-dy-120)
-  font.Render("Descend: Page Down")
+  font.Render("Descend:        Page Down")
   glRasterPos2f(-L+dy+20, L-dy-130)
-  font.Render("Ascend: Page Up")
+  font.Render("Ascend:         Page Up")
   glRasterPos2f(-L+dy+20, L-dy-140)
-  font.Render("Pause/Resume: p")
+  font.Render("Pause/Resume:   p")
   glRasterPos2f(-L+dy+20, L-dy-150)
-  font.Render("Rotate Camera: Left-click")
+  font.Render("Rotate Camera:  Left-click")
   glRasterPos2f(-L+dy+20, L-dy-160)
-  font.Render("Zoom In/Out: Scroll Wheel")
+  font.Render("Zoom In/Out:    Scroll Wheel")
   glRasterPos2f(-L+dy+20, L-dy-170)
-  font.Render("Exit: x")
+  font.Render("Exit:           esc")
   glPopMatrix()
   
   # re-enable lighting :
@@ -699,6 +699,97 @@ def draw_specter_field(S, r):
     glEnd()
   glEnable(GL_LIGHTING)    # enable lighting
 
+def draw_solid_particles():
+  """
+  draw the spheres.
+  """
+  glPushMatrix() 
+  glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
+  glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
+  glMaterial(GL_FRONT, GL_SHININESS, 100.0)
+  for i in range(p.N):
+    a = array([p.ax[i], p.ay[i], p.az[i]])
+    if norm(a) > 20000.0 and i != 0:
+      glColor(1/2.0, 1/2.0, 1/2.0, 1.0)
+    elif i != 0:
+      glColor(1, 1/2.0, 0.0, 1.0)
+    
+    glPushMatrix()
+    glTranslate(p.x[i], p.y[i], p.z[i])
+    
+    # rotation :
+    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)    # current rotation / translation
+    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])  # rotate the view by theta[i]
+    glLoadMatrixf(mvm)                        # reload the modelView matrix
+    
+    # draw particles as spheres or the ship if index == 0 :
+    if i == 0 and camDist != 0:
+      glColor(shipColor)
+      glCallList(obj.gl_list)
+    else:  
+      glutSolidSphere(p.r[i], SLICES, STACKS)
+    
+    glPopMatrix()
+
+def draw_wireframe_particles():
+  """
+  draw the spheres.
+  """
+  glPushMatrix() 
+  glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
+  glMaterial(GL_FRONT, GL_SHININESS, 0.0)
+  glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
+  glLineWidth(1.0)
+  for i in range(p.N):
+    glPushMatrix()
+    glTranslate(p.x[i], p.y[i], p.z[i])
+    
+    # rotation :
+    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)    # current rotation / translation
+    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])  # rotate the view by theta[i]
+    glLoadMatrixf(mvm)                        # reload the modelView matrix
+    
+    # draw particles as spheres or the ship if index == 0 :
+    if i == 0 and camDist != 0:
+      glColor(shipColor)
+      glCallList(obj.gl_list)
+    elif i == 0:
+      pass
+      #glDisable(GL_LIGHTING)
+      #glColor(1.0,0.0,0.0,1.0)
+      #glBegin(GL_POINTS)
+      #glVertex3f(p.x[i], p.y[i], -p.z[i])
+      #glEnd()
+      #glEnable(GL_LIGHTING)
+    else:
+      glColor(0.0,1.0,0.0,1.0)
+      glutWireSphere(p.r[i]*1.01, 10, 5)
+    
+    glPopMatrix()
+
+def draw_point_particles():
+  """
+  draw the spheres.
+  """
+  glPushMatrix() 
+  glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
+  glMaterial(GL_FRONT, GL_SHININESS, 0.0)
+  glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
+  for i in range(p.N):
+    glPushMatrix()
+    glTranslate(p.x[i], p.y[i], p.z[i])
+    
+    # draw particles as spheres or the ship if index == 0 :
+    if i == 0 and camDist != 0:
+      glColor(shipColor)
+      glCallList(obj.gl_list)
+    else:  
+      glColor(0.0,0.0,1.0,1.0)
+      glBegin(GL_POINTS)
+      glVertex3f(p.x[i], p.y[i], p.z[i])
+      glEnd()
+
+    glPopMatrix()
 
 def display():
   """
@@ -741,45 +832,9 @@ def display():
   # draw star field :
   draw_specter_field(star, 4.0)
  
-  # draw the spheres :
-  glPushMatrix() 
-  glMaterial(GL_FRONT, GL_EMISSION,  [0.0, 0.0, 0.0, 0.0])
-  glMaterial(GL_FRONT, GL_SPECULAR,  [0.5, 0.5, 0.5, 0.0])
-  glMaterial(GL_FRONT, GL_SHININESS, 100.0)
-  for i in range(p.N):
-    a = array([p.ax[i], p.ay[i], p.az[i]])
-    if norm(a) > 20000.0 and i != 0:
-      glColor(1/2.0, 1/2.0, 1/2.0, 1.0)
-    elif i != 0:
-      glColor(1, 1/2.0, 0.0, 1.0)
-    
-    glPushMatrix()
-    glTranslate(p.x[i], p.y[i], p.z[i])
-    
-    # rotation :
-    mvm = glGetFloatv(GL_MODELVIEW_MATRIX)    # current rotation / translation
-    mvm[:3,:3] = dot(p.theta[i], mvm[:3,:3])  # rotate the view by theta[i]
-    glLoadMatrixf(mvm)                        # reload the modelView matrix
-    
-    ## draw particles as points :
-    #glBegin(GL_POINTS)
-    #glVertex3f(p.x[i], p.y[i], p.z[i])
-    #glEnd()
-
-    # draw particles as spheres or the ship if index == 0 :
-    if i == 0 and camDist != 0:
-      glColor(shipColor)
-      glCallList(obj.gl_list)
-    else:  
-      glutSolidSphere(p.r[i], SLICES, STACKS)
-    
-    ## draw the wireframe around the particles :
-    #glColor(0.0,0.0,0.0,1.0)
-    #glMaterial(GL_FRONT, GL_SPECULAR,  [0.0, 0.0, 0.0, 0.0])
-    #glMaterial(GL_FRONT, GL_SHININESS, 0.0)
-    #glutWireSphere(p.r[i]/radiusDiv*1.01, SLICES/6, STACKS/6)
-    
-    glPopMatrix()
+  draw_solid_particles()
+  #draw_wireframe_particles()
+  #draw_point_particles()
 
   # draw vectors on particles :
   #draw_velocity_vectors()
@@ -984,8 +1039,8 @@ def key(k, x, y):
     camera.initialize()
   
   # quit the game :
-  if k == 'x':
-    print "'x' was pressed"
+  if k == '\033':
+    print "'esc' was pressed"
     exit(0)
 
   if k == 'p':
@@ -1082,6 +1137,11 @@ def special(k, x, y):
   # ascend :
   if k == GLUT_KEY_PAGE_UP:
     ascend = True
+  # quit the game :
+  if k == 'x':
+    print "'x' was pressed"
+    exit(0)
+
 
 
 def specialUp(k,x,y):
