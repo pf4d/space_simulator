@@ -253,7 +253,7 @@ def draw_ship_vectors(dx, dy):
   glRasterPos3f(xyz2_y[0], sign(vec[1])*xyz2_y[1], xyz2_y[2])
   font.Render("%.1f" % vec[1])
   glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(vec[2])*xyz2_z[2])
-  font.Render("%.1f" % vec[2])
+  font.Render("%.1f" % -vec[2])
   
   glLineWidth(1.0)
   glColor(axesColor)
@@ -283,7 +283,7 @@ def draw_ship_vectors(dx, dy):
   glRasterPos3f(xyz2_y[0], sign(omegav[1])*xyz2_y[1], xyz2_y[2])
   font.Render("%.1f" % omegav[1])
   glRasterPos3f(xyz2_z[0], xyz2_z[1], sign(omegav[2])*xyz2_z[2])
-  font.Render("%.1f" % omegav[2])
+  font.Render("%.1f" % -omegav[2])
   
   glLineWidth(1.0)
   glColor(axesColor)
