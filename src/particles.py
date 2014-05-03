@@ -87,7 +87,7 @@ class GranularMaterialForce(object):
     epiz = radx*vty - rady*vtx
 
     # angular acceleration coefficient:
-    k = 1.0
+    k = 0.5
 
     # linear velocity frictional contribution to torque coefficient :
     f = 0.0
@@ -289,7 +289,9 @@ class Particles(object):
     self.az  = hstack((self.az,0))
     self.r   = hstack((self.r,r))
     self.rho = hstack((self.rho,rho))
-    self.theta.append(identity(3))
+    I        = identity(3)
+    R        = self.rotate(I, array([thetax, thetay, thetaz]))
+    self.theta.append(R)
     self.thetax = hstack((self.thetax,thetax))
     self.thetay = hstack((self.thetay,thetay))
     self.thetaz = hstack((self.thetaz,thetaz))
@@ -307,7 +309,7 @@ class Particles(object):
     V          = 4.0/3.0 * pi * r**3
     self.V     = hstack((self.V, V))
     self.m     = self.rho * self.V
-    self.mi    = tile(self.m, (self.N,1))
+    self.mi    = (self.m * tile(self.m, (self.N,1)).T).T
     fill_diagonal(self.mi, zeros(self.N))
     self.f(self)
 
@@ -518,7 +520,7 @@ def initialize_random(p, n, r, rho, L):
               thetax, thetay, thetaz, 
               omegax, omegay, omegaz): 
   """
-  p.addParticle(0,0,-2*L,0,0,0,3,10,0,0,0,0,0,0)
+  p.addParticle(0,0,2*L,0,0,0,3,rho,0,0,0,0,0,0)
   for i in range(n):
     r     = 0.1*randn() + r
     x,y,z = L*randn(3)

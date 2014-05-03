@@ -18,9 +18,10 @@ class Camera(object):
 
   def initialize(self):
     """
-    reset the rotation to the identiy matrix.
+    reset the rotation to the identity matrix.
     """
     self.M = identity(3)
+    self.M[2,2] = -1
     #self.update([.2, 0, 0])  # provide an initial rotation up
 
   def update(self, v):
@@ -107,7 +108,7 @@ t          = 0                       # initial time
 k          = 30.0                    # elastic 'bounce'
 gamma      = 0.4                     # energy dissipation/loss
                                     
-rho        = 1e9                     # particle denisty
+rho        = 1e4                     # particle denisty
 g          = 0.0                     # downward acceleration
 
 # particle update data:
@@ -136,11 +137,11 @@ p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
 #  addParticle(x, y, z, vx, vy, vz, r, rho,
 #              thetax, thetay, thetaz, 
 #              omegax, omegay, omegaz): 
-initialize_grid(p, 4, 3.0, rho, L)
 #initialize_nebula(p, 5, 8.0, L/2)
-#k          = 30.0                    # elastic 'bounce'
-#gamma      = 0.1                     # energy dissipation/loss
-#initialize_random(p, 100, 3.0, rho, L/2)
+k          = 30.0                    # elastic 'bounce'
+gamma      = 0.1                     # energy dissipation/loss
+#initialize_grid(p, 4, 3.0, rho, L)
+initialize_random(p, 100, 3.0, rho, L/2)
 #initialize_system(p)
 #initialize_earth(p)
 #initialize_planet(p)
@@ -219,15 +220,12 @@ def draw_ship_vectors(dx, dy):
   font.FaceSize(15)
   
   # vectors of orientation :
-  R      = rotate_vector(array([pi/6, -pi/6, 0]))
+  R      = rotate_vector(array([-pi/6, pi/6, 0]))
   M      = dot(p.theta[0].T, R)
-  rt     = M[:,0]
-  up     = M[:,1]
-  fr     = M[:,2]
   av     = array([p.ax[0], p.ay[0], p.az[0]])
   vv     = array([p.vx[0], p.vy[0], p.vz[0]])
-  alphav = array([p.alphax[0], p.alphay[0], p.alphaz[0]])
-  omegav = array([p.omegax[0], p.omegay[0], p.omegaz[0]])
+  alphav = -array([p.alphax[0], p.alphay[0], p.alphaz[0]])
+  omegav = -array([p.omegax[0], p.omegay[0], p.omegaz[0]])
   x      = array([1,0,0])
   y      = array([0,1,0])
   z      = array([0,0,1])
@@ -248,7 +246,6 @@ def draw_ship_vectors(dx, dy):
   glLoadMatrixf(mvm)                       # reload the modelView matrix
   glColor(shipColor)
   glCallList(obj.gl_list)
-  #glutSolidSphere(2, SLICES, STACKS)
 
   glColor(vColor)
   glRasterPos3f(sign(vec[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
@@ -279,7 +276,6 @@ def draw_ship_vectors(dx, dy):
   glLoadMatrixf(mvm)                       # reload the modelView matrix
   glColor(shipColor)
   glCallList(obj.gl_list)
-  #glutSolidSphere(2, SLICES, STACKS)
   
   glColor(omegaColor)
   glRasterPos3f(sign(omegav[0])*xyz2_x[0], xyz2_x[1], xyz2_x[2])
@@ -307,19 +303,19 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xt, yt, zt)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)   # current rotation / translation
-  mvm[:3,:3] = M                           # rotate the view by M
+  mvm[:3,:3]  = M                          # rotate the view by M
   glLoadMatrixf(mvm)                       # reload the modelView matrix
   glLineWidth(2.0)
   glBegin(GL_LINES)
  
-  # acceleration vectors :
+  # acceleration vector :
   glColor(aColor)
   c    = ca/taccel
   xyz2 = xyz1 + c*av
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
-  # velocity vectors :
+  # velocity vector :
   glColor(vColor)
   c    = 1.0
   xyz2 = xyz1 + c*vv
@@ -335,18 +331,18 @@ def draw_ship_vectors(dx, dy):
   glLoadIdentity()
   glTranslate(xr, yr, zr)
   mvm = glGetFloatv(GL_MODELVIEW_MATRIX)   # current rotation / translation
-  mvm[:3,:3] = M                           # rotate the view by M
+  mvm[:3,:3]  = M                          # rotate the view by M
   glLoadMatrixf(mvm)                       # reload the modelView matrix
   glBegin(GL_LINES)
  
-  # angular acceleration vectors :
+  # angular acceleration vector :
   glColor(alphaColor)
   c    = ca/raccel
   xyz2 = xyz1 + c*alphav 
   glVertex3fv(xyz1)
   glVertex3fv(xyz2)
   
-  # angular velocity vectors :
+  # angular velocity vector :
   glColor(omegaColor)
   c    = 20.0
   xyz2 = xyz1 + c*omegav
@@ -629,7 +625,7 @@ def draw_angular_velocity_vectors():
   for i in range(p.N):
     omega_mag = sqrt(p.omegax[i]**2 + p.omegay[i]**2 + p.omegaz[i]**2) + 1e-16
     xyz1 = array([p.x[i],      p.y[i],      p.z[i]])
-    vxyz = array([p.omegax[i], p.omegay[i], p.omegaz[i]]) 
+    vxyz = -array([p.omegax[i], p.omegay[i], p.omegaz[i]]) 
     vxyz = vxyz / omega_mag * (p.r[i]+0.5)
     xyz2 = xyz1 + vxyz
     glVertex3fv(xyz1)
@@ -653,7 +649,7 @@ def draw_angular_acceleration_vectors():
   for i in range(p.N):
     alpha_mag = sqrt(p.alphax[i]**2 + p.alphay[i]**2 + p.alphaz[i]**2) + 1e-16
     xyz1 = array([p.x[i],      p.y[i],      p.z[i]])
-    vxyz = array([p.alphax[i], p.alphay[i], p.alphaz[i]])
+    vxyz = -array([p.alphax[i], p.alphay[i], p.alphaz[i]])
     vxyz = vxyz / alpha_mag * (p.r[i]+0.5)
     xyz2 = xyz1 + vxyz
     glVertex3fv(xyz1)
@@ -771,7 +767,7 @@ def display():
     #glEnd()
 
     # draw particles as spheres or the ship if index == 0 :
-    if i == 0:
+    if i == 0 and camDist != 0:
       glColor(shipColor)
       glCallList(obj.gl_list)
     else:  
@@ -872,65 +868,65 @@ def idle():
     if fwd == True:
       vf = p.theta[0][2,:]
       pf = vf / norm(vf) * taccel
-      p.ax[0] += pf[0]
-      p.ay[0] += pf[1]
-      p.az[0] += pf[2]
+      p.ax[0] -= pf[0]
+      p.ay[0] -= pf[1]
+      p.az[0] -= pf[2]
   
     # move backward :
     elif back == True:
       vf = p.theta[0][2,:]
       pf = vf / norm(vf) * taccel
-      p.ax[0] -= pf[0]
-      p.ay[0] -= pf[1]
-      p.az[0] -= pf[2]
+      p.ax[0] += pf[0]
+      p.ay[0] += pf[1]
+      p.az[0] += pf[2]
   
     # move left :
     if left == True:
       vf = p.theta[0][0,:]
       pf = vf / norm(vf) * taccel
-      p.ax[0] += pf[0]
-      p.ay[0] += pf[1]
-      p.az[0] += pf[2]
+      p.ax[0] -= pf[0]
+      p.ay[0] -= pf[1]
+      p.az[0] -= pf[2]
   
     # move right :
     elif right == True:
       vf = p.theta[0][0,:]
       pf = vf / norm(vf) * taccel
-      p.ax[0] -= pf[0]
-      p.ay[0] -= pf[1]
-      p.az[0] -= pf[2]
+      p.ax[0] += pf[0]
+      p.ay[0] += pf[1]
+      p.az[0] += pf[2]
 
     # pitch up :
     if up == True:
       vf = p.theta[0][0,:]
       pf = vf / norm(vf) * raccel
-      p.alphax[0] -= pf[0]
-      p.alphay[0] -= pf[1]
-      p.alphaz[0] -= pf[2]
+      p.alphax[0] += pf[0]
+      p.alphay[0] += pf[1]
+      p.alphaz[0] += pf[2]
   
     # pitch down :
     elif down == True:
       vf = p.theta[0][0,:]
       pf = vf / norm(vf) * raccel
-      p.alphax[0] += pf[0]
-      p.alphay[0] += pf[1]
-      p.alphaz[0] += pf[2]
+      p.alphax[0] -= pf[0]
+      p.alphay[0] -= pf[1]
+      p.alphaz[0] -= pf[2]
 
     # roll left :
     if rollLeft == True:
       vf = p.theta[0][2,:]
       pf = vf / norm(vf) * raccel
-      p.alphax[0] += pf[0]
-      p.alphay[0] += pf[1]
-      p.alphaz[0] += pf[2]
+      p.alphax[0] -= pf[0]
+      p.alphay[0] -= pf[1]
+      p.alphaz[0] -= pf[2]
   
     # roll right :
     elif rollRight == True:
       vf = p.theta[0][2,:]
       pf = vf / norm(vf) * raccel
-      p.alphax[0] -= pf[0]
-      p.alphay[0] -= pf[1]
-      p.alphaz[0] -= pf[2]
+      p.alphax[0] += pf[0]
+      p.alphay[0] += pf[1]
+      p.alphaz[0] += pf[2]
 
     # yaw left :
     if yawLeft == True:
@@ -1135,8 +1131,10 @@ def mouse(button,state,x,y):
     camDist += 0.2
   # move camera in :
   if button == 3:
-    if camDist >= 0.2:
+    if camDist > 0.2:
       camDist -= 0.2
+    else:
+      camDist = 0.0
 
 
 def motion(x,y):
@@ -1179,7 +1177,7 @@ if __name__ == '__main__':
   glutSpecialFunc(special)
   glutSpecialUpFunc(specialUp)
 
-  obj = OBJ('SpaceShip.obj', swapyz=False)
+  obj = OBJ('SpaceShip.obj', revz=True)
   
   # initialize
   init()

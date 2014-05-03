@@ -31,7 +31,7 @@ def MTL(filename):
     return contents
 
 class OBJ:
-    def __init__(self, filename, swapyz=False):
+    def __init__(self, filename, swapyz=False, revz=True):
         """Loads a Wavefront OBJ file. """
         self.vertices = []
         self.normals = []
@@ -47,11 +47,15 @@ class OBJ:
                 v = map(float, values[1:4])
                 if swapyz:
                     v = v[0], v[2], v[1]
+                if revz:
+                    v = v[0], v[1], -v[2]
                 self.vertices.append(v)
             elif values[0] == 'vn':
                 v = map(float, values[1:4])
                 if swapyz:
                     v = v[0], v[2], v[1]
+                if revz:
+                    v = v[0], v[1], -v[2]
                 self.normals.append(v)
             elif values[0] == 'vt':
                 self.texcoords.append(map(float, values[1:3]))
