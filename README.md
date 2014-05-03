@@ -12,6 +12,16 @@ This game requires Pylab be installed:
 sudo apt-get install numpy scipy
 ```
 
+as well as OpenGL:
+```bash
+sudo apt-get install python-opengl
+```
+
+and PyGame:
+```bash
+sudo apt-get install python-pygame
+```
+
 On Ubuntu 13.10, install as instructed at https://code.google.com/p/pyftgl/wiki/HowToBuild :
 
 install FTGL:
