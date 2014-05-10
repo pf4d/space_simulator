@@ -141,10 +141,10 @@ p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
 k          = 30.0                    # elastic 'bounce'
 gamma      = 0.1                     # energy dissipation/loss
 #initialize_grid(p, 4, 3.0, rho, L)
-initialize_random(p, 100, 3.0, rho, L/2)
+#initialize_random(p, 100, 3.0, rho, L/2)
 #initialize_system(p)
 #initialize_earth(p)
-#initialize_planet(p)
+initialize_planet(p)
 
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
