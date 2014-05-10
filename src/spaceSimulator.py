@@ -140,11 +140,11 @@ p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
 #initialize_nebula(p, 5, 8.0, L/2)
 k          = 30.0                    # elastic 'bounce'
 gamma      = 0.1                     # energy dissipation/loss
-#initialize_grid(p, 4, 3.0, rho, L)
+initialize_grid(p, 4, 3.0, rho, L)
 #initialize_random(p, 100, 3.0, rho, L/2)
 #initialize_system(p)
 #initialize_earth(p)
-initialize_planet(p)
+#initialize_planet(p)
 
 # instantiate Integrator
 integrate = VerletIntegrator(dt)
@@ -223,9 +223,9 @@ def draw_ship_vectors(dx, dy):
   R      = rotate_vector(array([-pi/6, pi/6, 0]))
   M      = dot(p.theta[0].T, R)
   av     = array([p.ax[0], p.ay[0], p.az[0]])
-  vv     = array([p.vx[0], p.vy[0], p.vz[0]])
+  vv     = array([p.vx[0], p.vy[0], p.vz[0]]) + 1e-16
   alphav = -array([p.alphax[0], p.alphay[0], p.alphaz[0]])
-  omegav = -array([p.omegax[0], p.omegay[0], p.omegaz[0]])
+  omegav = -array([p.omegax[0], p.omegay[0], p.omegaz[0]]) + 1e-16
   x      = array([1,0,0])
   y      = array([0,1,0])
   z      = array([0,0,1])
