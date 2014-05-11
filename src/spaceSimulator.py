@@ -66,8 +66,8 @@ descend   = False          #   "   descending
 paused    = False          # pauses the game
                            
                            
-taccel    = 20.0           # translational acceleration to apply 
-raccel    = 1.0            # rotational acceleration to apply
+taccel    = 15.0           # translational acceleration to apply 
+raccel    = 0.3            # rotational acceleration to apply
                            
 rotx      = 0              # camera x rotation
 roty      = 0              # camera y rotation
@@ -94,7 +94,7 @@ h          = 700                     # screen height
                                      
 r_earth    = 6.3781e6
 au         = 1.49597871e11
-dt         = 0.1                     # time step
+dt         = 0.04                    # time step
 L          = 120.0                   # size of the box
 t          = 0                       # initial time
                                     
@@ -140,8 +140,8 @@ p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
 #initialize_nebula(p, 5, 8.0, L/2)
 k          = 30.0                    # elastic 'bounce'
 gamma      = 0.1                     # energy dissipation/loss
-initialize_grid(p, 4, 3.0, rho, L)
-#initialize_random(p, 100, 3.0, rho, L/2)
+#initialize_grid(p, 4, 3.0, rho, L)
+initialize_random(p, 100, 3.0, rho, L)
 #initialize_system(p)
 #initialize_earth(p)
 #initialize_planet(p)

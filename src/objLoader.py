@@ -1,4 +1,3 @@
-import pygame
 from OpenGL.GL import *
 
 def MTL(filename):
