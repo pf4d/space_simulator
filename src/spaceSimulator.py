@@ -94,7 +94,7 @@ h          = 700                     # screen height
                                      
 r_earth    = 6.3781e6
 au         = 1.49597871e11
-dt         = 0.04                    # time step
+dt         = 0.06                    # time step
 L          = 120.0                   # size of the box
 t          = 0                       # initial time
                                     
@@ -141,7 +141,7 @@ p = Particles(L, f, periodicY=0, periodicZ=0, periodicX=0)
 k          = 30.0                    # elastic 'bounce'
 gamma      = 0.1                     # energy dissipation/loss
 #initialize_grid(p, 4, 3.0, rho, L)
-initialize_random(p, 100, 3.0, rho, L)
+initialize_random(p, 60, 3.0, rho, L)
 #initialize_system(p)
 #initialize_earth(p)
 #initialize_planet(p)
