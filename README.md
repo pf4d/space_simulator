@@ -62,7 +62,7 @@ Controls :
 * ```Page Down``` : descend
 * ```Page Up``` : ascend
 * ```c``` : reset the camera
-* ```p``` : quit the game
+* ```esc``` : quit the game
 
 To move the camera, press the left mouse button and drag up and down, and zoom in and out with the mouse wheel.  
 
